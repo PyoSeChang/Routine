@@ -3,9 +3,10 @@ package com.routine.domain.f_product.controller;
 
 import com.routine.domain.f_product.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
+
+@Controller
 @RequiredArgsConstructor
 public class ProductController {
 

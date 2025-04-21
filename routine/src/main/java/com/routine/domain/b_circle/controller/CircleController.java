@@ -3,9 +3,10 @@ package com.routine.domain.b_circle.controller;
 
 import com.routine.domain.b_circle.service.CircleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
+
+@Controller
 @RequiredArgsConstructor
 public class CircleController {
 

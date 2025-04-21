@@ -3,9 +3,10 @@ package com.routine.domain.c_routine.controller;
 
 import com.routine.domain.c_routine.service.RoutineService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
+
+@Controller
 @RequiredArgsConstructor
 public class RoutineController {
 

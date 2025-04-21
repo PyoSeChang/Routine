@@ -3,9 +3,10 @@ package com.routine.domain.d_routine_commit.controller;
 
 import com.routine.domain.d_routine_commit.service.CommitService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
-@RestController
+
+@Controller
 @RequiredArgsConstructor
 public class CommitController {
 
