@@ -3,6 +3,8 @@ package com.routine.domain.a_member.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -24,4 +26,12 @@ public class UserInfo {
     private String status;       // 신분 (ex. 학생, 직장인 등)
     private String tags;         // 관심사 태그 (예: "운동,공부,습관")
     private int totalPoints;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime regDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.regDate = LocalDateTime.now();
+    }
 }

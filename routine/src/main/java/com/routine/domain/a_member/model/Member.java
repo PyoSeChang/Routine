@@ -15,17 +15,20 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;  // 로그인 ID
+    @Column(nullable = false, unique = true)
+    private String loginId;
+
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, unique = true)
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private UserInfo userInfo;
 }
 
-enum Role {
-    ADMIN,
-    USER
-}
