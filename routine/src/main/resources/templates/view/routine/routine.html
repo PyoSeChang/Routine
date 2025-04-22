@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>루틴 등록</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body class="container mt-5">
+
+<h2 class="mb-4">루틴 등록</h2>
+
+<form th:action="@{/routine/savePersonalRoutine}" th:object="${routine}" method="post">
+
+    <!-- 제목 -->
+    <div class="mb-3">
+        <label for="title" class="form-label">루틴 제목</label>
+        <input type="text" th:field="*{title}" class="form-control" id="title" placeholder="루틴 이름을 입력하세요">
+    </div>
+
+    <!-- 카테고리 -->
+    <div class="mb-3">
+        <label for="category" class="form-label">카테고리</label>
+        <select th:field="*{category}" class="form-select" id="category">
+            <option value="">선택하세요</option>
+            <option value="운동">운동</option>
+            <option value="공부">공부</option>
+            <option value="습관">습관</option>
+            <option value="기타">기타</option>
+        </select>
+    </div>
+
+    <!-- 세부 카테고리 -->
+    <div class="mb-3">
+        <label for="detailCategory" class="form-label">세부 카테고리</label>
+        <select th:field="*{detailCategory}" class="form-select" id="detailCategory">
+            <option value="">선택하세요</option>
+            <option value="조깅">조깅</option>
+            <option value="헬스">헬스</option>
+            <option value="영어단어">영어단어</option>
+            <option value="코딩테스트">코딩테스트</option>
+        </select>
+    </div>
+
+    <!-- 태그 -->
+    <div class="mb-3">
+        <label for="tags" class="form-label">태그</label>
+        <input type="text" th:field="*{tags}" class="form-control" id="tags" placeholder="#태그1, #태그2 형식으로 입력">
+    </div>
+
+    <!-- 설명 -->
+    <div class="mb-3">
+        <label for="description" class="form-label">설명</label>
+        <textarea th:field="*{description}" class="form-control" id="description" rows="3"
+                  placeholder="루틴에 대한 간단한 설명을 적어주세요"></textarea>
+    </div>
+
+    <!-- 반복할 요일 -->
+    <!-- 반복 요일 선택 -->
+    <div class="mb-3">
+        <label class="form-label">반복 요일</label>
+        <div class="form-check form-check-inline" th:each="day : ${T(java.time.DayOfWeek).values()}">
+            <input class="form-check-input" type="checkbox"
+                   th:field="*{repeatDays}"
+                   th:value="${day}" th:id="${day.name()}">
+            <label class="form-check-label" th:for="${day.name()}"
+                   th:text="${#strings.substring(day.name(), 0, 1)} + ${day.name().substring(1).toLowerCase()}">
+                <!-- 예: Monday, Tuesday -->
+            </label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">루틴 Tasks</label>
+        <div id="task-list">
+            <input type="text" th:field="*{tasks[0]}" class="form-control mb-2" placeholder="할 일을 입력하세요" />
+        </div>
+        <button type="button" class="btn btn-outline-secondary" onclick="addTaskInput()">+</button>
+    </div>
+
+    <!-- 제출 버튼 -->
+    <button type="submit" class="btn btn-primary">저장</button>
+</form>
+<script>
+    let taskIndex = 1; // 이미 0번 인풋은 존재하니까 1부터 시작
+
+    function addTaskInput() {
+        const container = document.getElementById("task-list");
+
+        const newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.name = "tasks[" + taskIndex + "]"; // 필드 이름 맞춰야 Spring이 바인딩함
+        newInput.className = "form-control mb-2";
+        newInput.placeholder = "할 일을 입력하세요";
+
+        container.appendChild(newInput);
+        taskIndex++;
+    }
+</script>
+</body>
+</html>

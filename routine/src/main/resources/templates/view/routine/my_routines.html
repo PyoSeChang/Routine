@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>나의 루틴</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body class="container mt-5">
+
+<h2 class="mb-4">나의 루틴 목록</h2>
+
+<!-- 루틴별 개별 form -->
+<div th:each="routine : ${routines}" style="border: 2px solid black; padding: 1.5rem; margin-bottom: 2rem;">
+    <form th:action="@{/commit/{id}(id=${routine.routineId})}" method="post">
+
+        <!-- ✅ routineId hidden 필드 -->
+        <input type="hidden" name="routineId" th:value="${routine.routineId}" />
+
+        <!-- ✅ 루틴 정보 출력 -->
+        <h4 th:text="${routine.title}">루틴 제목</h4>
+        <p>
+            <span th:text="'카테고리: ' + ${routine.category}">카테고리</span> |
+            <span th:text="'세부: ' + ${routine.detailCategory}">세부</span>
+        </p>
+        <p th:text="${routine.description}">루틴 설명</p>
+
+        <!-- ✅ 루틴 태스크 체크박스 출력 -->
+        <div class="mb-3" th:each="task, i : ${routine.tasks}">
+            <input type="checkbox"
+                   th:id="${'routine-' + routine.routineId + '-task-' + i.index}"
+                   th:name="tasks"
+                   th:value="${task.content}"
+                   th:checked="${task.checked}" />
+            <label th:for="${'routine-' + routine.routineId + '-task-' + i.index}" th:text="${task.content}">태스크</label>
+        </div>
+
+
+
+
+        <!-- ✅ 제출 / 저장 버튼 -->
+        <div class="d-flex justify-content-end gap-3 mt-3">
+            <button type="submit" name="action" value="save" class="btn btn-secondary">저장</button>
+            <button type="submit" name="action" value="submit" class="btn btn-primary">제출</button>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

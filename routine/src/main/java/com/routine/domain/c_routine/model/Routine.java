@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,8 @@ public class Routine {
     private String title;
 
     private String category;  // 예: 운동, 공부, 습관 등
+    private String detailCategory;
+    private String tags;
 
     private String description;
 
@@ -37,15 +40,15 @@ public class Routine {
     @JoinColumn(name = "circle_id")
     private Circle circle;
 
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "routine_repeat_days", joinColumns = @JoinColumn(name = "routine_id"))
     @Column(name = "repeat_day")
     private List<DayOfWeek> repeatDays;
+
+    @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoutineTask> routineTasks = new ArrayList<>();
 
     private LocalDateTime createdAt;
 

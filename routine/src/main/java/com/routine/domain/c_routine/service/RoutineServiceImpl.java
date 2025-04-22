@@ -1,15 +1,112 @@
 package com.routine.domain.c_routine.service;
 
 
+import com.routine.domain.a_member.model.Member;
+import com.routine.domain.a_member.repository.MemberRepository;
+import com.routine.domain.b_circle.model.Circle;
+import com.routine.domain.b_circle.repository.CircleRepository;
+import com.routine.domain.c_routine.dto.RoutineDTO;
+import com.routine.domain.c_routine.model.Routine;
+import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.c_routine.repository.RoutineRepository;
+import com.routine.domain.c_routine.repository.RoutineTaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class RoutineServiceImpl implements RoutineService {
-
+    private final MemberRepository memberRepository;
     private final RoutineRepository routineRepository;
+    private final RoutineTaskRepository routineTaskRepository;
+    private final CircleRepository circleRepository;
 
+    @Transactional
+    @Override
+    public void saveRoutine(RoutineDTO routineDTO, Long memberId, boolean isCircleRoutine) {
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        Routine routine;
+
+        if (isCircleRoutine) {
+            Long circleId = routineDTO.getCircleId();
+            Circle circle = circleRepository.findById(circleId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 서클입니다."));
+            routine = routineDTO.toCircleRoutine(member, circle);
+        } else {
+            routine = routineDTO.toPersonalRoutine(member);
+        }
+
+        routineRepository.save(routine);
+
+        List<RoutineTask> routineTasks = routineDTO.toRoutineTasks(routine);
+        if (!routineTasks.isEmpty()) {
+            routineTaskRepository.saveAll(routineTasks);
+        }
+    }
+
+    @Transactional
+    @Override
+    public RoutineDTO getRoutine(Long routineId) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
+
+        List<RoutineTask> routineTasks = routineTaskRepository.findAllByRoutine(routine);
+
+        return RoutineDTO.fromEntity(routine, routineTasks);
+    }
+
+    @Transactional
+    @Override
+    public void updateRoutine(RoutineDTO routineDTO, Long routineId) {
+        Routine original = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("루틴이 존재하지 않습니다."));
+
+        if (original.isGroupRoutine()) {
+            throw new UnsupportedOperationException("그룹 루틴은 수정할 수 없습니다.");
+        }
+
+        Member member = original.getMember(); // 기존 멤버 유지
+        Routine updated = routineDTO.toPersonalRoutine(member);
+        updated.setId(original.getId()); // PK 유지
+
+        routineTaskRepository.deleteAllByRoutine(original);
+
+        routineRepository.save(updated);
+
+        List<RoutineTask> tasks = routineDTO.toRoutineTasks(updated);
+        if (!tasks.isEmpty()) {
+            routineTaskRepository.saveAll(tasks);
+        }
+    }
+
+    @Override
+    public void deleteRoutine(Long routineId) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
+
+        if (routine.isGroupRoutine()) {
+            throw new UnsupportedOperationException("그룹 루틴은 삭제할 수 없습니다.");
+        }
+        routineTaskRepository.deleteAllByRoutine(routine);
+        routineRepository.delete(routine);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoutineDTO> getAllRoutinesByMember(Long memberId) {
+        List<Routine> routines = routineRepository.findAllByMemberId(memberId);
+
+        return routines.stream()
+                .map(routine -> {
+                    List<RoutineTask> tasks = routineTaskRepository.findAllByRoutine(routine);
+                    return RoutineDTO.fromEntity(routine, tasks);
+                })
+                .toList();
+    }
 }
