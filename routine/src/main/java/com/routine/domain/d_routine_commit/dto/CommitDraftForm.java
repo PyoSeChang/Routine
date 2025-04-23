@@ -12,4 +12,6 @@ public class CommitDraftForm {
     // 체크된 태스크 ID 리스트
     private List<Long> checkedTaskIds;
 
+    private boolean isSkipped;
+
 }

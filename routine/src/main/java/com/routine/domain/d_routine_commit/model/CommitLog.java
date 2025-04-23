@@ -20,6 +20,8 @@ public class CommitLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long taskId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "routine_id")
     private Routine routine;

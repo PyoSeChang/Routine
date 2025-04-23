@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,9 +35,12 @@ public class CommitDraft {
     // 오늘 날짜 루틴 기준
     private LocalDate targetDate;
 
+    private boolean isSkipped;
+
     // 체크된 태스크들 (태스크 이름 기준으로 저장)
     @OneToMany(mappedBy = "commitDraft", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TaskCheckStatus> taskStatuses;
+    @Builder.Default
+    private List<TaskCheckStatus> taskStatuses = new ArrayList<>();
 
     // 상태: 저장 중인지, 제출 완료인지
     @Enumerated(EnumType.STRING)

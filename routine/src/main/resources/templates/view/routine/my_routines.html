@@ -9,41 +9,71 @@
 
 <h2 class="mb-4">나의 루틴 목록</h2>
 
-<!-- 루틴별 개별 form -->
+<!-- ✅ 루틴 목록 출력 -->
 <div th:each="routine : ${routines}" style="border: 2px solid black; padding: 1.5rem; margin-bottom: 2rem;">
-    <form th:action="@{/commit/{id}(id=${routine.routineId})}" method="post">
 
-        <!-- ✅ routineId hidden 필드 -->
+    <!-- ✅ 루틴 정보 출력 -->
+    <h4 th:text="${routine.title}">루틴 제목</h4>
+    <p>
+        <span th:text="'카테고리: ' + ${routine.category}">카테고리</span> |
+        <span th:text="'세부: ' + ${routine.detailCategory}">세부</span>
+    </p>
+    <p th:text="${routine.description}">루틴 설명</p>
+
+    <!-- ✅ 날짜 및 타입 정보 -->
+    <p>
+        <strong th:text="${#temporals.format(routine.date, 'yyyy-MM-dd')}">날짜</strong> |
+        <span th:text="${routine.type}">타입</span>
+    </p>
+
+    <!-- ✅ PAST 루틴: 단순 태스크 상태 표시 -->
+    <div th:if="${routine.type.name() == 'PAST'}">
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                th:each="task : ${routine.tasks}">
+                <span th:text="${task.content}">태스크 내용</span>
+                <span th:text="${task.status}" class="badge bg-secondary">상태</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ✅ TODAY 루틴: 폼으로 제출 가능 -->
+    <form th:if="${routine.type.name() == 'TODAY'}"
+          th:action="@{/commit/{id}(id=${routine.routineId})}"
+          method="post">
+
         <input type="hidden" name="routineId" th:value="${routine.routineId}" />
 
-        <!-- ✅ 루틴 정보 출력 -->
-        <h4 th:text="${routine.title}">루틴 제목</h4>
-        <p>
-            <span th:text="'카테고리: ' + ${routine.category}">카테고리</span> |
-            <span th:text="'세부: ' + ${routine.detailCategory}">세부</span>
-        </p>
-        <p th:text="${routine.description}">루틴 설명</p>
+        <!-- ✅ 오늘은 그냥 넘기기 -->
+        <div class="form-check mt-2">
+            <input type="radio" name="isSkipped" value="true" id="skip-${routine.routineId}" />
+            <label for="skip-${routine.routineId}">오늘은 그냥 넘기기</label>
+            <input type="radio" name="isSkipped" value="false" id="skip-no-${routine.routineId}" checked style="display: none;" />
+        </div>
 
-        <!-- ✅ 루틴 태스크 체크박스 출력 -->
+        <!-- ✅ 태스크 체크박스 -->
         <div class="mb-3" th:each="task, i : ${routine.tasks}">
             <input type="checkbox"
                    th:id="${'routine-' + routine.routineId + '-task-' + i.index}"
-                   th:name="tasks"
-                   th:value="${task.content}"
+                   th:name="checkedTaskIds"
+                   th:value="${task.taskId}"
                    th:checked="${task.checked}" />
             <label th:for="${'routine-' + routine.routineId + '-task-' + i.index}" th:text="${task.content}">태스크</label>
         </div>
 
-
-
-
-        <!-- ✅ 제출 / 저장 버튼 -->
         <div class="d-flex justify-content-end gap-3 mt-3">
             <button type="submit" name="action" value="save" class="btn btn-secondary">저장</button>
             <button type="submit" name="action" value="submit" class="btn btn-primary">제출</button>
         </div>
-
     </form>
+
+    <!-- ✅ UPCOMING 루틴: 체크박스 없음, 단순 리스트 -->
+    <div th:if="${routine.type.name() == 'UPCOMING'}">
+        <ul class="list-group">
+            <li class="list-group-item" th:each="task : ${routine.tasks}" th:text="${task.content}">태스크 내용</li>
+        </ul>
+    </div>
+
 </div>
 
 </body>

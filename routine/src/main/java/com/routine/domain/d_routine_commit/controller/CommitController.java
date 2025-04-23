@@ -21,7 +21,10 @@ public class CommitController {
                                @ModelAttribute CommitDraftForm form) {
 
         Long memberId = 1L;
-
+        System.out.println("바운딩 테스트: "+form.isSkipped());
+        System.out.println("바운딩 테스트: "+form.isSkipped());
+        System.out.println("바운딩 테스트: "+form.isSkipped());
+        System.out.println("바운딩 테스트: "+form.isSkipped());
         if ("save".equals(action)) {
             commitService.saveDraft(memberId, routineId, form);
         } else if ("submit".equals(action)) {

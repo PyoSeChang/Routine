@@ -6,7 +6,9 @@ import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.c_routine.dto.RoutineDTO;
 import com.routine.domain.c_routine.service.RoutineService;
 import com.routine.domain.d_routine_commit.dto.RoutineDraftDTO;
+import com.routine.domain.d_routine_commit.dto.RoutineViewDTO;
 import com.routine.domain.d_routine_commit.service.CommitService;
+import com.routine.domain.d_routine_commit.service.week.RoutineViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -25,7 +28,7 @@ public class RoutineController {
     private final RoutineService routineService;
     private final CommitService commitService;
     private final MemberRepository memberRepository;
-
+    private final RoutineViewService routineViewService;
 
     @GetMapping("/goToRoutine")
     public String goToRoutinePage(Model model) {
@@ -44,11 +47,15 @@ public class RoutineController {
     @GetMapping("/myRoutines")
     public String displayAllMyRoutines(Model model) {
         Long memberId = 1L; // ✅ 로그인 구현 전이므로 하드코딩
+        LocalDate today = LocalDate.now();
 
-        commitService.initializeTodayDrafts(memberId); // Draft 없으면 생성
-        List<RoutineDraftDTO> todayDrafts = commitService.getTodayDrafts(memberId); // 모두 조회
 
-        model.addAttribute("routines", todayDrafts);
+        routineViewService.initializeTodayDrafts(memberId);
+
+        // 전체 주간 루틴 뷰 가져오기 (TODAY + PAST + UPCOMING)
+        List<RoutineViewDTO> routines = routineViewService.getWeeklyRoutineView(memberId, today);
+
+        model.addAttribute("routines", routines);
         return "view/routine/my_routines";
     }
 
