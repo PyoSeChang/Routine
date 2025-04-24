@@ -2,6 +2,7 @@ package com.routine.domain.d_routine_commit.model;
 
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.a_member.model.Member;
+import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +22,9 @@ public class CommitLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long taskId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id")
+    private RoutineTask task;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "routine_id")

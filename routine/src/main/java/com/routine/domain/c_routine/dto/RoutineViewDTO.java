@@ -1,10 +1,8 @@
 package com.routine.domain.c_routine.dto;
 
 import com.routine.domain.c_routine.model.Routine;
-import com.routine.domain.d_routine_commit.model.CommitDraft;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
-import com.routine.domain.d_routine_commit.model.enums.RoutineCommitStatus;
 import com.routine.domain.d_routine_commit.model.week.WeekdayType;
 import lombok.*;
 
@@ -20,17 +18,15 @@ import java.util.List;
 public class RoutineViewDTO {
 
     private Long routineId;
-
     private String title;
     private String category;
     private String detailCategory;
     private String description;
-    private DayOfWeek weekday;              // 이 루틴이 속한 날짜의 요일
-    private List<DayOfWeek> repeatDays;     // 반복 요일들 (루틴의 패턴)
+    private DayOfWeek weekday;
+    private List<DayOfWeek> repeatDays;
     private LocalDate date;
-    private WeekdayType type; // PAST, TODAY, UPCOMING
+    private WeekdayType type;
     private boolean isGroupRoutine;
-    private boolean isSubmitted;
     private List<TaskDTO> tasks;
 
     @Getter
@@ -41,15 +37,11 @@ public class RoutineViewDTO {
     public static class TaskDTO {
         private Long taskId;
         private String content;
-        private CommitStatus status; // SUCCESS, FAIL, SKIP (과거)
+        private CommitStatus status;
         private boolean checked;
-        // null (오늘 or 미래)
     }
 
-    // ✅ PAST용 CommitLog 기반
-    public static RoutineViewDTO fromCommitLogs(LocalDate date, List<CommitLog> logs) {
-        Routine routine = logs.get(0).getRoutine(); // 동일 루틴 기준
-
+    private static RoutineViewDTOBuilder baseBuilder(Routine routine, LocalDate date, WeekdayType type) {
         return RoutineViewDTO.builder()
                 .routineId(routine.getId())
                 .title(routine.getTitle())
@@ -57,72 +49,56 @@ public class RoutineViewDTO {
                 .detailCategory(routine.getDetailCategory())
                 .description(routine.getDescription())
                 .date(date)
-                .weekday(date.getDayOfWeek())                    // 🔥 추가
-                .repeatDays(routine.getRepeatDays())             // 🔥 추가
-                .type(WeekdayType.PAST)
-                .tasks(logs.stream()
-                        .map(log -> TaskDTO.builder()
-                                .taskId(log.getTaskId())
-                                .content(null)
-                                .status(log.getStatus())
-                                .build())
-                        .toList())
-                .isGroupRoutine(routine.isGroupRoutine())
+                .weekday(date.getDayOfWeek())
+                .repeatDays(routine.getRepeatDays())
+                .type(type)
+                .isGroupRoutine(routine.isGroupRoutine());
+    }
+
+    public static RoutineViewDTO fromPastLogs(LocalDate date, List<CommitLog> logs) {
+        Routine routine = logs.get(0).getRoutine();
+
+        List<TaskDTO> taskDTOs = logs.stream()
+                .map(log -> TaskDTO.builder()
+                        .taskId(log.getTask().getId())
+                        .content(log.getTask().getContent())
+                        .status(log.getStatus())
+                        .checked(false)
+                        .build())
+                .toList();
+
+        return baseBuilder(routine, date, WeekdayType.PAST)
+                .tasks(taskDTOs)
                 .build();
     }
 
-    // ✅ TODAY용 CommitDraft 기반
-    public static RoutineViewDTO fromDraft(CommitDraft draft) {
-        Routine routine = draft.getRoutine();
+    public static RoutineViewDTO fromTodayLogs(LocalDate date, Routine routine, List<CommitLog> logs) {
+        List<TaskDTO> taskDTOs = logs.stream()
+                .map(log -> TaskDTO.builder()
+                        .taskId(log.getTask().getId())
+                        .content(log.getTask().getContent())
+                        .status(null)
+                        .checked(log.getStatus() == CommitStatus.SUCCESS)
+                        .build())
+                .toList();
 
-        return RoutineViewDTO.builder()
-                .routineId(routine.getId())
-                .title(routine.getTitle())
-                .category(routine.getCategory())
-                .detailCategory(routine.getDetailCategory())
-                .description(routine.getDescription())
-                .date(draft.getTargetDate())
-                .weekday(draft.getTargetDate().getDayOfWeek())   // 🔥 추가
-                .repeatDays(routine.getRepeatDays())             // 🔥 추가
-                .type(WeekdayType.TODAY)
-                .isSubmitted(draft.getStatus() == RoutineCommitStatus.SUBMITTED)
-                .tasks(draft.getTaskStatuses().stream()
-                        .map(status -> TaskDTO.builder()
-                                .taskId(status.getTaskId())
-                                .content(status.getContent())
-                                .status(null)
-                                .checked(status.isChecked())
-                                .build())
-                        .toList())
-                .isGroupRoutine(routine.isGroupRoutine())
+        return baseBuilder(routine, date, WeekdayType.TODAY)
+                .tasks(taskDTOs)
                 .build();
     }
 
+    public static RoutineViewDTO fromUpcoming(LocalDate futureDate, Routine routine) {
+        List<TaskDTO> taskDTOs = routine.getRoutineTasks().stream()
+                .map(task -> TaskDTO.builder()
+                        .taskId(task.getId())
+                        .content(task.getContent())
+                        .status(null)
+                        .checked(false)
+                        .build())
+                .toList();
 
-    // ✅ UPCOMING용 RoutineTask 기반
-    public static RoutineViewDTO fromRoutine(LocalDate futureDate, Routine routine) {
-        return RoutineViewDTO.builder()
-                .routineId(routine.getId())
-                .title(routine.getTitle())
-                .category(routine.getCategory())
-                .detailCategory(routine.getDetailCategory())
-                .description(routine.getDescription())
-                .date(futureDate)
-                .weekday(futureDate.getDayOfWeek())              // 🔥 추가
-                .repeatDays(routine.getRepeatDays())             // 🔥 추가
-                .type(WeekdayType.UPCOMING)
-                .tasks(routine.getRoutineTasks().stream()
-                        .map(task -> TaskDTO.builder()
-                                .taskId(task.getId())
-                                .content(task.getContent())
-                                .status(null)
-                                .checked(false)
-                                .build())
-                        .toList())
-                .isGroupRoutine(routine.isGroupRoutine())
+        return baseBuilder(routine, futureDate, WeekdayType.UPCOMING)
+                .tasks(taskDTOs)
                 .build();
     }
-
-
 }
-

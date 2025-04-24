@@ -6,7 +6,7 @@ import com.routine.domain.c_routine.dto.RoutineDTO;
 import com.routine.domain.c_routine.service.RoutineService;
 import com.routine.domain.c_routine.dto.RoutineViewDTO;
 import com.routine.domain.d_routine_commit.service.CommitService;
-import com.routine.domain.d_routine_commit.service.week.RoutineViewService;
+import com.routine.domain.c_routine.service.RoutineViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,11 +44,9 @@ public class RoutineController {
 
     @GetMapping("/myRoutines")
     public String displayAllMyRoutines(Model model) {
-        Long memberId = 1L; // ✅ 로그인 구현 전이므로 하드코딩
+        Long memberId = 1L; //  로그인 구현 전이므로 하드코딩
         LocalDate today = LocalDate.now();
 
-
-        routineViewService.initializeTodayDrafts(memberId);
 
         // 전체 주간 루틴 뷰 가져오기 (TODAY + PAST + UPCOMING)
         List<RoutineViewDTO> routines = routineViewService.getWeeklyRoutineView(memberId, today);

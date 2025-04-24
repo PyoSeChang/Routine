@@ -1,45 +1,31 @@
 package com.routine.domain.d_routine_commit.controller;
 
 
-import com.routine.domain.d_routine_commit.dto.CommitDraftForm;
+import com.routine.domain.d_routine_commit.dto.CommitRequestDTO;
 import com.routine.domain.d_routine_commit.service.CommitService;
 import com.routine.domain.d_routine_commit.service.PointService;
+import com.routine.security.model.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/commit")
+@RequestMapping("/api/commit")
 public class CommitController {
 
     private final CommitService commitService;
-    private final PointService pointService;
-    @PostMapping("/{routineId}")
-    public ResponseEntity<Void> handleCommit(@PathVariable Long routineId,
-                               @RequestParam("action") String action,
-                               @ModelAttribute CommitDraftForm form) {
 
+    @PostMapping("/today")
+    public ResponseEntity<Void> saveTodayCommitLog(@RequestBody CommitRequestDTO dto
+//                                                   @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        // Long memberId = principal.getMember().getId();
         Long memberId = 1L;
-//        System.out.println("바운딩 테스트: "+form.isSkipped());
-//        System.out.println("바운딩 테스트: "+form.isSkipped());
-//        System.out.println("바운딩 테스트: "+form.isSkipped());
-
-        String isSkippedStr = form.getIsSkippedStr();
-        if (isSkippedStr.equals("true")) {
-            form.setSkipped(true);
-        }
-//        System.out.println("바운딩 테스트: "+form.isSkipped());
-        if ("save".equals(action)) {
-            commitService.saveDraft(memberId, routineId, form);
-        } else if ("submit".equals(action)) {
-            commitService.submitDraft(memberId, routineId, form);
-        }
-
-        pointService.rewardForCircleRoutineCommit(memberId, routineId);
-
+        commitService.saveTodayCommitLog(memberId, dto);
         return ResponseEntity.ok().build();
     }
 }

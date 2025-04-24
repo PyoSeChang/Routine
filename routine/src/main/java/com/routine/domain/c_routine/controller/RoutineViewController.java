@@ -1,7 +1,8 @@
 package com.routine.domain.c_routine.controller;
 
 import com.routine.domain.c_routine.dto.RoutineViewDTO;
-import com.routine.domain.d_routine_commit.service.week.RoutineViewService;
+import com.routine.domain.c_routine.service.RoutineService;
+import com.routine.domain.c_routine.service.RoutineViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,15 +18,14 @@ import java.util.List;
 public class RoutineViewController {
 
     private final RoutineViewService routineViewService;
+    private final RoutineService routineService;
 
     @GetMapping("/week")
     public ResponseEntity<List<RoutineViewDTO>> getWeeklyRoutines() {
         Long memberId = 1L; // ✅ 로그인 구현 전이므로 하드코딩
         LocalDate today = LocalDate.now();
 
-        // 오늘 드래프트 먼저 생성
-        routineViewService.initializeTodayDrafts(memberId);
-
+        routineService.initializeTodayCommitLogs();
         // 전체 주간 루틴 반환
         List<RoutineViewDTO> routines = routineViewService.getWeeklyRoutineView(memberId, today);
         return ResponseEntity.ok(routines);
