@@ -1,12 +1,10 @@
 package com.routine.domain.c_routine.controller;
 
 
-import com.routine.domain.a_member.model.Member;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.c_routine.dto.RoutineDTO;
 import com.routine.domain.c_routine.service.RoutineService;
-import com.routine.domain.d_routine_commit.dto.RoutineDraftDTO;
-import com.routine.domain.d_routine_commit.dto.RoutineViewDTO;
+import com.routine.domain.c_routine.dto.RoutineViewDTO;
 import com.routine.domain.d_routine_commit.service.CommitService;
 import com.routine.domain.d_routine_commit.service.week.RoutineViewService;
 import lombok.RequiredArgsConstructor;

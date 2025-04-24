@@ -15,10 +15,11 @@ export interface RoutineViewDTO {
     category: string;
     detailCategory: string;
     description: string;
-    date: string;
+    date: string; // ISO date string
     weekday: Weekday;
     repeatDays: Weekday[];
     type: 'PAST' | 'TODAY' | 'UPCOMING';
     isGroupRoutine: boolean;
+    isSubmitted: boolean;        // ✅ 추가된 필드
     tasks: TaskDTO[];
 }

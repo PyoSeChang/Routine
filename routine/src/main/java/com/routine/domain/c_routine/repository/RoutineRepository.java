@@ -18,4 +18,6 @@ public interface RoutineRepository extends JpaRepository<Routine, Long> {
     List<Routine> findAllByMemberAndRepeatDaysContaining(Member member, DayOfWeek repeatDay);
 
     List<Routine> findAllByMemberIdAndRepeatDaysContaining(Long memberId, DayOfWeek dow);
+
+    List<Routine> findAllByMemberAndRepeatDay(Member member, DayOfWeek dayOfWeek);
 }

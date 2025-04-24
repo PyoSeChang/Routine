@@ -1,6 +1,6 @@
 package com.routine.domain.c_routine.controller;
 
-import com.routine.domain.d_routine_commit.dto.RoutineViewDTO;
+import com.routine.domain.c_routine.dto.RoutineViewDTO;
 import com.routine.domain.d_routine_commit.service.week.RoutineViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -2,6 +2,7 @@ package com.routine.domain.d_routine_commit.repository;
 
 
 import com.routine.domain.d_routine_commit.model.CommitLog;
+import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +13,11 @@ import java.util.List;
 public interface CommitLogRepository extends JpaRepository<CommitLog, Long> {
 
     List<CommitLog> findAllByMemberIdAndCommitDate(Long memberId, LocalDate date);
+
+
+    // 루틴 커밋 성공률 계산
+    int countByMemberIdAndRoutineId(Long memberId, Long routineId);
+    int countByMemberIdAndRoutineIdAndStatus(Long memberId, Long routineId, CommitStatus status);
+
+    List<CommitLog> findByCommitDate(LocalDate today);
 }

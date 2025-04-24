@@ -3,7 +3,7 @@ package com.routine.domain.d_routine_commit.dto;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.d_routine_commit.model.CommitDraft;
-import com.routine.domain.d_routine_commit.model.RoutineCommitStatus;
+import com.routine.domain.d_routine_commit.model.enums.RoutineCommitStatus;
 import com.routine.domain.d_routine_commit.model.TaskCheckStatus;
 import lombok.Getter;
 import lombok.Setter;

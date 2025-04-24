@@ -1,9 +1,10 @@
-package com.routine.domain.d_routine_commit.dto;
+package com.routine.domain.c_routine.dto;
 
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.d_routine_commit.model.CommitDraft;
 import com.routine.domain.d_routine_commit.model.CommitLog;
-import com.routine.domain.d_routine_commit.model.CommitStatus;
+import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
+import com.routine.domain.d_routine_commit.model.enums.RoutineCommitStatus;
 import com.routine.domain.d_routine_commit.model.week.WeekdayType;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class RoutineViewDTO {
     private LocalDate date;
     private WeekdayType type; // PAST, TODAY, UPCOMING
     private boolean isGroupRoutine;
+    private boolean isSubmitted;
     private List<TaskDTO> tasks;
 
     @Getter
@@ -83,6 +85,7 @@ public class RoutineViewDTO {
                 .weekday(draft.getTargetDate().getDayOfWeek())   // 🔥 추가
                 .repeatDays(routine.getRepeatDays())             // 🔥 추가
                 .type(WeekdayType.TODAY)
+                .isSubmitted(draft.getStatus() == RoutineCommitStatus.SUBMITTED)
                 .tasks(draft.getTaskStatuses().stream()
                         .map(status -> TaskDTO.builder()
                                 .taskId(status.getTaskId())

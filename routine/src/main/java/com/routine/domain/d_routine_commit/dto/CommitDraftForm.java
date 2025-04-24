@@ -9,9 +9,15 @@ import java.util.List;
 @Setter
 public class CommitDraftForm {
 
-    // 체크된 태스크 ID 리스트
-    private List<Long> checkedTaskIds;
-
+    private List<TaskInput> tasks;
     private boolean isSkipped;
+    private String isSkippedStr;
 
+    @Getter
+    @Setter
+    public static class TaskInput {
+        private Long taskId;
+        private String content;
+        private boolean checked;
+    }
 }

@@ -1,38 +1,31 @@
-import { RoutineViewDTO, Weekday } from '../types/routine';
+import React, { useState } from 'react';
 import { useRoutineData } from '../hooks/useRoutineData';
-import { weekdayLabels } from '../constants/weekdayLabels';
-import RoutineSectionLayout from '../components/RoutineSectionLayout';
+import WeekdayNav from '../components/WeekdayNav';
+import PastRoutineCard from '../components/PastRoutineCard';
+import TodayRoutineCard from '../components/TodayRoutineCard';
+import UpcomingRoutineCard from '../components/UpcomingRoutineCard';
+import { Weekday } from '../types/routine';
 
-const RoutinePage = () => {
-    const { routines, selectedWeekday, setSelectedWeekday } = useRoutineData();
+type ViewMode = { type: 'DAY'; day: Weekday };
 
-    const filtered = routines.filter(r => r.weekday === selectedWeekday);
-    const circleRoutines = filtered.filter(r => r.isGroupRoutine);      // ✅ 그룹 루틴
-    const personalRoutines = filtered.filter(r => !r.isGroupRoutine);
+const RoutinePage: React.FC = () => {
+    const { routines } = useRoutineData();
+    const [viewMode, setViewMode] = useState<ViewMode>({ type: 'DAY', day: 'MONDAY' });
+
+    const filtered = routines.filter(r => viewMode.type === 'DAY' && r.weekday === viewMode.day);
+
     return (
-        <div className="container mt-4">
-            <h2 className="mb-4">요일별 루틴 보기</h2>
-
-            <div className="d-flex gap-2 mb-4">
-                {(Object.keys(weekdayLabels) as Weekday[]).map(day => (
-                    <button
-                        key={day}
-                        className={`btn ${day === selectedWeekday ? 'btn-primary' : 'btn-outline-secondary'}`}
-                        onClick={() => setSelectedWeekday(day)}
-                    >
-                        {weekdayLabels[day]}
-                    </button>
-                ))}
+        <div className="space-y-6">
+            <WeekdayNav viewMode={viewMode} setViewMode={setViewMode} />
+            <div className="flex flex-wrap gap-4">
+                {filtered.map(routine => {
+                    switch (routine.type) {
+                        case 'PAST': return <PastRoutineCard key={routine.routineId} routine={routine} />;
+                        case 'TODAY': return <TodayRoutineCard key={routine.routineId} routine={routine} />;
+                        case 'UPCOMING': return <UpcomingRoutineCard key={routine.routineId} routine={routine} />;
+                    }
+                })}
             </div>
-
-            {filtered.length === 0 ? (
-                <p>해당 요일의 루틴이 없습니다.</p>
-            ) : (
-                <RoutineSectionLayout
-                    circleRoutines={circleRoutines}
-                    personalRoutines={personalRoutines}
-                />
-            )}
         </div>
     );
 };

@@ -1,7 +1,6 @@
 package com.routine.domain.d_routine_commit.service.week;
 
-import com.routine.domain.d_routine_commit.dto.RoutineDraftDTO;
-import com.routine.domain.d_routine_commit.dto.RoutineViewDTO;
+import com.routine.domain.c_routine.dto.RoutineViewDTO;
 
 import java.time.LocalDate;
 import java.util.List;

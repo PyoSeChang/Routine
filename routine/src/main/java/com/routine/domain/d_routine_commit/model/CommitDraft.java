@@ -2,6 +2,7 @@ package com.routine.domain.d_routine_commit.model;
 
 import com.routine.domain.a_member.model.Member;
 import com.routine.domain.c_routine.model.Routine;
+import com.routine.domain.d_routine_commit.model.enums.RoutineCommitStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

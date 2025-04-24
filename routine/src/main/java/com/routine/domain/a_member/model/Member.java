@@ -30,5 +30,11 @@ public class Member {
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private UserInfo userInfo;
+
+    private int point;
+
+    public void addPoint(int amount) {
+        this.point += amount;
+    }
 }
 
