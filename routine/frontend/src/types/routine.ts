@@ -1,8 +1,7 @@
 export interface TaskDTO {
     taskId: number;
     content: string;
-    status: 'SUCCESS' | 'FAIL' | 'SKIP' | null;
-    checked: boolean;
+    status: 'SUCCESS' | 'FAIL' | 'SKIP' | 'NONE' ;
 }
 
 export type Weekday =
@@ -15,11 +14,11 @@ export interface RoutineViewDTO {
     category: string;
     detailCategory: string;
     description: string;
-    date: string; // ISO date string
+    date: string;
     weekday: Weekday;
     repeatDays: Weekday[];
     type: 'PAST' | 'TODAY' | 'UPCOMING';
-    isGroupRoutine: boolean;
-    isSubmitted: boolean;        // ✅ 추가된 필드
+    groupRoutine: boolean; // ← ✅ 이름 맞춰야 함
+    routineSkipped: boolean;      // ← ✅ 이름 맞춰야 함
     tasks: TaskDTO[];
 }

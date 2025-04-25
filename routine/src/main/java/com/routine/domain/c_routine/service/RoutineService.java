@@ -20,5 +20,4 @@ public interface RoutineService {
     // Commit Log 만들기 (View 출력용)
     void initializeTodayCommitLogs();
 
-    void createTodayCommitLog(Routine routine, Long memberId);
 }

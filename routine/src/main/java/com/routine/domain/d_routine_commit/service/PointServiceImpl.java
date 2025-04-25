@@ -4,15 +4,21 @@ import com.routine.domain.a_member.model.Member;
 import com.routine.domain.a_member.model.UserInfo;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.a_member.repository.UserInfoRepository;
+import com.routine.domain.b_circle.model.Circle;
+import com.routine.domain.b_circle.model.CircleMember;
+import com.routine.domain.b_circle.repository.CircleMemberRepository;
+import com.routine.domain.b_circle.repository.CircleRepository;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.d_routine_commit.model.CommitLog;
+import com.routine.domain.d_routine_commit.model.CommitRate;
 import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
 import com.routine.domain.d_routine_commit.model.PointLog;
 import com.routine.domain.d_routine_commit.model.enums.PointReason;
 import com.routine.domain.d_routine_commit.model.enums.PointLogStatus;
 import com.routine.domain.d_routine_commit.model.enums.PointFailureReason;
 import com.routine.domain.d_routine_commit.repository.CommitLogRepository;
+import com.routine.domain.d_routine_commit.repository.CommitRateRepository;
 import com.routine.domain.d_routine_commit.repository.PointLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +38,9 @@ public class PointServiceImpl implements PointService {
     private final MemberRepository memberRepository;
     private final RoutineRepository routineRepository;
     private final UserInfoRepository userInfoRepository;
+    private final CommitRateRepository commitRateRepository;
+    private final CircleRepository circleRepository;
+    private final CircleMemberRepository circleMemberRepository;
 
     private boolean checkPointLimitOrLogFailure(Long memberId, Long routineId) {
         UserInfo userInfo = userInfoRepository.findByMemberId(memberId)
@@ -57,7 +63,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
-    public void rewardPoint(Member member, int amount, PointReason reason, Long routineId) {
+    public void rewardPoint(Member member, int amount, PointReason reason, Long routineId, LocalDate commitDate) {
         UserInfo userInfo = userInfoRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new IllegalStateException("UserInfo 없음"));
 
@@ -70,53 +76,27 @@ public class PointServiceImpl implements PointService {
                 .reason(reason)
                 .routineId(routineId)
                 .status(PointLogStatus.SUCCESS)
+                .commitDate(commitDate) // ✅ 커밋 기준일 추가!
                 .createdAt(LocalDateTime.now())
                 .build());
 
         member.addPoint(finalAmount);
         userInfo.setTodayAvailablePoint(available - finalAmount);
     }
+
+
     @Override
     @Transactional
-    public void rewardForCircleRoutineCommit(Long memberId, Long routineId) {
-
-        Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new IllegalArgumentException("루틴 없음"));
-        // 그룹 루틴 아니라면 포인트 지급 X
-        if (!routine.isGroupRoutine()) return;
-
-        // 잔여 포인트 0이라면 종료
+    public void rewardForCircleRoutineCommit(Long memberId, Long routineId, LocalDate commitDate) {
+        // 1. 포인트 한도 체크 (내부에서 실패 로그 남김)
         checkPointLimitOrLogFailure(memberId, routineId);
 
-        // 성공률 계산 분모 0 방지
-        int total = commitLogRepository.countByMemberIdAndRoutineId(memberId, routineId);
-        if (total == 0) return;
-
-        int success = commitLogRepository.countByMemberIdAndRoutineIdAndStatus(
-                memberId, routineId, CommitStatus.SUCCESS
-        );
-
-
-        // 포인트 지급 조건 루틴 이행률 70% 이상
-        double rate = (double) success / total;
-        if (rate < 0.7) {
-            pointLogRepository.save(PointLog.builder()
-                    .member(memberRepository.findById(memberId).orElse(null))
-                    .amount(0)
-                    .reason(PointReason.CIRCLE_ROUTINE_COMMIT)
-                    .routineId(routineId)
-                    .status(PointLogStatus.FAIL)
-                    .failureReason(PointFailureReason.LOW_SUCCESS_RATE)
-                    .createdAt(LocalDateTime.now())
-                    .build());
-            return;
-        }
-
-        // 중복 지급 예방
-        boolean alreadyRewarded = pointLogRepository.existsByMemberIdAndReasonAndDescription(
+        // 2. 중복 지급 방지 - commitDate 기준!
+        boolean alreadyRewarded = pointLogRepository.existsByMemberIdAndReasonAndRoutineIdAndCommitDate(
                 memberId,
                 PointReason.CIRCLE_ROUTINE_COMMIT,
-                "routineId=" + routineId
+                routineId,
+                commitDate
         );
         if (alreadyRewarded) {
             pointLogRepository.save(PointLog.builder()
@@ -126,11 +106,13 @@ public class PointServiceImpl implements PointService {
                     .routineId(routineId)
                     .status(PointLogStatus.FAIL)
                     .failureReason(PointFailureReason.ALREADY_REWARDED)
+                    .commitDate(commitDate)
                     .createdAt(LocalDateTime.now())
                     .build());
             return;
         }
 
+        // 3. 포인트 지급
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버 없음"));
 
@@ -138,108 +120,140 @@ public class PointServiceImpl implements PointService {
                 member,
                 5,
                 PointReason.CIRCLE_ROUTINE_COMMIT,
-                routineId
+                routineId,
+                commitDate
         );
     }
 
-    @Override
+
     @Transactional
-    public void rewardCircleRoutineCommitPoints() {
-        LocalDate today = LocalDate.now();
-
-        // 1. 오늘 커밋된 전체 로그 조회
-        List<CommitLog> todayLogs = commitLogRepository.findByCommitDate(today);
-
-        // 2. 중복 제거: (memberId, routineId) 조합 기준으로 추림
-        Set<String> processedKeys = new HashSet<>();
-
-        for (CommitLog log : todayLogs) {
-            Long memberId = log.getMember().getId();
-            Long routineId = log.getRoutine().getId();
-
-            String key = memberId + "-" + routineId;
-            if (processedKeys.contains(key)) continue;
-            processedKeys.add(key);
-
-            rewardForCircleRoutineCommit(memberId, routineId); // ✅ 개인 리워드 지급
-        }
-    }
-
-
     @Override
-    @Transactional
-    public void rewardCollectiveBonusForEligibleMembers() {
-        LocalDate today = LocalDate.now();
+    public void rewardCircleRoutineCommitToAll(LocalDate targetDate) {
 
-        // 1. 오늘 날짜에 해당하는 커밋 로그 모두 조회
-        List<CommitLog> todayLogs = commitLogRepository.findByCommitDate(today);
+        // 1. 어제 커밋 로그 전부 조회 (NONE은 오토커밋 이후 없다고 가정)
+        List<CommitLog> logs = commitLogRepository.findAllByCommitDate(targetDate);
 
-        // 2. CircleRoutine별 + 멤버별 그룹화
-        Map<String, List<CommitLog>> grouped = todayLogs.stream()
-                .filter(log -> log.getRoutine().isGroupRoutine()) // ✅ 그룹 루틴 필터링
+        // 2. 그룹 루틴 필터 + 멤버-루틴 조합으로 묶기
+        Map<String, List<CommitLog>> grouped = logs.stream()
+                .filter(log -> log.getRoutine().isGroupRoutine())
                 .collect(Collectors.groupingBy(log ->
-                        log.getRoutine().getId() + ":" + log.getMember().getId()
-                ));
+                        log.getMember().getId() + ":" + log.getRoutine().getId()));
 
         for (Map.Entry<String, List<CommitLog>> entry : grouped.entrySet()) {
-            List<CommitLog> logs = entry.getValue();
-            if (logs.isEmpty()) continue;
+            String[] parts = entry.getKey().split(":");
+            Long memberId = Long.valueOf(parts[0]);
+            Long routineId = Long.valueOf(parts[1]);
 
-            CommitLog first = logs.get(0);
-            Long routineId = first.getRoutine().getId();
-            Long memberId = first.getMember().getId();
-            Member member = first.getMember();
+            // 3. 어제자 포인트 지급 여부 확인
+            boolean alreadyRewarded = pointLogRepository.existsByMemberIdAndReasonAndRoutineIdAndCreatedAtBetween(
+                    memberId,
+                    PointReason.CIRCLE_ROUTINE_COMMIT,
+                    routineId,
+                    targetDate.atStartOfDay(),
+                    targetDate.plusDays(1).atStartOfDay()
+            );
+            if (alreadyRewarded) continue;
 
-            // 잔여 포인트 0이라면 종료
-            checkPointLimitOrLogFailure(memberId, routineId);
 
-            int total = logs.size();
-            int success = (int) logs.stream()
-                    .filter(l -> l.getStatus() == CommitStatus.SUCCESS)
-                    .count();
+            Optional<CommitRate> rateOpt = commitRateRepository.findByMemberIdAndRoutineIdAndCommitDate(memberId, routineId, targetDate);
+            if (rateOpt.isEmpty()) continue;
+            double rate = rateOpt.get().getCommitRate();
 
-            double rate = (double) success / total;
-            if (rate < 0.7) {
-                // 실패 로그
+            Member member = memberRepository.findById(memberId).orElse(null);
+            if (member == null) continue;
+
+            // 4. 조건 충족 여부에 따라 로그 작성 및 지급
+            if (rate >= 0.7) {
+                rewardPoint(member, 5, PointReason.CIRCLE_ROUTINE_COMMIT, routineId, targetDate);
+            } else {
                 pointLogRepository.save(PointLog.builder()
                         .member(member)
                         .amount(0)
-                        .reason(PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS)
+                        .reason(PointReason.CIRCLE_ROUTINE_COMMIT)
                         .routineId(routineId)
                         .status(PointLogStatus.FAIL)
                         .failureReason(PointFailureReason.LOW_SUCCESS_RATE)
+                        .commitDate(targetDate)
                         .createdAt(LocalDateTime.now())
                         .build());
-                continue;
             }
-
-            // 중복 방지
-            boolean alreadyRewarded = pointLogRepository.existsByMemberIdAndReasonAndDescription(
-                    memberId,
-                    PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS,
-                    "routineId=" + routineId
-            );
-            if (alreadyRewarded) {
-                pointLogRepository.save(PointLog.builder()
-                        .member(member)
-                        .amount(0)
-                        .reason(PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS)
-                        .routineId(routineId)
-                        .status(PointLogStatus.FAIL)
-                        .failureReason(PointFailureReason.ALREADY_REWARDED)
-                        .createdAt(LocalDateTime.now())
-                        .build());
-                continue;
-            }
-
-            // 성공 보상
-            rewardPoint(
-                    member,
-                    5,
-                    PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS,
-                    routineId
-            );
         }
     }
+
+
+    @Transactional
+    @Override
+    public void rewardCollectiveBonusForEligibleMembers(LocalDate targetDate) {
+
+        // 1. 어제 CIRCLE_ROUTINE_COMMIT 보상 받은 사람들만 조회
+        List<PointLog> baseLogs = pointLogRepository.findAllByReasonAndCommitDate(
+                PointReason.CIRCLE_ROUTINE_COMMIT,
+                targetDate
+        );
+
+        // 2. 참여한 Circle ID들만 중복 없이 수집
+        Set<Long> participatedCircleIds = baseLogs.stream()
+                .map(log -> {
+                    Routine routine = routineRepository.findById(log.getRoutineId()).orElse(null);
+                    return (routine != null && routine.getCircle() != null) ? routine.getCircle().getId() : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 3. Circle별 참여율 계산 후, 70% 이상인 Circle만 추림
+        Set<Long> eligibleCircleIds = new HashSet<>();
+        for (Long circleId : participatedCircleIds) {
+            Circle circle = circleRepository.findById(circleId).orElse(null);
+            if (circle == null) continue;
+
+            List<CircleMember> members = circleMemberRepository.findAllByCircleId(circleId);
+
+            long total = 0;
+            long success = 0;
+            for (CircleMember cm : members) {
+                Optional<CommitLog> logOpt = commitLogRepository.findByMemberIdAndRoutineCircleIdAndCommitDate(cm.getMember().getId(), circleId, targetDate);
+                if (logOpt.isPresent()) {
+                    CommitLog log = logOpt.get();
+                    if (log.getStatus() != CommitStatus.SKIP) {
+                        total++;
+                        if (log.getStatus() == CommitStatus.SUCCESS) success++;
+                    }
+                }
+            }
+
+            if (total > 0 && (double) success / total >= 0.7) {
+                eligibleCircleIds.add(circleId);
+            }
+        }
+
+        // 4. 보상 지급: eligibleCircleIds에 속한 멤버 중 baseLogs에 있는 멤버만
+        for (PointLog log : baseLogs) {
+            Routine routine = routineRepository.findById(log.getRoutineId()).orElse(null);
+            if (routine == null || routine.getCircle() == null) continue;
+
+            Long circleId = routine.getCircle().getId();
+            if (!eligibleCircleIds.contains(circleId)) continue;
+
+            Member member = log.getMember();
+            if (pointLogRepository.existsByMemberIdAndReasonAndRoutineIdAndCreatedAtBetween(
+                    member.getId(),
+                    PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS,
+                    routine.getId(),
+                    targetDate.atStartOfDay(),
+                    targetDate.plusDays(1).atStartOfDay()
+            )) continue;
+
+            pointLogRepository.save(PointLog.builder()
+                    .member(member)
+                    .routineId(routine.getId())
+                    .amount(5)
+                    .reason(PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS)
+                    .status(PointLogStatus.SUCCESS)
+                    .commitDate(targetDate)
+                    .createdAt(LocalDateTime.now())
+                    .build());
+        }
+    }
+
 
 }

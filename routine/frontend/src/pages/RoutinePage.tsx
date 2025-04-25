@@ -26,7 +26,9 @@ const RoutinePage: React.FC = () => {
                     }
                 })}
             </div>
+
         </div>
+
     );
 };
 

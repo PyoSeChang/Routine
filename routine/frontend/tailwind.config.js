@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        "./src/**/*.{js,ts,jsx,tsx}", // ✅ src 폴더 내 모든 JS/TSX 파일에 적용
+        "./src/**/*.{js,jsx,ts,tsx}", // ← 이거 꼭 있어야 함!
     ],
     theme: {
         extend: {},

@@ -55,7 +55,22 @@ public class RoutineServiceImpl implements RoutineService {
         if (!routineTasks.isEmpty()) {
             routineTaskRepository.saveAll(routineTasks);
         }
-        createTodayCommitLog(routine, memberId);
+        routine.setRoutineTasks(routineTasks);
+
+        LocalDate today = LocalDate.now();
+        routine.getRoutineTasks().forEach(task -> {
+            boolean exists = commitLogRepository.existsByRoutineAndMemberAndTaskAndCommitDate(routine, member, task, today);
+            if (!exists) {
+                CommitLog log = CommitLog.builder()
+                        .routine(routine)
+                        .member(member)
+                        .task(task)
+                        .commitDate(today)
+                        .status(CommitStatus.NONE)
+                        .build();
+                commitLogRepository.save(log);
+            }
+        });
     }
 
     @Transactional
@@ -130,37 +145,22 @@ public class RoutineServiceImpl implements RoutineService {
             Member member = memberRepository.findById(routine.getMember().getId())
                     .orElseThrow(() -> new IllegalStateException("루틴에 연결된 멤버를 찾을 수 없습니다."));
 
-            boolean exists = commitLogRepository.existsByRoutineAndMemberAndCommitDate(routine, member, today);
-            if (!exists) {
-                CommitLog log = CommitLog.builder()
-                        .routine(routine)
-                        .member(member)
-                        .commitDate(today)
-                        .status(CommitStatus.NONE)
-                        .build();
-                commitLogRepository.save(log);
-            }
+            routine.getRoutineTasks().forEach(task -> {
+                boolean exists = commitLogRepository.existsByRoutineAndMemberAndTaskAndCommitDate(routine, member, task, today);
+                if (!exists) {
+                    CommitLog log = CommitLog.builder()
+                            .routine(routine)
+                            .member(member)
+                            .task(task)
+                            .commitDate(today)
+                            .status(CommitStatus.NONE)
+                            .build();
+                    commitLogRepository.save(log);
+                }
+            });
         }
     }
 
-    @Transactional
-    @Override
-    public void createTodayCommitLog(Routine routine, Long memberId) {
-        LocalDate today = LocalDate.now();
-
-        Member member = Member.builder().id(memberId).build();
-
-        boolean exists = commitLogRepository.existsByRoutineAndMemberAndCommitDate(routine, member, today);
-        if (!exists) {
-            CommitLog log = CommitLog.builder()
-                    .routine(routine)
-                    .member(member)
-                    .commitDate(today)
-                    .status(CommitStatus.NONE)
-                    .build();
-            commitLogRepository.save(log);
-        }
-    }
 
 
 }

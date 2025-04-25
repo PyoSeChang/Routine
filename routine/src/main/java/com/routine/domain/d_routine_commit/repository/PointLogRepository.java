@@ -5,9 +5,18 @@ import com.routine.domain.d_routine_commit.model.enums.PointReason;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface PointLogRepository extends JpaRepository<PointLog, Long> {
     // 중복 지급 방지
-    boolean existsByMemberIdAndReasonAndDescription(Long memberId, PointReason reason, String description);
+    boolean existsByMemberIdAndReasonAndRoutineIdAndCommitDate(Long memberId, PointReason pointReason, Long routineId, LocalDate commitDate);
 
+    LocalDate commitDate(LocalDate commitDate);
+
+    boolean existsByMemberIdAndReasonAndRoutineIdAndCreatedAtBetween(Long memberId, PointReason pointReason, Long routineId, LocalDateTime localDateTime, LocalDateTime localDateTime1);
+
+    List<PointLog> findAllByReasonAndCommitDate(PointReason pointReason, LocalDate targetDate);
 }
