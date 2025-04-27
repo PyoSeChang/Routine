@@ -1,6 +1,6 @@
 package com.routine.domain.d_routine_commit.service.week;
 
-import com.routine.domain.d_routine_commit.model.week.WeekdayVO;
+import com.routine.domain.c_routine.model.week.WeekdayVO;
 
 import java.time.LocalDate;
 import java.util.List;

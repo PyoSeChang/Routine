@@ -4,7 +4,7 @@ package com.routine.domain.c_routine.controller;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.c_routine.dto.RoutineDTO;
 import com.routine.domain.c_routine.service.RoutineService;
-import com.routine.domain.c_routine.dto.RoutineViewDTO;
+import com.routine.domain.c_routine.dto.AllRoutinesViewDTO;
 import com.routine.domain.d_routine_commit.service.CommitService;
 import com.routine.domain.c_routine.service.RoutineViewService;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class RoutineController {
 
 
         // 전체 주간 루틴 뷰 가져오기 (TODAY + PAST + UPCOMING)
-        List<RoutineViewDTO> routines = routineViewService.getWeeklyRoutineView(memberId, today);
+        List<AllRoutinesViewDTO> routines = routineViewService.getWeeklyRoutineView(memberId, today);
 
         model.addAttribute("routines", routines);
         return "view/routine/my_routines";

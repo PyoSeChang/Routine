@@ -1,11 +1,12 @@
-import React from 'react';
-import { Weekday } from '../types/routine';
+import React, { useEffect } from 'react';
+import { Weekday } from '../../types/routine';
 
 type ViewMode = { type: 'DAY'; day: Weekday };
 
 interface Props {
     viewMode: ViewMode;
     setViewMode: (mode: ViewMode) => void;
+    className?: string;
 }
 
 const weekdays: Weekday[] = [
@@ -14,8 +15,15 @@ const weekdays: Weekday[] = [
 ];
 
 const WeekdayNav: React.FC<Props> = ({ viewMode, setViewMode }) => {
+    useEffect(() => {
+        // 오늘의 요일을 구해서 viewMode에 반영
+        const today = new Date();
+        const todayDay = weekdays[today.getDay() === 0 ? 6 : today.getDay() - 1]; // 일요일은 6으로 설정
+        setViewMode({ type: 'DAY', day: todayDay });
+    }, [setViewMode]);
+
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-center">
             {weekdays.map(day => (
                 <button
                     key={day}

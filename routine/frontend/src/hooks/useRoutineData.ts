@@ -7,7 +7,7 @@ export const useRoutineData = () => {
     const [selectedWeekday, setSelectedWeekday] = useState<Weekday>('WEDNESDAY');
 
     useEffect(() => {
-        axios.get('/api/routines/week')
+        axios.get('/api/routine/week')
             .then(res => setRoutines(res.data))
             .catch(err => console.error('루틴 불러오기 실패:', err));
     }, []);

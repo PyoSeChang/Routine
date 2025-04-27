@@ -164,6 +164,9 @@ public class PointServiceImpl implements PointService {
 
             // 4. 조건 충족 여부에 따라 로그 작성 및 지급
             if (rate >= 0.7) {
+                //  포인트 한도 체크 (내부에서 실패 로그 남김)
+                checkPointLimitOrLogFailure(memberId, routineId);
+
                 rewardPoint(member, 5, PointReason.CIRCLE_ROUTINE_COMMIT, routineId, targetDate);
             } else {
                 pointLogRepository.save(PointLog.builder()
@@ -242,16 +245,10 @@ public class PointServiceImpl implements PointService {
                     targetDate.atStartOfDay(),
                     targetDate.plusDays(1).atStartOfDay()
             )) continue;
+            // 포인트 한도 체크 (내부에서 실패 로그 남김)
+            checkPointLimitOrLogFailure(member.getId(), routine.getId());
 
-            pointLogRepository.save(PointLog.builder()
-                    .member(member)
-                    .routineId(routine.getId())
-                    .amount(5)
-                    .reason(PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS)
-                    .status(PointLogStatus.SUCCESS)
-                    .commitDate(targetDate)
-                    .createdAt(LocalDateTime.now())
-                    .build());
+            rewardPoint(member, 5, PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS, routine.getId(), targetDate);
         }
     }
 

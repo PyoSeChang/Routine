@@ -1,7 +1,7 @@
 package com.routine.domain.d_routine_commit.service.week;
 
-import com.routine.domain.d_routine_commit.model.week.WeekdayType;
-import com.routine.domain.d_routine_commit.model.week.WeekdayVO;
+import com.routine.domain.c_routine.model.week.WeekdayType;
+import com.routine.domain.c_routine.model.week.WeekdayVO;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;

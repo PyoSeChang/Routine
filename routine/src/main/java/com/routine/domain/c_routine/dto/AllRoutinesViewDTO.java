@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder(toBuilder = true)
-public class RoutineViewDTO {
+public class AllRoutinesViewDTO {
 
     private Long routineId;
     private String title;
@@ -21,12 +21,14 @@ public class RoutineViewDTO {
     private String date;
     private String type;
     private DayOfWeek weekday;
+    private List<DayOfWeek> repeatDays;
     private boolean isGroupRoutine;
     private boolean isRoutineSkipped;
     private List<TaskDTO> tasks;
+    private int skipCount;
 
-    public static RoutineViewDTO fromPastLogs(LocalDate date, Routine routine, List<CommitLog> logs) {
-        return RoutineViewDTO.builder()
+    public static AllRoutinesViewDTO fromPastLogs(LocalDate date, Routine routine, List<CommitLog> logs) {
+        return AllRoutinesViewDTO.builder()
                 .routineId(routine.getId())
                 .title(routine.getTitle())
                 .description(routine.getDescription())
@@ -36,11 +38,12 @@ public class RoutineViewDTO {
                 .isGroupRoutine(routine.isGroupRoutine())
                 .isRoutineSkipped(logs.stream().allMatch(log -> log.getStatus() == CommitStatus.SKIP))
                 .tasks(logs.stream().map(TaskDTO::from).toList())
+                .repeatDays(routine.getRepeatDays())
                 .build();
     }
 
-    public static RoutineViewDTO fromTodayLogs(LocalDate date, Routine routine, List<CommitLog> logs) {
-        return RoutineViewDTO.builder()
+    public static AllRoutinesViewDTO fromTodayLogs(LocalDate date, Routine routine, List<CommitLog> logs) {
+        return AllRoutinesViewDTO.builder()
                 .routineId(routine.getId())
                 .title(routine.getTitle())
                 .description(routine.getDescription())
@@ -50,11 +53,16 @@ public class RoutineViewDTO {
                 .isGroupRoutine(routine.isGroupRoutine())
                 .isRoutineSkipped(logs.stream().allMatch(log -> log.getStatus() == CommitStatus.SKIP))
                 .tasks(logs.stream().map(TaskDTO::from).toList())
+                .repeatDays(routine.getRepeatDays())
                 .build();
     }
 
-    public static RoutineViewDTO fromUpcoming(LocalDate date, Routine routine) {
-        return RoutineViewDTO.builder()
+    public static AllRoutinesViewDTO fromUpcoming(LocalDate date, Routine routine) {
+        List<TaskDTO> taskDTOs = routine.getRoutineTasks().stream()
+                .map(TaskDTO::fromTask) // 🔥 RoutineTask → TaskDTO 변환 (status = NULL, checked = null 처리돼야 함)
+                .collect(Collectors.toList());
+
+        return AllRoutinesViewDTO.builder()
                 .routineId(routine.getId())
                 .title(routine.getTitle())
                 .description(routine.getDescription())
@@ -63,7 +71,8 @@ public class RoutineViewDTO {
                 .weekday(date.getDayOfWeek())
                 .isGroupRoutine(routine.isGroupRoutine())
                 .isRoutineSkipped(false)
-                .tasks(routine.getRoutineTasks().stream().map(TaskDTO::fromTask).collect(Collectors.toList()))
+                .tasks(taskDTOs)
+                .repeatDays(routine.getRepeatDays())
                 .build();
     }
 }

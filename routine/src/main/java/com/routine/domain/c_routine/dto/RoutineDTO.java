@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class RoutineDTO {
     private List<String> tasks;
     private List<DayOfWeek> repeatDays;
     private Long routineId;
+    private LocalDateTime createdAt;
 
     public Routine toPersonalRoutine(Member member) {
         return Routine.builder()
@@ -86,6 +88,7 @@ public class RoutineDTO {
         dto.setRepeatDays(routine.getRepeatDays());
         dto.setCircleId(circleId);
         dto.setRoutineId(routine.getId());
+        dto.setCreatedAt(routine.getCreatedAt());
 
         return dto;
     }

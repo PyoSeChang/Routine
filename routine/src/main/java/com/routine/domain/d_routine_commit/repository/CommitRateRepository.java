@@ -18,4 +18,6 @@ public interface CommitRateRepository extends JpaRepository<CommitRate, Long> {
     Optional<CommitRate> findByMemberIdAndRoutineIdAndYearAndWeek(Long memberId, Long routineId, int year, int week);
 
     Optional<CommitRate> findByMemberIdAndRoutineIdAndCommitDate(Long memberId, Long routineId, LocalDate commitDate);
+
+    List<CommitRate> findAllByRoutineIdAndCommitDateBetween(Long routineId, LocalDate thisMonday, LocalDate thisSunday);
 }

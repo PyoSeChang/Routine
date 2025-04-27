@@ -16,6 +16,9 @@ public class CommitRequestDTO {
 
     private List<TaskStatusDTO> taskStatuses; // ✅ 이걸 추가!
 
+    private String message;
+    private Boolean isPublic;
+
     @Getter @Setter
     public static class TaskStatusDTO {
         private Long taskId;

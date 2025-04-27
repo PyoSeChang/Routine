@@ -7,6 +7,8 @@ import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -33,4 +35,10 @@ public interface CommitLogRepository extends JpaRepository<CommitLog, Long> {
     List<CommitLog> findAllByCommitDate(LocalDate targetDate);
 
     Optional<CommitLog> findByMemberIdAndRoutineCircleIdAndCommitDate(Long id, Long circleId, LocalDate targetDate);
+
+    List<CommitLog> findByRoutineIdAndCommitDateBetween(Long id, LocalDate monday, LocalDate sunday);
+
+    @Query("SELECT DISTINCT c.commitDate FROM CommitLog c WHERE c.member.id = :memberId AND c.routine.id = :routineId ORDER BY c.commitDate")
+    List<LocalDate> findCommitDates(@Param("memberId") Long memberId, @Param("routineId") Long routineId);
+
 }

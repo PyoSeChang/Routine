@@ -1,4 +1,4 @@
-package com.routine.domain.d_routine_commit.model.week;
+package com.routine.domain.c_routine.model.week;
 
 public enum WeekdayType {
     PAST,

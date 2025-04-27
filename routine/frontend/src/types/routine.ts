@@ -1,7 +1,7 @@
 export interface TaskDTO {
     taskId: number;
     content: string;
-    status: 'SUCCESS' | 'FAIL' | 'SKIP' | 'NONE' ;
+    status: 'SUCCESS' | 'NONE' | 'SKIP' | 'NULL' ;
 }
 
 export type Weekday =
@@ -21,4 +21,5 @@ export interface RoutineViewDTO {
     groupRoutine: boolean; // ← ✅ 이름 맞춰야 함
     routineSkipped: boolean;      // ← ✅ 이름 맞춰야 함
     tasks: TaskDTO[];
+    skipCount: number;
 }

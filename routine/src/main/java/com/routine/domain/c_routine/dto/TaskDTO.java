@@ -31,7 +31,7 @@ public class TaskDTO {
         return TaskDTO.builder()
                 .taskId(task.getId())
                 .content(task.getContent())
-                .status("NONE")
+                .status("NULL")
                 .checked(false)
                 .build();
     }
