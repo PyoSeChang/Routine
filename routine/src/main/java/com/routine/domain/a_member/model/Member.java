@@ -36,5 +36,9 @@ public class Member {
     public void addPoint(int amount) {
         this.point += amount;
     }
+
+    public void usePoints(int amount) {
+        this.point -= amount;
+    }
 }
 

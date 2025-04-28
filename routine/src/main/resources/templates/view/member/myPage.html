@@ -1,0 +1,93 @@
+<!-- templates/view/member/myPage.html -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>마이페이지</title>
+</head>
+<body>
+
+<h1>마이페이지</h1>
+<h2 style="margin-top: 30px;">내 루틴</h2>
+
+<table border="1" style="margin-top: 10px;">
+  <thead>
+  <tr>
+    <th>루틴명</th>
+    <th>반복 요일</th>
+    <th>서클 루틴 여부</th>
+    <th>생성일</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="routine : ${routineSummaries}">
+    <td>
+      <a th:href="@{'http://localhost:3000/routine/' + ${routine.routineId}}"
+         th:text="${routine.routineName}">루틴명</a>
+    </td>
+    <td th:text="${#strings.arrayJoin(routine.repeatDays, ', ')}">반복 요일</td>
+    <td th:text="${routine.circleRoutine ? '서클 루틴' : '개인 루틴'}">루틴 타입</td>
+    <td th:text="${routine.createdAt}">생성일</td>
+  </tr>
+  </tbody>
+</table>
+<!-- 포인트 조회 버튼 -->
+<h2>내 포인트 총합</h2>
+<span th:text="${myPoints}">0</span>
+<button id="loadPointsButton">포인트 내역 보기</button>
+
+<!-- 포인트 내역 테이블 -->
+<table border="1" id="pointTable" style="margin-top: 20px; display: none;">
+  <thead>
+  <tr>
+    <th>포인트</th>
+    <th>이유</th>
+    <th>비고</th>
+    <th>지급일</th>
+  </tr>
+  </thead>
+  <tbody id="pointTableBody">
+  <!-- JS로 데이터 삽입 -->
+  </tbody>
+</table>
+
+<!-- 회원 정보 수정 페이지 이동 버튼 -->
+<form th:action="@{|/myPage/${memberId}/edit-userinfo|}" method="get" style="margin-top: 20px;">
+  <button type="submit">회원정보 수정</button>
+</form>
+
+<script>
+  document.getElementById('loadPointsButton').addEventListener('click', async () => {
+    // const memberId = /*[[${memberId}]]*/ 0;
+    const memberId = 1;
+
+    const response = await fetch(`/myPage/${memberId}/points`);
+
+    if (!response.ok) {
+      alert('포인트 조회 실패');
+      return;
+    }
+
+    const pointLogs = await response.json();
+    const tbody = document.getElementById('pointTableBody');
+    tbody.innerHTML = '';
+
+    pointLogs.forEach(log => {
+      const row = `
+            <tr>
+                <td>${log.amount}</td>
+                <td>${log.reason}</td>
+                <td>${log.remark}</td>
+                <td>${new Date(log.createdAt).toLocaleString()}</td>
+            </tr>
+        `;
+      tbody.innerHTML += row;
+    });
+
+    document.getElementById('pointTable').style.display = 'table';
+  });
+</script>
+
+</body>
+</html>

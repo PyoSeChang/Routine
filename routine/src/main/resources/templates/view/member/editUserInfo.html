@@ -1,0 +1,37 @@
+<!-- templates/view/member/editUserinfo.html -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원정보 수정</title>
+</head>
+<body>
+
+<h1>회원정보 수정</h1>
+
+<!-- 수정 폼 -->
+<form th:action="@{|/myPage/${memberId}/edit-userinfo|}" method="post">
+  <div>
+    <label>이름: </label>
+    <input type="text" name="name" required />
+  </div>
+  <div>
+    <label>이메일: </label>
+    <input type="email" name="email" required />
+  </div>
+  <div>
+    <label>비밀번호 변경: </label>
+    <input type="password" name="password" />
+  </div>
+
+  <button type="submit" style="margin-top: 10px;">수정 완료</button>
+</form>
+
+<!-- 마이페이지로 돌아가기 버튼 -->
+<form th:action="@{|/myPage/${memberId}|}" method="get" style="margin-top: 20px;">
+  <button type="submit">마이페이지로 돌아가기</button>
+</form>
+
+</body>
+</html>

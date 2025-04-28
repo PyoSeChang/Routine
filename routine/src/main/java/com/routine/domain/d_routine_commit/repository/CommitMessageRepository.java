@@ -17,4 +17,6 @@ public interface CommitMessageRepository extends JpaRepository<CommitMessage, Lo
 
     // 특정 루틴에 대한 모든 커밋 메세지 출력
     List<CommitMessage> findByRoutineIdOrderByCommitDateDesc(Long routineId);
+
+    List<CommitMessage> findAllByMemberIdInAndCommitDate(List<Long> memberIds, LocalDate commitDate);
 }

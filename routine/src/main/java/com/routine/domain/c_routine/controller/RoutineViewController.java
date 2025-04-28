@@ -1,20 +1,26 @@
 package com.routine.domain.c_routine.controller;
 
+import com.routine.domain.a_member.model.Member;
 import com.routine.domain.c_routine.dto.AllRoutinesViewDTO;
 import com.routine.domain.c_routine.dto.CommitLogDTO;
 import com.routine.domain.c_routine.dto.RoutineCommitRatesResponse;
 import com.routine.domain.c_routine.dto.RoutineDTO;
+import com.routine.domain.c_routine.model.Routine;
+import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.c_routine.service.RoutineService;
 import com.routine.domain.c_routine.service.RoutineViewService;
 import com.routine.domain.d_routine_commit.service.CommitService;
 import com.routine.security.model.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/routine")
@@ -24,10 +30,11 @@ public class RoutineViewController {
     private final RoutineViewService routineViewService;
     private final RoutineService routineService;
     private final CommitService commitService;
+    private final RoutineRepository routineRepository;
 
     @GetMapping("/week")
-    public ResponseEntity<List<AllRoutinesViewDTO>> getWeeklyRoutines() {
-        Long memberId = 1L; // ✅ 로그인 구현 전이므로 하드코딩
+    public ResponseEntity<List<AllRoutinesViewDTO>> getWeeklyRoutines(@AuthenticationPrincipal PrincipalDetails principal) {
+        Long memberId = principal.getMember().getId();
         LocalDate today = LocalDate.now();
 
         routineService.initializeTodayCommitLogs();
@@ -37,10 +44,24 @@ public class RoutineViewController {
     }
 
     @GetMapping("/{routineId}")
-    public ResponseEntity<RoutineDTO> getRoutine(@PathVariable Long routineId) {
-        RoutineDTO routine = routineViewService.getRoutineById(routineId);
-        return ResponseEntity.ok(routine);
+    public ResponseEntity<RoutineDTO> getRoutine(@PathVariable Long routineId,
+                                                 @AuthenticationPrincipal PrincipalDetails principal) {
+        Long loginMemberId = principal.getMember().getId();
+
+        Long routineOwnerId = routineRepository.findMemberIdById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("루틴에 연결된 멤버가 없습니다."));
+
+        if (!Objects.equals(loginMemberId, routineOwnerId)) {
+            throw new AccessDeniedException("해당 루틴을 조회할 권한이 없습니다.");
+        }
+
+        RoutineDTO routineDTO = routineService.getRoutine(routineId);
+
+        return ResponseEntity.ok(routineDTO);
     }
+
+
+
 
     @GetMapping("/{routineId}/messages")
     public ResponseEntity<List<String>> getRoutineMessages(@PathVariable Long routineId) {
@@ -56,11 +77,10 @@ public class RoutineViewController {
 
     @GetMapping("/{routineId}/commit-dates")
     public List<LocalDate> getCommitDates(
-            @PathVariable Long routineId //,
-            // @AuthenticationPrincipal PrincipalDetails principal
+            @PathVariable Long routineId,
+             @AuthenticationPrincipal PrincipalDetails principal
     ) {
-        // Long memberId = principal.getMember().getId();
-        Long memberId = 1L;
+        Long memberId = principal.getMember().getId();
         return commitService.getCommitDatesByRoutineId(memberId, routineId);
     }
 
@@ -68,11 +88,10 @@ public class RoutineViewController {
     @GetMapping("/{routineId}/commit")
     public CommitLogDTO getCommitsByRoutineAndDate(
             @PathVariable Long routineId,
-            @RequestParam LocalDate date
-            //@AuthenticationPrincipal PrincipalDetails principal
+            @RequestParam LocalDate date,
+            @AuthenticationPrincipal PrincipalDetails principal
     ) {
-        // Long memberId = principal.getMember().getId();
-        Long memberId = 1L;
+        Long memberId = principal.getMember().getId();
         return commitService.getCommitLogSummary(memberId, routineId, date);
     }
 

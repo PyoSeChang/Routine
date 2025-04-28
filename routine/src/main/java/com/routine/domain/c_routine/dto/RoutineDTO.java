@@ -29,6 +29,7 @@ public class RoutineDTO {
     private List<DayOfWeek> repeatDays;
     private Long routineId;
     private LocalDateTime createdAt;
+    private boolean circleRoutine;
 
     public Routine toPersonalRoutine(Member member) {
         return Routine.builder()
@@ -89,6 +90,7 @@ public class RoutineDTO {
         dto.setCircleId(circleId);
         dto.setRoutineId(routine.getId());
         dto.setCreatedAt(routine.getCreatedAt());
+        dto.setCircleRoutine(routine.isGroupRoutine());
 
         return dto;
     }

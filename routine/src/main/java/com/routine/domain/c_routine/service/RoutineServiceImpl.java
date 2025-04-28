@@ -6,6 +6,7 @@ import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.b_circle.model.Circle;
 import com.routine.domain.b_circle.repository.CircleRepository;
 import com.routine.domain.c_routine.dto.RoutineDTO;
+import com.routine.domain.c_routine.dto.RoutineSummary;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.c_routine.repository.RoutineRepository;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -159,6 +161,23 @@ public class RoutineServiceImpl implements RoutineService {
                 }
             });
         }
+    }
+
+    @Override
+    public List<RoutineSummary> getMyRoutinesSummary(Long memberId) {
+        List<Routine> routines = routineRepository.findAllByMemberId(memberId);
+
+        return routines.stream()
+                .sorted(Comparator.comparing(Routine::isGroupRoutine).reversed())
+                .map(routine -> RoutineSummary.builder()
+                        .routineId(routine.getId())
+                        .circleId(routine.isGroupRoutine() && routine.getCircle() != null ? routine.getCircle().getId() : null)
+                        .routineName(routine.getTitle())
+                        .repeatDays(routine.getRepeatDays())
+                        .circleRoutine(routine.isGroupRoutine())
+                        .createdAt(routine.getCreatedAt().toLocalDate())
+                        .build())
+                .toList();
     }
 
 

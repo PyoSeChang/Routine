@@ -1,6 +1,7 @@
 package com.routine.domain.c_routine.service;
 
 import com.routine.domain.c_routine.dto.RoutineDTO;
+import com.routine.domain.c_routine.dto.RoutineSummary;
 import com.routine.domain.c_routine.model.Routine;
 
 import java.util.List;
@@ -19,5 +20,8 @@ public interface RoutineService {
 
     // Commit Log 만들기 (View 출력용)
     void initializeTodayCommitLogs();
+
+    // 나의 루틴 모아보기
+    List<RoutineSummary> getMyRoutinesSummary(Long memberId);
 
 }

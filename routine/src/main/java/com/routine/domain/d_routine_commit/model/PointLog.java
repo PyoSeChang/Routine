@@ -32,6 +32,8 @@ public class PointLog {
 
     private Long routineId;
 
+    private Long purchaseId;
+
     @Enumerated(EnumType.STRING)
     private PointLogStatus status; //  SUCCESS, FAIL 구분
 

@@ -10,6 +10,7 @@ import com.routine.domain.b_circle.repository.CircleMemberRepository;
 import com.routine.domain.b_circle.repository.CircleRepository;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.repository.RoutineRepository;
+import com.routine.domain.d_routine_commit.dto.PointLogDTO;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.d_routine_commit.model.CommitRate;
 import com.routine.domain.d_routine_commit.model.enums.CommitStatus;
@@ -63,7 +64,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
-    public void rewardPoint(Member member, int amount, PointReason reason, Long routineId, LocalDate commitDate) {
+    public void updatePoint(Member member, int amount, PointReason reason, Long routineId, LocalDate commitDate) {
         UserInfo userInfo = userInfoRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new IllegalStateException("UserInfo 없음"));
 
@@ -116,7 +117,7 @@ public class PointServiceImpl implements PointService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버 없음"));
 
-        rewardPoint(
+        updatePoint(
                 member,
                 5,
                 PointReason.CIRCLE_ROUTINE_COMMIT,
@@ -167,7 +168,7 @@ public class PointServiceImpl implements PointService {
                 //  포인트 한도 체크 (내부에서 실패 로그 남김)
                 checkPointLimitOrLogFailure(memberId, routineId);
 
-                rewardPoint(member, 5, PointReason.CIRCLE_ROUTINE_COMMIT, routineId, targetDate);
+                updatePoint(member, 5, PointReason.CIRCLE_ROUTINE_COMMIT, routineId, targetDate);
             } else {
                 pointLogRepository.save(PointLog.builder()
                         .member(member)
@@ -248,9 +249,69 @@ public class PointServiceImpl implements PointService {
             // 포인트 한도 체크 (내부에서 실패 로그 남김)
             checkPointLimitOrLogFailure(member.getId(), routine.getId());
 
-            rewardPoint(member, 5, PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS, routine.getId(), targetDate);
+            updatePoint(member, 5, PointReason.CIRCLE_ROUTINE_COLLECTIVE_BONUS, routine.getId(), targetDate);
         }
     }
+
+    @Override
+    @Transactional
+    public void usePoints(Long memberId, int amount, Long purchaseId) {
+        // 1. 만 포인트 이상 체크
+        if (amount < 10000) {
+            throw new IllegalArgumentException("포인트는 10,000 이상부터 사용할 수 있습니다.");
+        }
+
+        // 2. 멤버 포인트 조회 (여기서 memberRepository 같은거 필요)
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        int currentPoints = member.getPoint(); // 멤버 엔티티에 포인트 필드 있다고 가정
+
+        // 3. 잔고 부족 체크
+        if (currentPoints < amount) {
+            throw new IllegalArgumentException("포인트가 부족합니다. 현재 포인트: " + currentPoints);
+        }
+
+        // 4. 포인트 차감
+        member.usePoints(amount);
+
+        // 5.
+        pointLogRepository.save(PointLog.builder()
+                .member(member)
+                .amount(amount)
+                .reason(PointReason.PURCHASE_PRODUCTS)
+                .purchaseId(purchaseId)
+                .routineId(null)
+                .status(PointLogStatus.SUCCESS)
+                .commitDate(null)
+                .createdAt(LocalDateTime.now())
+                .build());
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<PointLogDTO> showPointLogs(Long memberId) {
+        // 1. 해당 멤버의 포인트 로그 전체 가져오기 (SUCCESS만 필터링)
+        List<PointLog> pointLogs = pointLogRepository.findAllByMemberIdAndStatus(memberId, PointLogStatus.SUCCESS);
+
+        // 2. 루틴 이름 필요 → 루틴 ID 뽑아서 일괄 조회
+        List<Long> routineIds = pointLogs.stream()
+                .map(PointLog::getRoutineId)
+                .filter(routineId -> routineId != null)
+                .distinct()
+                .toList();
+
+        Map<Long, String> routineNameMap = routineRepository.findAllById(routineIds).stream()
+                .collect(Collectors.toMap(
+                        routine -> routine.getId(),
+                        routine -> routine.getTitle()
+                ));
+
+        // 3. PointLog를 PointLogDTO로 변환
+        return pointLogs.stream()
+                .map(log -> PointLogDTO.from(log, routineNameMap.get(log.getRoutineId())))
+                .toList();
+    }
+
 
 
 }

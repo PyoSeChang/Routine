@@ -25,4 +25,6 @@ public interface RoutineRepository extends JpaRepository<Routine, Long> {
     @Query("SELECT r.circle.id FROM Routine r WHERE r.id = :routineId")
     Optional<Long> findCircleIdById(@Param("routineId") Long routineId);
 
+    @Query("SELECT r.member.id FROM Routine r WHERE r.id = :routineId")
+    Optional<Long> findMemberIdById(@Param("routineId") Long routineId);
 }

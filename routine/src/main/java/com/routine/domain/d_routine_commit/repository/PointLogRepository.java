@@ -1,6 +1,7 @@
 package com.routine.domain.d_routine_commit.repository;
 
 import com.routine.domain.d_routine_commit.model.PointLog;
+import com.routine.domain.d_routine_commit.model.enums.PointLogStatus;
 import com.routine.domain.d_routine_commit.model.enums.PointReason;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,6 @@ public interface PointLogRepository extends JpaRepository<PointLog, Long> {
     boolean existsByMemberIdAndReasonAndRoutineIdAndCreatedAtBetween(Long memberId, PointReason pointReason, Long routineId, LocalDateTime localDateTime, LocalDateTime localDateTime1);
 
     List<PointLog> findAllByReasonAndCommitDate(PointReason pointReason, LocalDate targetDate);
+
+    List<PointLog> findAllByMemberIdAndStatus(Long memberId, PointLogStatus pointLogStatus);
 }

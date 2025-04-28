@@ -25,11 +25,10 @@ public class CommitController {
     private final PointService pointService;
 
     @PostMapping("/today")
-    public ResponseEntity<Void> saveTodayCommitLog(@RequestBody CommitRequestDTO dto
-//                                                   @AuthenticationPrincipal PrincipalDetails principal
+    public ResponseEntity<Void> saveTodayCommitLog(@RequestBody CommitRequestDTO dto,
+                                                   @AuthenticationPrincipal PrincipalDetails principal
     ) {
-        // Long memberId = principal.getMember().getId();
-        Long memberId = 1L;
+        Long memberId = principal.getMember().getId();
         LocalDate commitDate = LocalDate.now();
         commitService.saveTodayCommitLog(memberId, dto, commitDate);
         double successRate = commitRateService.updateRecentRate(memberId, dto.getRoutineId(), commitDate);

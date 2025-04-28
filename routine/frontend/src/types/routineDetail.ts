@@ -10,7 +10,7 @@ export interface RoutineDTO {
     description?: string;
     repeatDays: string[]; // 예: ["MONDAY", "WEDNESDAY"]
     createdAt: string; // ISO 문자열
-    isGroupRoutine: boolean;
+    circleRoutine: boolean;
     tasks: string[]; // 태스크 내용 리스트
 }
 

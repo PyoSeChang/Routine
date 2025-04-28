@@ -1,5 +1,7 @@
 package com.routine.domain.c_routine.service;
 
+import com.routine.domain.b_circle.model.CircleMember;
+import com.routine.domain.b_circle.repository.CircleMemberRepository;
 import com.routine.domain.b_circle.service.CircleMemberService;
 import com.routine.domain.c_routine.dto.*;
 import com.routine.domain.c_routine.model.Routine;
@@ -9,19 +11,23 @@ import com.routine.domain.c_routine.repository.RoutineTaskRepository;
 import com.routine.domain.d_routine_commit.dto.CommitMessageDTO;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.c_routine.model.week.WeekdayVO;
+import com.routine.domain.d_routine_commit.model.CommitMessage;
 import com.routine.domain.d_routine_commit.model.CommitRate;
 import com.routine.domain.d_routine_commit.model.TaskCommitRate;
 import com.routine.domain.d_routine_commit.repository.CommitLogRepository;
+import com.routine.domain.d_routine_commit.repository.CommitMessageRepository;
 import com.routine.domain.d_routine_commit.repository.CommitRateRepository;
 import com.routine.domain.d_routine_commit.repository.TaskCommitRateRepository;
 import com.routine.domain.d_routine_commit.service.CommitMessageService;
 import com.routine.domain.d_routine_commit.service.week.WeekService;
 import com.routine.domain.c_routine.model.week.WeekdayType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +43,8 @@ public class RoutineViewServiceImpl implements RoutineViewService {
     private final TaskCommitRateRepository taskCommitRateRepository;
     private final CommitMessageService commitMessageService;
     private final CircleMemberService circleMemberService;
+    private final CircleMemberRepository circleMemberRepository;
+    private final CommitMessageRepository commitMessageRepository;
 
 
     @Override
@@ -127,6 +135,74 @@ public class RoutineViewServiceImpl implements RoutineViewService {
                 .build();
     }
 
+    @Override
+    public CircleRoutineCommits getCommitsByCircleId(Long circleId, LocalDate commitDate) {
+        List<Long> memberIds = circleMemberRepository.findMemberIdsByCircleId(circleId);
+        if (memberIds.isEmpty()) {
+            return new CircleRoutineCommits(List.of());
+        }
+
+        List<CommitLog> commitLogs = commitLogRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
+        List<CommitMessage> commitMessages = commitMessageRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
+        List<CommitRate> commitRates = commitRateRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
+
+        // --- 데이터 매핑 ---
+        Map<Long, List<TaskDTO>> tasksByMemberId = mapTasksByMember(commitLogs);
+        Map<Long, String> messageByMemberId = mapMessagesByMember(commitMessages);
+        Map<Long, Double> rateByMemberId = mapRatesByMember(commitRates);
+
+        // --- DTO 조립 ---
+        List<CircleRoutineCommits.MemberCommitInfo> memberCommitInfos = memberIds.stream()
+                .map(memberId -> buildMemberCommitInfo(
+                        memberId,
+                        tasksByMemberId.getOrDefault(memberId, List.of()),
+                        messageByMemberId.get(memberId),
+                        rateByMemberId.getOrDefault(memberId, 0.0)
+                ))
+                .collect(Collectors.toList());
+
+        return new CircleRoutineCommits(memberCommitInfos);
+    }
+
+    private Map<Long, List<TaskDTO>> mapTasksByMember(List<CommitLog> commitLogs) {
+        return commitLogs.stream()
+                .collect(Collectors.groupingBy(
+                        log -> log.getMember().getId(),
+                        Collectors.mapping(TaskDTO::from, Collectors.toList())
+                ));
+    }
+
+    private Map<Long, String> mapMessagesByMember(List<CommitMessage> commitMessages) {
+        return commitMessages.stream()
+                .collect(Collectors.toMap(
+                        msg -> msg.getMember().getId(),
+                        CommitMessage::getMessage
+                ));
+    }
+
+    private Map<Long, Double> mapRatesByMember(List<CommitRate> commitRates) {
+        return commitRates.stream()
+                .collect(Collectors.toMap(
+                        rate -> rate.getMember().getId(),
+                        CommitRate::getCommitRate
+                ));
+    }
+
+    private CircleRoutineCommits.MemberCommitInfo buildMemberCommitInfo(
+            Long memberId,
+            List<TaskDTO> tasks,
+            String commitMessage,
+            Double commitRate
+    ) {
+        return CircleRoutineCommits.MemberCommitInfo.builder()
+                .memberId(memberId)
+                .tasks(tasks)
+                .commitMessage(commitMessage)
+                .commitRate(commitRate)
+                .build();
+    }
+
+
 
 
     private List<DailyRateDTO> mapThisWeekDailyRates(Long routineId) {
@@ -165,14 +241,20 @@ public class RoutineViewServiceImpl implements RoutineViewService {
         LocalDate lastSunday = today.with(DayOfWeek.SUNDAY).minusWeeks(1);    // 저번 주 일요일
         LocalDate fiveWeeksAgoMonday = lastSunday.minusWeeks(4).with(DayOfWeek.MONDAY); // 5주 전 월요일
 
-        List<CommitRate> rates = commitRateRepository.findAllByRoutineIdAndCommitDateBetween(
-                routineId, fiveWeeksAgoMonday, lastSunday
+        int startYear = fiveWeeksAgoMonday.getYear();
+        int startWeek = fiveWeeksAgoMonday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int endYear = lastSunday.getYear();
+        int endWeek = lastSunday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+
+        List<CommitRate> rates = commitRateRepository.findWeeklyAverageCommitRatesByRoutineIdBetween(
+                routineId, startYear, startWeek, endYear, endWeek
         );
 
         return rates.stream()
                 .map(WeeklyRateDTO::from)
                 .collect(Collectors.toList());
     }
+
 
 
     private List<TaskWeeklyRateDTO> mapTaskWeeklyRates(Long routineId) {

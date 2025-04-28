@@ -4,6 +4,7 @@ import WeekdayNav from '../components/Routines/WeekdayNav';
 import PastRoutineCard from '../components/Routines/PastRoutineCard';
 import TodayRoutineCard from '../components/Routines/TodayRoutineCard';
 import UpcomingRoutineCard from '../components/Routines/UpcomingRoutineCard';
+import CreateRoutineOverlay from "../components/Routines/CreateRoutineOverlay";
 import PostIt from "../components/ui/PostIt";
 import { Weekday } from '../types/routine';
 
@@ -17,7 +18,7 @@ const RoutinePage: React.FC = () => {
 
     const circleRoutines = filtered.filter(r => r.groupRoutine);
     const personalRoutines = filtered.filter(r => !r.groupRoutine);
-
+    const [isCreateMode, setIsCreateMode] = useState(false);
     const routineCardMap = {
         PAST: PastRoutineCard,
         TODAY: TodayRoutineCard,
@@ -50,6 +51,20 @@ const RoutinePage: React.FC = () => {
                         );
                     })}
                 </div>
+            )}
+            {/* ✅ 루틴 만들기 버튼 */}
+            <div className="flex justify-center mt-6">
+                <button
+                    onClick={() => setIsCreateMode(true)}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-xl shadow-md hover:bg-blue-600 transition"
+                >
+                    + 루틴 만들기
+                </button>
+            </div>
+
+            {/* ✅ 루틴 생성 오버레이 */}
+            {isCreateMode && (
+                <CreateRoutineOverlay onClose={() => setIsCreateMode(false)} />
             )}
         </div>
     );

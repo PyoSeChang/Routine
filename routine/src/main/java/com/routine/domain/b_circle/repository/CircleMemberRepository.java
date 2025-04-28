@@ -21,4 +21,6 @@ public interface CircleMemberRepository extends JpaRepository<CircleMember, Long
     @Modifying
     @Query("UPDATE CircleMember cm SET cm.skipCount = 3")
     void updateSkipCountToThreeForAll();
+
+    List<Long> findMemberIdsByCircleId(Long circleId);
 }
