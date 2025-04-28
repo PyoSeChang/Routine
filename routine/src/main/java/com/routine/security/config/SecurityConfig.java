@@ -1,4 +1,4 @@
-package com.routine.global.config;
+package com.routine.security.config;
 
 import com.routine.security.service.PrincipalDetailsService;
 import lombok.RequiredArgsConstructor;

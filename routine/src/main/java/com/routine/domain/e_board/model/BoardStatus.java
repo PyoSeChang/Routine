@@ -23,7 +23,7 @@ public class BoardStatus {
     @JoinColumn(name = "id")
     private Board board;
 
-    private boolean isDeleted;
+    private boolean isDisabled;
 
     private int viewCount;
 

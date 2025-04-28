@@ -22,9 +22,15 @@ public class Board {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private BoardType type;      // 공지, 후기, 홍보 등
+    private BoardType type; // 공지, 후기, 홍보 등
 
-    private String category;     // 글 주제 (예: 공부, 루틴, 독서 등)
+    @Enumerated(EnumType.STRING)
+    private Category category; //
+
+    @Enumerated(EnumType.STRING)
+    private DetailCategory detailCategory;
+
+    private String tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

@@ -63,6 +63,9 @@ dependencies {
 
     // JUnit5 플랫폼 런처 (테스트 실행 지원)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+
 }
 
 
