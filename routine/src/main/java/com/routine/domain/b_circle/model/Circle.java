@@ -1,6 +1,8 @@
 package com.routine.domain.b_circle.model;
 
 
+import com.routine.domain.e_board.model.Category;
+import com.routine.domain.e_board.model.DetailCategory;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +29,11 @@ public class Circle {
 
     private boolean isPublic;
 
-    private double averageCommitRate;
+    @Enumerated(EnumType.STRING)
+    private Category category; //
+
+    @Enumerated(EnumType.STRING)
+    private DetailCategory detailCategory;
 
     private LocalDateTime createdAt;
 

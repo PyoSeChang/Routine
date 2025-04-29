@@ -41,5 +41,6 @@ public interface CommitLogRepository extends JpaRepository<CommitLog, Long> {
     @Query("SELECT DISTINCT c.commitDate FROM CommitLog c WHERE c.member.id = :memberId AND c.routine.id = :routineId ORDER BY c.commitDate")
     List<LocalDate> findCommitDates(@Param("memberId") Long memberId, @Param("routineId") Long routineId);
 
-    List<CommitLog> findAllByMemberIdInAndCommitDate(List<Long> memberIds, LocalDate commitDate);
+    List<CommitLog> findAllByMemberIdInAndCommitDateAndRoutine_Circle_Id(List<Long> memberIds, LocalDate commitDate, Long circleId);
+
 }

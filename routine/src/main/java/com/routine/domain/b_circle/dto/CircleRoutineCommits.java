@@ -1,5 +1,6 @@
-package com.routine.domain.c_routine.dto;
+package com.routine.domain.b_circle.dto;
 
+import com.routine.domain.c_routine.dto.TaskDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +18,9 @@ public class CircleRoutineCommits {
     @AllArgsConstructor
     public static class MemberCommitInfo {
         private Long memberId;
-        private String commitMessage; // 커밋 메세지
-        private Double commitRate;    // 이행률 (성공률)
-        private List<TaskDTO> tasks;  // 커밋한 태스크들
+        private String nickname;
+        private Double commitRate;
+        private List<TaskDTO> tasks;
+        private String commitMessage;
     }
 }

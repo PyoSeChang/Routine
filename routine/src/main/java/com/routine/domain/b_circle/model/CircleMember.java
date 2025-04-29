@@ -27,11 +27,8 @@ public class CircleMember {
     @Enumerated(EnumType.STRING)
     private Role role; // 내부 enum
 
-    private double commitRate;
-
     private int skipCount;
 
-    private int points;
 
     public enum Role {
         LEADER,

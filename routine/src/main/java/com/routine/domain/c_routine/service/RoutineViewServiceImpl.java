@@ -135,72 +135,9 @@ public class RoutineViewServiceImpl implements RoutineViewService {
                 .build();
     }
 
-    @Override
-    public CircleRoutineCommits getCommitsByCircleId(Long circleId, LocalDate commitDate) {
-        List<Long> memberIds = circleMemberRepository.findMemberIdsByCircleId(circleId);
-        if (memberIds.isEmpty()) {
-            return new CircleRoutineCommits(List.of());
-        }
 
-        List<CommitLog> commitLogs = commitLogRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
-        List<CommitMessage> commitMessages = commitMessageRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
-        List<CommitRate> commitRates = commitRateRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
 
-        // --- 데이터 매핑 ---
-        Map<Long, List<TaskDTO>> tasksByMemberId = mapTasksByMember(commitLogs);
-        Map<Long, String> messageByMemberId = mapMessagesByMember(commitMessages);
-        Map<Long, Double> rateByMemberId = mapRatesByMember(commitRates);
 
-        // --- DTO 조립 ---
-        List<CircleRoutineCommits.MemberCommitInfo> memberCommitInfos = memberIds.stream()
-                .map(memberId -> buildMemberCommitInfo(
-                        memberId,
-                        tasksByMemberId.getOrDefault(memberId, List.of()),
-                        messageByMemberId.get(memberId),
-                        rateByMemberId.getOrDefault(memberId, 0.0)
-                ))
-                .collect(Collectors.toList());
-
-        return new CircleRoutineCommits(memberCommitInfos);
-    }
-
-    private Map<Long, List<TaskDTO>> mapTasksByMember(List<CommitLog> commitLogs) {
-        return commitLogs.stream()
-                .collect(Collectors.groupingBy(
-                        log -> log.getMember().getId(),
-                        Collectors.mapping(TaskDTO::from, Collectors.toList())
-                ));
-    }
-
-    private Map<Long, String> mapMessagesByMember(List<CommitMessage> commitMessages) {
-        return commitMessages.stream()
-                .collect(Collectors.toMap(
-                        msg -> msg.getMember().getId(),
-                        CommitMessage::getMessage
-                ));
-    }
-
-    private Map<Long, Double> mapRatesByMember(List<CommitRate> commitRates) {
-        return commitRates.stream()
-                .collect(Collectors.toMap(
-                        rate -> rate.getMember().getId(),
-                        CommitRate::getCommitRate
-                ));
-    }
-
-    private CircleRoutineCommits.MemberCommitInfo buildMemberCommitInfo(
-            Long memberId,
-            List<TaskDTO> tasks,
-            String commitMessage,
-            Double commitRate
-    ) {
-        return CircleRoutineCommits.MemberCommitInfo.builder()
-                .memberId(memberId)
-                .tasks(tasks)
-                .commitMessage(commitMessage)
-                .commitRate(commitRate)
-                .build();
-    }
 
 
 

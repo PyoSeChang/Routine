@@ -24,4 +24,7 @@ public interface RoutineService {
     // 나의 루틴 모아보기
     List<RoutineSummary> getMyRoutinesSummary(Long memberId);
 
+    // 서클 루틴 만들기
+    void saveCircleRoutine(Long memberId, Long CircleId);
+
 }

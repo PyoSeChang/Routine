@@ -1,5 +1,7 @@
 package com.routine.domain.b_circle.service;
 
+import com.routine.domain.a_member.model.Member;
+
 public interface CircleMemberService {
 
     // 현재 skipCount 조회
@@ -11,4 +13,5 @@ public interface CircleMemberService {
     // 모든 skipCount 초기화
     void resetAllSkipCounts();
 
+    void register(Long circleId, Member member);
 }

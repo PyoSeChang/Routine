@@ -64,7 +64,10 @@ const RoutinePage: React.FC = () => {
 
             {/* ✅ 루틴 생성 오버레이 */}
             {isCreateMode && (
-                <CreateRoutineOverlay onClose={() => setIsCreateMode(false)} />
+                <CreateRoutineOverlay
+                    onClose={() => setIsCreateMode(false)}
+                    isCircleRoutine={false} // 명시하거나, 생략 가능 (기본 false라)
+                />
             )}
         </div>
     );

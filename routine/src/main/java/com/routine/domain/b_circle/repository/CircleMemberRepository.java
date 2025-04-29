@@ -6,6 +6,7 @@ import com.routine.domain.b_circle.model.CircleMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,5 +23,8 @@ public interface CircleMemberRepository extends JpaRepository<CircleMember, Long
     @Query("UPDATE CircleMember cm SET cm.skipCount = 3")
     void updateSkipCountToThreeForAll();
 
-    List<Long> findMemberIdsByCircleId(Long circleId);
+    @Query("select cm.member.id from CircleMember cm where cm.circle.id = :circleId")
+    List<Long> findMemberIdsByCircleId(@Param("circleId") Long circleId);
+
+
 }

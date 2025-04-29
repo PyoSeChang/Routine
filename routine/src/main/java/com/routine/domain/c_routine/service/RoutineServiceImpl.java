@@ -180,6 +180,38 @@ public class RoutineServiceImpl implements RoutineService {
                 .toList();
     }
 
+    @Override
+    public void saveCircleRoutine(Long memberId, Long circleId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("멤버를 찾을 수 없습니다."));
+        Circle circle = circleRepository.findById(circleId)
+                .orElseThrow(() -> new IllegalStateException("멤버를 찾을 수 없습니다."));
+        RoutineDTO routineDTO = new RoutineDTO();
+        Routine routine = routineDTO.toCircleRoutine(member, circle);
+        routineRepository.save(routine);
+
+        List<RoutineTask> routineTasks = routineDTO.toRoutineTasks(routine);
+        if (!routineTasks.isEmpty()) {
+            routineTaskRepository.saveAll(routineTasks);
+        }
+        routine.setRoutineTasks(routineTasks);
+
+        LocalDate today = LocalDate.now();
+        routine.getRoutineTasks().forEach(task -> {
+            boolean exists = commitLogRepository.existsByRoutineAndMemberAndTaskAndCommitDate(routine, member, task, today);
+            if (!exists) {
+                CommitLog log = CommitLog.builder()
+                        .routine(routine)
+                        .member(member)
+                        .task(task)
+                        .commitDate(today)
+                        .status(CommitStatus.NONE)
+                        .build();
+                commitLogRepository.save(log);
+            }
+        });
+
+    }
 
 
 }

@@ -2,29 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { Weekday } from '../../types/routine';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { CategorySelector } from '../../components/ui/CategorySelector';
+import { Category } from '../../types/board';
 
 interface Props {
     onClose: () => void;
+    isCircleRoutine?: boolean;
+    circleId?: number;
 }
 
-const CATEGORIES = ['운동', '공부', '취미', '건강', '기타'];
-const DETAIL_CATEGORIES = ['헬스', '러닝', '영어', '자격증', '기타'];
 const WEEKDAYS: Weekday[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
-const CreateRoutineOverlay: React.FC<Props> = ({ onClose }) => {
+const CreateRoutineOverlay: React.FC<Props> = ({ onClose, isCircleRoutine = false, circleId }) => {
     const [form, setForm] = useState({
         title: '',
-        category: '',
+        category: Category.LANGUAGE,
         detailCategory: '',
         tags: '',
         description: '',
         repeatDays: [] as Weekday[],
         tasks: ['', '', ''],
+        circleRoutine: isCircleRoutine,
+        circleId: circleId ?? null,
     });
 
     const navigate = useNavigate();
 
-    const handleInputChange = (field: keyof typeof form, value: string) => {
+    const handleInputChange = (field: keyof typeof form, value: any) => {
         setForm(prev => ({ ...prev, [field]: value }));
     };
 
@@ -54,9 +58,7 @@ const CreateRoutineOverlay: React.FC<Props> = ({ onClose }) => {
 
         const payload = {
             ...form,
-            tags: form.tags,
             tasks: form.tasks.filter(t => t.trim() !== ''),
-            isGroupRoutine: false,
         };
 
         console.log('보내는 payload:', payload);
@@ -115,25 +117,12 @@ const CreateRoutineOverlay: React.FC<Props> = ({ onClose }) => {
                         ))}
                     </div>
 
-                    <select
-                        className="w-full border rounded-lg p-2"
-                        value={form.category}
-                        onChange={e => handleInputChange('category', e.target.value)}
-                        required
-                    >
-                        <option value="">카테고리 선택</option>
-                        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-
-                    <select
-                        className="w-full border rounded-lg p-2"
-                        value={form.detailCategory}
-                        onChange={e => handleInputChange('detailCategory', e.target.value)}
-                        required
-                    >
-                        <option value="">세부 카테고리 선택</option>
-                        {DETAIL_CATEGORIES.map(dc => <option key={dc} value={dc}>{dc}</option>)}
-                    </select>
+                    <CategorySelector
+                        category={form.category}
+                        detailCategory={form.detailCategory}
+                        onCategoryChange={(newCategory) => setForm(prev => ({ ...prev, category: newCategory, detailCategory: '' }))}
+                        onDetailCategoryChange={(newDetailCategory) => setForm(prev => ({ ...prev, detailCategory: newDetailCategory }))}
+                    />
 
                     <input
                         type="text"

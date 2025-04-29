@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { BoardDTO, Category, BoardType } from '../types/board';
-import { detailCategories } from '../types/detailCategories';
+import { CategorySelector } from '../components/ui/CategorySelector';
 
 interface Props {
     mode: 'create' | 'edit';
@@ -63,10 +63,6 @@ function BoardFormPage({ mode }: Props) {
         }
     };
 
-    const filteredDetailCategories = detailCategories.filter(
-        (detail) => detail.parentCategory === form.category
-    );
-
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">
@@ -85,34 +81,26 @@ function BoardFormPage({ mode }: Props) {
                     className="border p-2 rounded"
                 />
 
-                {/* 2. 카테고리 선택 */}
-                <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                >
-                    <option value={Category.LANGUAGE}>외국어</option>
-                    <option value={Category.EMPLOYMENT}>취업</option>
-                    <option value={Category.STUDY}>학습</option>
-                    <option value={Category.LIFE}>라이프</option>
-                </select>
+                {/* 2. 카테고리 + 디테일카테고리 선택 (리팩토링) */}
+                <CategorySelector
+                    category={form.category}
+                    detailCategory={form.detailCategory}
+                    onCategoryChange={(newCategory) => {
+                        setForm(prev => ({
+                            ...prev,
+                            category: newCategory,
+                            detailCategory: '', // 부모 카테고리 바뀌면 디테일 초기화
+                        }));
+                    }}
+                    onDetailCategoryChange={(newDetailCategory) => {
+                        setForm(prev => ({
+                            ...prev,
+                            detailCategory: newDetailCategory,
+                        }));
+                    }}
+                />
 
-                {/* 3. 디테일카테고리 선택 */}
-                <select
-                    name="detailCategory"
-                    value={form.detailCategory}
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                >
-                    <option value="">세부 카테고리를 선택하세요</option>
-                    {filteredDetailCategories.map((detail) => (
-                        <option key={detail.code} value={detail.code}>
-                            {detail.displayName}
-                        </option>
-                    ))}
-                </select>
-
+                {/* 3. 게시판 종류 선택 */}
                 <select
                     name="boardType"
                     value={form.boardType}
@@ -122,8 +110,8 @@ function BoardFormPage({ mode }: Props) {
                     <option value={BoardType.NOTICE}>공지</option>
                     <option value={BoardType.PROMOTION}>홍보</option>
                     <option value={BoardType.REVIEW}>후기</option>
-                    <option value={BoardType.QNA}>Q&A</option> {/* ⭐ 추가 */}
-                    <option value={BoardType.INFORMATION}>정보공유</option> {/* ⭐ 추가 */}
+                    <option value={BoardType.QNA}>Q&A</option>
+                    <option value={BoardType.INFORMATION}>정보공유</option>
                 </select>
 
                 {/* 4. 내용 */}

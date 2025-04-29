@@ -4,6 +4,9 @@ import RoutineDetailPage from "./pages/RoutineDetailPage";
 import BoardListPage from './pages/BoardListPage';
 import BoardFormPage from './pages/BoardFormPage';
 import BoardDetailPage from './pages/BoardDetailPage';
+import CirclePage from "./pages/circle/CirclePage";
+import CircleFormPage from "./pages/circle/CircleFormPage";
+import CircleDetailPage from "./pages/circle/CircleDetailPage";
 
 function App() {
     return (
@@ -22,6 +25,12 @@ function App() {
 
                 {/* 게시글 상세 */}
                 <Route path="/boards/:boardId" element={<BoardDetailPage />} />
+                {/*/!* 서클 보기 *!/*/}
+                <Route path="/circles" element={<CirclePage/>} />
+                {/*/!* 서클 만들기 }*/}
+                <Route path="/circles/create" element={<CircleFormPage/>} />
+                {/*/!* 서클 상세 *!/*/}
+                <Route path="/circles/:circleId" element={<CircleDetailPage />} />
             </Routes>
         </BrowserRouter>
     );
