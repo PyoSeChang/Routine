@@ -12,4 +12,6 @@ import lombok.Setter;
 public class RoutineSummaryDTO {
     private Long routineId;
     private String title;
+    private String category;
+    private String detailCategory;
 }

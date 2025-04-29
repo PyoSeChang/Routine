@@ -1,3 +1,6 @@
+import {Category} from "./board";
+
+
 export interface TaskDTO {
     taskId: number;
     content: string;
@@ -23,3 +26,11 @@ export interface RoutineViewDTO {
     tasks: TaskDTO[];
     skipCount: number;
 }
+
+export interface RoutineSummaryDTO {
+    routineId: number;
+    title: string;
+    category: Category;
+    detailCategory: string;
+}
+

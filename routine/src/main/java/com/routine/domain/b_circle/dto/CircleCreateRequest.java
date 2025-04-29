@@ -8,10 +8,9 @@ import lombok.Setter;
 @Setter
 public class CircleCreateRequest {
     private String name;
-    private Long leaderId;
+    private Long routineId;
     private String description;
     private String tags;
-    private boolean opened;
     private String category;        // 대분류 (ex: LANGUAGE)
     private String detailCategory;  // 소분류 (ex: ENGLISH)
 }

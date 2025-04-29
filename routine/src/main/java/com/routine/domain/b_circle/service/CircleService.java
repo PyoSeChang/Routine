@@ -5,6 +5,7 @@ import com.routine.domain.b_circle.dto.CircleResponse;
 import com.routine.domain.b_circle.dto.CircleSummary;
 import com.routine.domain.b_circle.dto.RoutineSummaryDTO;
 import com.routine.domain.b_circle.dto.CircleRoutineCommits;
+import com.routine.domain.e_board.model.Category;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,12 +14,13 @@ public interface CircleService {
 
     List<CircleSummary> getMyCircles(Long memberId);
 
+    Long createCircle(CircleCreateRequest request, Long leaderId);
 
-    Long createCircle(CircleCreateRequest request);
+    CircleResponse getCircleDetail(Long circleId, Long memberId);
 
-    CircleResponse getCircleDetail(Long circleId);
 
-    List<RoutineSummaryDTO> getMyRoutinesForCircle(Long memberId, Long circleId);
+
+    List<RoutineSummaryDTO> getMyRoutinesForCircle(Long memberId, String detailCategory);
 
     void convertRoutineToCircle(Long routineId, Long circleId, Long memberId);
 

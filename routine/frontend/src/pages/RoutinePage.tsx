@@ -66,7 +66,9 @@ const RoutinePage: React.FC = () => {
             {isCreateMode && (
                 <CreateRoutineOverlay
                     onClose={() => setIsCreateMode(false)}
-                    isCircleRoutine={false} // 명시하거나, 생략 가능 (기본 false라)
+                    onSave={(routineId, title) => {
+                        // 여기에도 저장 로직 있으면 작성
+                    }}
                 />
             )}
         </div>

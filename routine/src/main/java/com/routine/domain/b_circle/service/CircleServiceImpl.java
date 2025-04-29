@@ -49,8 +49,8 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public Long createCircle(CircleCreateRequest request) {
-        Long leaderId = request.getLeaderId();
+    public Long createCircle(CircleCreateRequest request, Long leaderId) {
+
         Member leader = memberRepository.findById(leaderId)
                 .orElseThrow(() -> new IllegalArgumentException("리더를 찾을 수 없습니다."));
 
@@ -58,7 +58,6 @@ public class CircleServiceImpl implements CircleService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .tags(request.getTags())
-                .isPublic(request.isOpened())
                 .category(Category.valueOf(request.getCategory()))
                 .detailCategory(DetailCategory.valueOf(request.getDetailCategory()))
                 .build();
@@ -80,7 +79,7 @@ public class CircleServiceImpl implements CircleService {
 
 
     @Override
-    public CircleResponse getCircleDetail(Long circleId) {
+    public CircleResponse getCircleDetail(Long circleId, Long memberId) {
         LocalDate today = LocalDate.now();
 
         // 1. 공용 루틴 조회
@@ -90,11 +89,35 @@ public class CircleServiceImpl implements CircleService {
         CircleRoutineCommits commitsToday = getCommitsByCircleId(circleId, today);
 
         // 3. 서클 회원 목록
-        List<Long> circleMembers = circleMemberRepository.findMemberIdsByCircleId(circleId);
+        AuthorizationDTO authorizationDTO = checkAuthorization(circleId, memberId);
 
-        // 3. DTO 조립
-        return new CircleResponse(circleRoutine, commitsToday, circleMembers);
+        // 4. DTO 조립
+        return new CircleResponse(circleRoutine, commitsToday, authorizationDTO);
 
+    }
+
+    @Override
+    public List<RoutineSummaryDTO> getMyRoutinesForCircle(Long memberId, String detailCategory) {
+        DetailCategory detailCategoryEnum = DetailCategory.valueOf(detailCategory);
+        List<Routine> routines = routineRepository.findPersonalRoutinesByDetailCategory(memberId, detailCategoryEnum);
+
+        return routines.stream()
+                .map(r -> new RoutineSummaryDTO(
+                        r.getId(),
+                        r.getTitle(),
+                        r.getCategory().name(),
+                        r.getDetailCategory().name()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    private AuthorizationDTO checkAuthorization(Long circleId, Long memberId) {
+
+        boolean leader = circleMemberRepository.existsByCircleIdAndMemberIdAndRole(circleId, memberId, CircleMember.Role.LEADER);
+        boolean member = circleMemberRepository.existsByCircleIdAndMemberId(circleId, memberId);
+
+        return new AuthorizationDTO(leader, member);
     }
 
     private CircleRoutineDTO findCircleRoutine(Long circleId) {
@@ -104,22 +127,6 @@ public class CircleServiceImpl implements CircleService {
         List<RoutineTask> tasks = routineTaskRepository.findAllByRoutineIdOrderByOrderNumberAsc(routine.getId());
 
         return CircleRoutineDTO.from(routine, tasks);
-    }
-
-    @Override
-    public List<RoutineSummaryDTO> getMyRoutinesForCircle(Long memberId, Long circleId) {
-        Circle circle = circleRepository.findById(circleId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 서클입니다"));
-
-        // circle의 detailCategory 가져오기
-        var circleDetailCategory = circle.getDetailCategory();
-
-        // 내 개인 루틴 중, 카테고리가 일치하는 루틴만 가져오기
-        List<Routine> routines = routineRepository.findPersonalRoutinesByDetailCategory(memberId, circleDetailCategory);
-
-        return routines.stream()
-                .map(r -> new RoutineSummaryDTO(r.getId(), r.getTitle()))
-                .collect(Collectors.toList());
     }
 
     @Override

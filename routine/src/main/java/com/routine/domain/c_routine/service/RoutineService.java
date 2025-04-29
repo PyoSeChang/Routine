@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface RoutineService {
     // 루틴의 기본적인 C, R, U, D
-    void saveRoutine(RoutineDTO routineDTO, Long memberId, boolean isCircleRoutine);
+    Long saveRoutine(RoutineDTO routineDTO, Long memberId);
 
     RoutineDTO getRoutine(Long routineId);
 
@@ -25,6 +25,6 @@ public interface RoutineService {
     List<RoutineSummary> getMyRoutinesSummary(Long memberId);
 
     // 서클 루틴 만들기
-    void saveCircleRoutine(Long memberId, Long CircleId);
+    void saveCircleRoutine(Long memberId, Long routineId, Long circleId);
 
 }

@@ -4,7 +4,7 @@ import { Category } from '../../types/board';
 import { detailCategories } from '../../types/detailCategories';
 
 interface CategorySelectorProps {
-    category: Category;
+    category: Category | "";
     detailCategory: string;
     onCategoryChange: (category: Category) => void;
     onDetailCategoryChange: (detailCategory: string) => void;

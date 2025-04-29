@@ -6,6 +6,7 @@ import com.routine.domain.b_circle.dto.*;
 import com.routine.domain.b_circle.service.CircleMemberService;
 import com.routine.domain.b_circle.service.CircleService;
 import com.routine.domain.c_routine.service.RoutineService;
+import com.routine.domain.e_board.model.Category;
 import com.routine.security.model.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,25 +35,32 @@ public class CircleController {
 
     //  2. 서클 생성
     @PostMapping
-    public Long createCircle(@RequestBody CircleCreateRequest request) {
-        System.out.println("요청 받음");
-        return circleService.createCircle(request);
+    public Long createCircle(@RequestBody CircleCreateRequest request,
+                             @AuthenticationPrincipal PrincipalDetails principal) {
+        Long memberId = principal.getMember().getId();
+        Long circleId = circleService.createCircle(request, memberId);
+
+        Long routineId = request.getRoutineId();
+        routineService.saveCircleRoutine(memberId, routineId, circleId);
+        return circleId;
     }
 
     //  3. 서클 상세 조회
     @GetMapping("/{circleId}")
-    public CircleResponse getCircleDetail(@PathVariable Long circleId) {
-        return circleService.getCircleDetail(circleId);
+    public CircleResponse getCircleDetail(@PathVariable Long circleId,
+                                          @AuthenticationPrincipal PrincipalDetails principal) {
+        Long memberId = principal.getMember().getId();
+        return circleService.getCircleDetail(circleId, memberId);
     }
 
     // 4. 서클 루틴으로 만들 나의 루틴 불러오기
-    @GetMapping("/{circleId}/my-routines")
+    @GetMapping("/my-routines")
     public List<RoutineSummaryDTO> getMyRoutinesForCircle(
-            @PathVariable Long circleId,
-            @AuthenticationPrincipal PrincipalDetails principal
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam String detailCategory
     ) {
         Long memberId = principal.getMember().getId();
-        return circleService.getMyRoutinesForCircle(memberId, circleId);
+        return circleService.getMyRoutinesForCircle(memberId, detailCategory);
     }
 
     // 5. 4에서 선택한 나의 루틴 서클 루틴으로 변환
@@ -68,14 +76,14 @@ public class CircleController {
     }
 
     // 6. 서클 가입
-    @PostMapping("/{circleId}/join")
-    public ResponseEntity<Void> joinCircle(@PathVariable Long circleId,
-                                           @AuthenticationPrincipal PrincipalDetails principal) {
-        Member member = principal.getMember();
-        Long memberId = member.getId();
-        circleMemberService.register(circleId, member);
-        routineService.saveCircleRoutine(memberId, circleId);
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/{circleId}/join")
+//    public ResponseEntity<Void> joinCircle(@PathVariable Long circleId,
+//                                           @AuthenticationPrincipal PrincipalDetails principal) {
+//        Member member = principal.getMember();
+//        Long memberId = member.getId();
+//        circleMemberService.register(circleId, member);
+//        routineService.saveCircleRoutine(memberId, circleId);
+//        return ResponseEntity.ok().build();
+//    }
 
 }

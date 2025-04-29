@@ -44,6 +44,15 @@ public class RoutineViewController {
         return ResponseEntity.ok(routines);
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<Long> createRoutine(@RequestBody RoutineDTO dto,
+                                              @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        Long memberId = principal.getMember().getId();
+        Long routineId = routineService.saveRoutine(dto, memberId);
+        return ResponseEntity.ok(routineId);
+    }
+
     @GetMapping("/{routineId}")
     public ResponseEntity<RoutineDTO> getRoutine(@PathVariable Long routineId,
                                                  @AuthenticationPrincipal PrincipalDetails principal) {

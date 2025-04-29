@@ -27,4 +27,7 @@ public interface CircleMemberRepository extends JpaRepository<CircleMember, Long
     List<Long> findMemberIdsByCircleId(@Param("circleId") Long circleId);
 
 
+    boolean existsByCircleIdAndMemberIdAndRole(Long circleId, Long memberId, CircleMember.Role role);
+
+    boolean existsByCircleIdAndMemberId(Long circleId, Long memberId);
 }

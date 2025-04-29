@@ -38,28 +38,31 @@ export default function CircleDetailPage() {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">서클 상세</h1>
 
-            {isLeader && (
-                <div className="flex gap-4 mb-6">
-                    <button
-                        className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600"
-                        onClick={() => setIsCreateMode(true)}
-                    >
-                        루틴 만들기
-                    </button>
-
-                    <button className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600">
-                        루틴 불러오기
-                    </button>
-                </div>
-            )}
-
             {routine ? (
                 <div className="mb-8">
                     <RoutinePublicCard routine={routine} />
                 </div>
             ) : (
-                <p className="mb-8 text-gray-500">등록된 공용 루틴이 없습니다.</p>
+                <>
+                    {isLeader ? (
+                        <div className="flex gap-4 mb-6">
+                            <button
+                                className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600"
+                                onClick={() => setIsCreateMode(true)}
+                            >
+                                루틴 만들기
+                            </button>
+
+                            <button className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600">
+                                루틴 불러오기
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="mb-8 text-gray-500">등록된 공용 루틴이 없습니다.</p>
+                    )}
+                </>
             )}
+
 
             <div className="flex flex-wrap gap-6">
                 {memberCommits.length === 0 ? (
@@ -78,8 +81,9 @@ export default function CircleDetailPage() {
             {isCreateMode && circleId && (
                 <CreateRoutineOverlay
                     onClose={() => setIsCreateMode(false)}
-                    isCircleRoutine={true}
-                    circleId={parseInt(circleId)}
+                    onSave={(routineId, title) => {
+                        // 필요하면 저장하거나, 아니면 빈 함수라도 둬야 한다
+                    }}
                 />
             )}
         </div>

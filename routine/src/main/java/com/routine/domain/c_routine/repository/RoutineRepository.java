@@ -3,6 +3,7 @@ package com.routine.domain.c_routine.repository;
 
 import com.routine.domain.a_member.model.Member;
 import com.routine.domain.c_routine.model.Routine;
+import com.routine.domain.e_board.model.Category;
 import com.routine.domain.e_board.model.DetailCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +34,9 @@ public interface RoutineRepository extends JpaRepository<Routine, Long> {
     List<Routine> findPersonalRoutinesByDetailCategory(@Param("memberId") Long memberId, @Param("detailCategory") DetailCategory detailCategory);
 
     Optional<Routine> findTopByCircleId(Long circleId);
+
+
+
+
+    Routine findByIdAndMemberId(Long routineId, Long memberId);
 }

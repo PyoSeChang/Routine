@@ -1,177 +1,164 @@
-import React, { useEffect, useState } from 'react';
-import { Weekday } from '../../types/routine';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { CategorySelector } from '../../components/ui/CategorySelector';
-import { Category } from '../../types/board';
+import React, { useState, useEffect } from "react";
+import axios from "../../api/axios";
+import CategorySelector from "../../components/ui/CategorySelector";
+import { Category } from "../../types/board"
+import TagInput from "../ui/TagInput";
 
 interface Props {
     onClose: () => void;
-    isCircleRoutine?: boolean;
-    circleId?: number;
+    onSave: (routineId: number, title: string) => void;
 }
 
-const WEEKDAYS: Weekday[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState(""); // ✅ description 추가
+    const [category, setCategory] = useState<Category>(Category.LANGUAGE);
+    const [detailCategory, setDetailCategory] = useState<string>("");
+    const [tags, setTags] = useState<string[]>([]);
+    const [tasks, setTasks] = useState<string[]>([""]);
+    const [repeatDays, setRepeatDays] = useState<string[]>([]);
 
-const CreateRoutineOverlay: React.FC<Props> = ({ onClose, isCircleRoutine = false, circleId }) => {
-    const [form, setForm] = useState({
-        title: '',
-        category: Category.LANGUAGE,
-        detailCategory: '',
-        tags: '',
-        description: '',
-        repeatDays: [] as Weekday[],
-        tasks: ['', '', ''],
-        circleRoutine: isCircleRoutine,
-        circleId: circleId ?? null,
-    });
-
-    const navigate = useNavigate();
-
-    const handleInputChange = (field: keyof typeof form, value: any) => {
-        setForm(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleDayToggle = (day: Weekday) => {
-        setForm(prev => ({
-            ...prev,
-            repeatDays: prev.repeatDays.includes(day)
-                ? prev.repeatDays.filter(d => d !== day)
-                : [...prev.repeatDays, day],
-        }));
-    };
-
-    const handleTaskChange = (index: number, value: string) => {
-        const updatedTasks = [...form.tasks];
-        updatedTasks[index] = value;
-        setForm(prev => ({ ...prev, tasks: updatedTasks }));
-    };
-
-    const handleAddTask = () => {
-        if (form.tasks.length < 10) {
-            setForm(prev => ({ ...prev, tasks: [...prev.tasks, ''] }));
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const payload = {
-            ...form,
-            tasks: form.tasks.filter(t => t.trim() !== ''),
-        };
-
-        console.log('보내는 payload:', payload);
-
+    const handleSave = async () => {
         try {
-            await axios.post('/api/routine/new-routine', payload, {
-                headers: { 'Content-Type': 'application/json' },
+            const res = await axios.post("/routine/create", {
+                title,
+                description,
+                category,
+                detailCategory,
+                tags: tags.join(","),
+                tasks
             });
-            alert('루틴이 성공적으로 생성되었습니다!');
-            window.location.reload();
-        } catch (error: any) {
-            if (error.response) {
-                console.error('서버 에러 상태:', error.response.status);
-                console.error('서버 에러 내용:', error.response.data);
-            } else {
-                console.error('루틴 생성 실패:', error);
-            }
-            alert('루틴 생성에 실패했습니다.');
+
+            const routineId = res.data.routineId;
+            onSave(routineId, title);
+        } catch (error) {
+            console.error("루틴 생성 실패", error);
         }
     };
 
     useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
         };
-        window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
     }, [onClose]);
 
+
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white p-8 rounded-lg w-[450px] shadow-lg relative">
-                <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onClick={onClose}>✕</button>
-                <h2 className="text-2xl font-bold mb-6 text-center">루틴 만들기</h2>
-                <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative">
+                <button
+                    className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                    onClick={onClose}
+                >
+                    ✕
+                </button>
 
-                    <input
-                        type="text"
-                        placeholder="루틴 이름"
-                        className="w-full border rounded-lg p-2"
-                        value={form.title}
-                        onChange={e => handleInputChange('title', e.target.value)}
-                        required
-                    />
+                <h2 className="text-xl font-bold mb-4">루틴 만들기</h2>
 
-                    <div className="flex flex-wrap gap-2">
-                        {WEEKDAYS.map(day => (
-                            <label key={day} className="flex items-center space-x-1">
-                                <input
-                                    type="checkbox"
-                                    checked={form.repeatDays.includes(day)}
-                                    onChange={() => handleDayToggle(day)}
-                                />
-                                <span>{day.slice(0, 3)}</span>
-                            </label>
-                        ))}
-                    </div>
+                {/* 루틴 제목 입력 */}
+                <input
+                    type="text"
+                    placeholder="루틴 제목"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="border p-2 rounded w-full mb-4"
+                />
 
+                {/* ✅ 루틴 설명 입력 */}
+                <textarea
+                    placeholder="루틴 설명"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="border p-2 rounded w-full mb-4"
+                    rows={4}
+                />
+
+                {/* 카테고리/디테일카테고리 선택 */}
+                <div className="mb-4">
                     <CategorySelector
-                        category={form.category}
-                        detailCategory={form.detailCategory}
-                        onCategoryChange={(newCategory) => setForm(prev => ({ ...prev, category: newCategory, detailCategory: '' }))}
-                        onDetailCategoryChange={(newDetailCategory) => setForm(prev => ({ ...prev, detailCategory: newDetailCategory }))}
+                        category={category}
+                        detailCategory={detailCategory}
+                        onCategoryChange={setCategory}
+                        onDetailCategoryChange={setDetailCategory}
                     />
+                </div>
 
-                    <input
-                        type="text"
-                        placeholder="태그 입력 (쉼표로 구분)"
-                        className="w-full border rounded-lg p-2"
-                        value={form.tags}
-                        onChange={e => handleInputChange('tags', e.target.value)}
-                    />
+                {/* ✅ 태그 입력 */}
+                <TagInput tags={tags} setTags={setTags} />
 
-                    <textarea
-                        placeholder="루틴 설명 작성"
-                        className="w-full border rounded-lg p-2"
-                        rows={3}
-                        value={form.description}
-                        onChange={e => handleInputChange('description', e.target.value)}
-                    />
-
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                        {form.tasks.map((task, index) => (
+                {/* ✅ 태스크 입력 */}
+                <div className="mb-4">
+                    <label className="block font-medium mb-1">태스크</label>
+                    {tasks.map((task, index) => (
+                        <div key={index} className="max-h-60 overflow-y-auto flex gap-2 mb-2">
                             <input
-                                key={index}
                                 type="text"
-                                placeholder={`Task ${index + 1}`}
-                                className="w-full border rounded-lg p-2"
                                 value={task}
-                                onChange={e => handleTaskChange(index, e.target.value)}
+                                onChange={(e) => {
+                                    const updated = [...tasks];
+                                    updated[index] = e.target.value;
+                                    setTasks(updated);
+                                }}
+                                className="border p-2 rounded w-full"
+                                placeholder={`할 일 ${index + 1}`}
                             />
-                        ))}
-                        {form.tasks.length < 10 && (
                             <button
-                                type="button"
-                                onClick={handleAddTask}
-                                className="mt-2 w-full border rounded-lg p-2 text-blue-500 hover:bg-blue-100"
+                                onClick={() => setTasks(tasks.filter((_, i) => i !== index))}
+                                className="text-gray-500 hover:text-red-500"
+                                disabled={tasks.length <= 1}
                             >
-                                + 태스크 추가
+                                🗑️
                             </button>
-                        )}
-                    </div>
+                        </div>
+                    ))}
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 mt-4"
-                    >
-                        저장하기
-                    </button>
-                </form>
+                    {tasks.length < 10 && (
+                        <button
+                            onClick={() => setTasks([...tasks, ""])}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            + 태스크 추가
+                        </button>
+                    )}
+                </div>
+
+                {/* ✅ 반복 요일 선택 */}
+                <div className="mb-4">
+                    <label className="block font-medium mb-1">반복 요일</label>
+                    <div className="flex flex-wrap gap-2">
+                        {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"].map(day => (
+                            <button
+                                key={day}
+                                type="button"
+                                onClick={() => {
+                                    if (repeatDays.includes(day)) {
+                                        setRepeatDays(repeatDays.filter(d => d !== day));
+                                    } else {
+                                        setRepeatDays([...repeatDays, day]);
+                                    }
+                                }}
+                                className={`px-3 py-1 rounded-full border ${repeatDays.includes(day) ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
+                            >
+                                {day.slice(0, 3)} {/* MON, TUE, WED 이렇게 표시 */}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+
+                <button
+                    className="bg-blue-500 text-white px-6 py-2 rounded w-full"
+                    onClick={handleSave}
+                >
+                    저장
+                </button>
             </div>
         </div>
     );
-};
-
-export default CreateRoutineOverlay;
+}

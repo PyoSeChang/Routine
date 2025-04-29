@@ -11,5 +11,5 @@ import java.util.List;
 public class CircleResponse {
     private CircleRoutineDTO circleRoutine;
     private CircleRoutineCommits memberCommits;
-    private List<Long> circleMembers;
+    private AuthorizationDTO circleMember;
 }

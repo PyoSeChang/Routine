@@ -35,21 +35,13 @@ public class RoutineServiceImpl implements RoutineService {
 
     @Transactional
     @Override
-    public void saveRoutine(RoutineDTO routineDTO, Long memberId, boolean isCircleRoutine) {
+    public Long saveRoutine(RoutineDTO routineDTO, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        Routine routine;
+        Routine routine = routineDTO.toPersonalRoutine(member);
 
-        if (isCircleRoutine) {
-            Long circleId = routineDTO.getCircleId();
-            Circle circle = circleRepository.findById(circleId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 서클입니다."));
-            routine = routineDTO.toCircleRoutine(member, circle);
-        } else {
-            routine = routineDTO.toPersonalRoutine(member);
-        }
 
         routineRepository.save(routine);
 
@@ -73,6 +65,7 @@ public class RoutineServiceImpl implements RoutineService {
                 commitLogRepository.save(log);
             }
         });
+        return routine.getId();
     }
 
     @Transactional
@@ -181,35 +174,13 @@ public class RoutineServiceImpl implements RoutineService {
     }
 
     @Override
-    public void saveCircleRoutine(Long memberId, Long circleId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalStateException("멤버를 찾을 수 없습니다."));
-        Circle circle = circleRepository.findById(circleId)
-                .orElseThrow(() -> new IllegalStateException("멤버를 찾을 수 없습니다."));
-        RoutineDTO routineDTO = new RoutineDTO();
-        Routine routine = routineDTO.toCircleRoutine(member, circle);
+    public void saveCircleRoutine(Long memberId, Long routineId, Long circleId) {
+        System.out.println("--------------------routineId: " + routineId);
+        Routine routine= routineRepository.findByIdAndMemberId(routineId, memberId);
+        Circle circle = circleRepository.findById(circleId).orElse(null);
+        routine.setCircle(circle);
+        routine.setGroupRoutine(true);
         routineRepository.save(routine);
-
-        List<RoutineTask> routineTasks = routineDTO.toRoutineTasks(routine);
-        if (!routineTasks.isEmpty()) {
-            routineTaskRepository.saveAll(routineTasks);
-        }
-        routine.setRoutineTasks(routineTasks);
-
-        LocalDate today = LocalDate.now();
-        routine.getRoutineTasks().forEach(task -> {
-            boolean exists = commitLogRepository.existsByRoutineAndMemberAndTaskAndCommitDate(routine, member, task, today);
-            if (!exists) {
-                CommitLog log = CommitLog.builder()
-                        .routine(routine)
-                        .member(member)
-                        .task(task)
-                        .commitDate(today)
-                        .status(CommitStatus.NONE)
-                        .build();
-                commitLogRepository.save(log);
-            }
-        });
 
     }
 
