@@ -1,5 +1,3 @@
-// src/types/circle.ts
-
 import { Category } from './board';
 import { Weekday } from './routine';
 
@@ -12,6 +10,7 @@ export interface CircleDTO {
     isPublic: boolean;
     category: Category;
     detailCategory: string;
+
 }
 
 export interface TaskDTO {
@@ -35,4 +34,21 @@ export interface MemberCommitInfoDTO {
     tasks: TaskDTO[];
     commitMessage?: string;
     commitRate: number;
+}
+
+export interface AuthorizationDTO {
+    leader: boolean;
+    member: boolean;
+    circleMemberId: number;
+    circleMemberName: string;
+}
+
+export interface CircleMemberSimpleDTO {
+    circleMemberId: number;
+    circleMemberName: string;
+}
+
+export interface CircleMemberDTO {
+    memberId: number;
+    nickname: string;
 }

@@ -4,6 +4,8 @@ import com.routine.domain.a_member.model.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -26,6 +28,15 @@ public class CircleMember {
 
     @Enumerated(EnumType.STRING)
     private Role role; // 내부 enum
+
+    private LocalDateTime joinedAt;
+
+    @PrePersist
+    public void setJoinedAtIfNull() {
+        if (this.joinedAt == null) {
+            this.joinedAt = LocalDateTime.now();
+        }
+    }
 
     private int skipCount;
 

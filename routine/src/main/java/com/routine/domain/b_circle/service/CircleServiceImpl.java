@@ -22,16 +22,19 @@ import com.routine.domain.d_routine_commit.repository.CommitMessageRepository;
 import com.routine.domain.d_routine_commit.repository.CommitRateRepository;
 import com.routine.domain.e_board.model.Category;
 import com.routine.domain.e_board.model.DetailCategory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CircleServiceImpl implements CircleService {
 
     private final CircleRepository circleRepository;
@@ -44,9 +47,19 @@ public class CircleServiceImpl implements CircleService {
     private final RoutineTaskRepository routineTaskRepository;
 
     @Override
-    public List<CircleSummary> getMyCircles(Long memberId) {
-        return List.of();
+    public List<CircleSummaryDTO> getMyCircles(Long memberId) {
+        List<CircleMember> memberships = circleMemberRepository.findAllByMemberId(memberId);
+
+        return memberships.stream()
+                .map(cm -> CircleSummaryDTO.from(cm.getCircle(), cm,
+                        circleMemberRepository.countByCircleId(cm.getCircle().getId())))
+                .sorted(Comparator
+                        .comparing(CircleSummaryDTO::isLeader).reversed()
+                        .thenComparing(CircleSummaryDTO::getJoinedAt))
+                .collect(Collectors.toList());
     }
+
+
 
     @Override
     public Long createCircle(CircleCreateRequest request, Long leaderId) {
@@ -55,11 +68,13 @@ public class CircleServiceImpl implements CircleService {
                 .orElseThrow(() -> new IllegalArgumentException("리더를 찾을 수 없습니다."));
 
         Circle circle = Circle.builder()
-                .name(request.getName())
-                .description(request.getDescription())
+                .name(request.getCircleName())
+                .description(request.getCircleDescription())
                 .tags(request.getTags())
                 .category(Category.valueOf(request.getCategory()))
                 .detailCategory(DetailCategory.valueOf(request.getDetailCategory()))
+                .isOpened(request.isOpened())
+                .maxMemberCount(request.getMaxMemberCount())
                 .build();
 
         circleRepository.save(circle);
@@ -88,12 +103,14 @@ public class CircleServiceImpl implements CircleService {
         // 2. 오늘 멤버 커밋 이력 조회
         CircleRoutineCommits commitsToday = getCommitsByCircleId(circleId, today);
 
-        // 3. 서클 회원 목록
+        // 3. 로그인된 서클 회원 정보
         AuthorizationDTO authorizationDTO = checkAuthorization(circleId, memberId);
 
-        // 4. DTO 조립
-        return new CircleResponse(circleRoutine, commitsToday, authorizationDTO);
+        // 4. 서클 멤버 리스트 조회
+        List<CircleMemberDTO> memberDTOs = getMemberDTOsByCircleId(circleId);
 
+        // 5. DTO 조립
+        return new CircleResponse(circleRoutine, commitsToday, authorizationDTO, memberDTOs);
     }
 
     @Override
@@ -116,12 +133,15 @@ public class CircleServiceImpl implements CircleService {
 
         boolean leader = circleMemberRepository.existsByCircleIdAndMemberIdAndRole(circleId, memberId, CircleMember.Role.LEADER);
         boolean member = circleMemberRepository.existsByCircleIdAndMemberId(circleId, memberId);
-
-        return new AuthorizationDTO(leader, member);
+        String nickname = memberRepository.findNicknameById(memberId);
+        return new AuthorizationDTO(leader, member, memberId, nickname);
     }
 
     private CircleRoutineDTO findCircleRoutine(Long circleId) {
-        Routine routine = routineRepository.findTopByCircleId(circleId)
+        Long adminId = circleMemberRepository.findAdminIdByCircleId(circleId)
+                .orElseThrow(() -> new IllegalArgumentException("리더가 존재하지 않는 서클입니다."));
+
+        Routine routine = routineRepository.findByCircleIdAndMemberId(circleId, adminId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 서클에 루틴이 존재하지 않습니다."));
 
         List<RoutineTask> tasks = routineTaskRepository.findAllByRoutineIdOrderByOrderNumberAsc(routine.getId());
@@ -182,6 +202,39 @@ public class CircleServiceImpl implements CircleService {
         return new CircleRoutineCommits(memberCommitInfos);
     }
 
+    @Override
+    public List<CircleSummaryDTO> searchCircles(String category, String detailCategory, String keyword) {
+        Category categoryEnum = null;
+
+        if (category != null && !category.isEmpty()) {
+            try {
+                categoryEnum = Category.valueOf(category.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("잘못된 category 값: " + category);
+            }
+        }
+
+        DetailCategory detailCategoryEnum = null;
+        if (detailCategory != null && !detailCategory.isEmpty()) {
+            try {
+                detailCategoryEnum = DetailCategory.valueOf(detailCategory);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("잘못된 detailCategory 값: " + detailCategory);
+            }
+        }
+
+        List<Circle> result = circleRepository.searchCircles(categoryEnum, detailCategoryEnum, keyword);
+
+        return result.stream()
+                .map(circle -> {
+                    int currentCount = circleMemberRepository.countByCircleId(circle.getId());
+                    return CircleSummaryDTO.from(circle, currentCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 
     private Map<Long, List<TaskDTO>> mapTasksByMember(List<CommitLog> commitLogs) {
         return commitLogs.stream()
@@ -221,6 +274,15 @@ public class CircleServiceImpl implements CircleService {
                 .tasks(tasks)
                 .commitMessage(commitMessage)
                 .build();
+    }
+
+    public List<CircleMemberDTO> getMemberDTOsByCircleId(Long circleId) {
+        return circleMemberRepository.findAllByCircleId(circleId).stream()
+                .map(cm -> new CircleMemberDTO(
+                        cm.getMember().getId(),
+                        cm.getMember().getNickname()
+                ))
+                .collect(Collectors.toList());
     }
 
 }

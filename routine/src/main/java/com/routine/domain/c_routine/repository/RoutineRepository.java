@@ -2,6 +2,7 @@ package com.routine.domain.c_routine.repository;
 
 
 import com.routine.domain.a_member.model.Member;
+import com.routine.domain.b_circle.model.Circle;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.e_board.model.Category;
 import com.routine.domain.e_board.model.DetailCategory;
@@ -33,10 +34,15 @@ public interface RoutineRepository extends JpaRepository<Routine, Long> {
     @Query("SELECT r FROM Routine r WHERE r.member.id = :memberId AND r.isGroupRoutine = false AND r.detailCategory = :detailCategory")
     List<Routine> findPersonalRoutinesByDetailCategory(@Param("memberId") Long memberId, @Param("detailCategory") DetailCategory detailCategory);
 
-    Optional<Routine> findTopByCircleId(Long circleId);
+
 
 
 
 
     Routine findByIdAndMemberId(Long routineId, Long memberId);
+
+    Optional<Routine> findByMemberIdAndCircleId(Long adminId, Long circleId);
+
+    Optional<Routine> findByCircleIdAndMemberId(Long circleId, Long memberId);
+
 }

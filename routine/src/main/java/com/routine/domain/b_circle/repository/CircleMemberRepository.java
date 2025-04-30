@@ -1,8 +1,10 @@
 package com.routine.domain.b_circle.repository;
 
 
+import com.routine.domain.b_circle.dto.CircleSummaryDTO;
 import com.routine.domain.b_circle.model.Circle;
 import com.routine.domain.b_circle.model.CircleMember;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +32,14 @@ public interface CircleMemberRepository extends JpaRepository<CircleMember, Long
     boolean existsByCircleIdAndMemberIdAndRole(Long circleId, Long memberId, CircleMember.Role role);
 
     boolean existsByCircleIdAndMemberId(Long circleId, Long memberId);
+
+    @EntityGraph(attributePaths = {"circle"})
+    List<CircleMember> findAllByMemberId(Long memberId);
+
+    int countByCircleId(Long id);
+
+    @Query("SELECT cm.member.id FROM CircleMember cm WHERE cm.circle.id = :circleId AND cm.role = 'LEADER'")
+    Optional<Long> findAdminIdByCircleId(Long circleId);
+
+    Optional<CircleMember> findByCircleIdAndMemberId(Long circleId, Long actorMemberId);
 }

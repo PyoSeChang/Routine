@@ -5,20 +5,21 @@ import CategorySelector from "../../components/ui/CategorySelector";
 import { RoutineSummaryDTO } from "../../types/routine";
 import { Category } from "../../types/board";
 import TagInput from "../../components/ui/TagInput";
+import { useNavigate } from 'react-router-dom';
 
 export default function CircleFormPage() {
     const [circleName, setCircleName] = useState("");
     const [circleDescription, setCircleDescription] = useState("");
-    const [category, setCategory] = useState<Category>(Category.LANGUAGE); // ✅ 초기값 LANGUAGE
+    const [category, setCategory] = useState<Category>(Category.LANGUAGE);
     const [detailCategory, setDetailCategory] = useState("");
     const [tags, setTags] = useState<string[]>([]);
     const [routineOptions, setRoutineOptions] = useState<RoutineSummaryDTO[]>([]);
-    const [createdRoutine, setCreatedRoutine] = useState<RoutineSummaryDTO | null>(null);
     const [selectedRoutineId, setSelectedRoutineId] = useState<number | null>(null);
-    const memberId = localStorage.getItem("memberId");
-
-
+    const [isOpened, setIsOpened] = useState(true);
+    const [maxMemberCount, setMaxMemberCount] = useState(10);
     const [isCreateRoutineOpen, setIsCreateRoutineOpen] = useState(false);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         if (category && detailCategory) {
@@ -46,28 +47,48 @@ export default function CircleFormPage() {
         }
 
         try {
-            await axios.post("/circles", {
+            const res = await axios.post("/circles", {
                 circleName,
                 circleDescription,
                 category,
                 detailCategory,
-                tags: tags.join(","), // ✅ 태그 추가
+                tags: tags.join(","),
+                routineId: selectedRoutineId,
                 mode: "IMPORT",
-                routineId: selectedRoutineId
+                opened: isOpened,
+                maxMemberCount,
             });
-            // TODO: 성공 후 이동 처리
+
+            const circleId = res.data.circleId;
+            navigate(`/circles/${circleId}`);
+
         } catch (error) {
             console.error("서클 생성 실패", error);
         }
     };
 
-    const handleRoutineCreate = (routineId: number, title: string, category: Category, detailCategory: string) => {
-        const newRoutine: RoutineSummaryDTO = { routineId, title, category, detailCategory };
+    const handleRoutineCreate = (
+        routineId: number,
+        title: string,
+        category: Category,
+        detailCategory: string
+    ) => {
+        if (!routineId || !title) {
+            console.error("handleRoutineCreate: invalid routineId or title", { routineId, title });
+            return;
+        }
 
-        setRoutineOptions(prev => [...prev, newRoutine]); // ✅ 새 루틴을 루틴 목록에 추가
-        setSelectedRoutineId(routineId); // ✅ 새 루틴 자동 선택
-        setCategory(category); // ✅ category 고정
-        setDetailCategory(detailCategory); // ✅ detailCategory 고정
+        const newRoutine: RoutineSummaryDTO = {
+            routineId,
+            title,
+            category,
+            detailCategory,
+        };
+
+        setRoutineOptions((prev) => [...prev, newRoutine]);
+        setSelectedRoutineId(routineId);
+        setCategory(category);
+        setDetailCategory(detailCategory);
         setIsCreateRoutineOpen(false);
     };
 
@@ -102,28 +123,64 @@ export default function CircleFormPage() {
 
             <TagInput tags={tags} setTags={setTags} />
 
+            {/* ✅ 공개 여부 */}
+            {/* ✅ 공개 여부 */}
+            <div className="mb-6">
+                <label className="mr-4 font-semibold">공개 여부:</label>
+                <label className="mr-4">
+                    <input
+                        type="radio"
+                        name="isOpened"
+                        value="true"
+                        checked={isOpened}
+                        onChange={() => setIsOpened(true)}
+                    /> 공개
+                </label>
+                <label>
+                    <input
+                        type="radio"
+                        name="isOpened"
+                        value="false"
+                        checked={!isOpened}
+                        onChange={() => setIsOpened(false)}
+                    /> 비공개
+
+                </label>
+            </div>
+
+
+            {/* ✅ 최대 멤버 수 */}
+            <div className="mb-6">
+                <label className="block font-semibold mb-1">최대 멤버 수:</label>
+                <input
+                    type="number"
+                    min={2}
+                    value={maxMemberCount}
+                    onChange={(e) => setMaxMemberCount(parseInt(e.target.value))}
+                    className="border p-2 rounded w-full"
+                />
+            </div>
+
             {/* 루틴 선택 */}
             <div className="mb-6">
                 <select
-                    value={selectedRoutineId ?? ""}
+                    value={selectedRoutineId != null ? selectedRoutineId.toString() : ""}
                     onChange={(e) => setSelectedRoutineId(Number(e.target.value))}
                     className="border p-2 rounded w-full"
                 >
                     <option value="">루틴 선택</option>
-                    {createdRoutine && (
-                        <option value={createdRoutine.routineId} key={createdRoutine.routineId}>
-                            {createdRoutine.title}
-                        </option>
-                    )}
-                    {routineOptions.map(routine => (
-                        <option key={routine.routineId} value={routine.routineId}>
-                            {routine.title}
-                        </option>
-                    ))}
+                    {routineOptions.map((routine, idx) => {
+                        if (!routine?.routineId) return null;
+                        return (
+                            <option key={routine.routineId} value={routine.routineId.toString()}>
+                                {routine.title}
+                            </option>
+                        );
+                    })}
                 </select>
             </div>
 
-            {/* 루틴 새로 만들기 버튼 */}
+            {/* 루틴 새로 만들기 */}
             <div className="flex gap-4 mb-8">
                 <button
                     className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600"
@@ -133,7 +190,6 @@ export default function CircleFormPage() {
                 </button>
             </div>
 
-            {/* 서클 생성 완료 버튼 */}
             <button
                 className="bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600"
                 onClick={handleSubmit}
@@ -141,12 +197,10 @@ export default function CircleFormPage() {
                 서클 생성 완료
             </button>
 
-            {/* 루틴 만들기 오버레이 */}
             {isCreateRoutineOpen && (
                 <CreateRoutineOverlay
                     onClose={() => setIsCreateRoutineOpen(false)}
                     onSave={(routineId, title) => {
-                        // 루틴 새로 만들었을 때 → 바로 선택 + 카테고리 고정
                         handleRoutineCreate(routineId, title, category, detailCategory);
                     }}
                 />

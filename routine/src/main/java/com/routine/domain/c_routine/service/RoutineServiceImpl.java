@@ -4,6 +4,7 @@ package com.routine.domain.c_routine.service;
 import com.routine.domain.a_member.model.Member;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.b_circle.model.Circle;
+import com.routine.domain.b_circle.repository.CircleMemberRepository;
 import com.routine.domain.b_circle.repository.CircleRepository;
 import com.routine.domain.c_routine.dto.RoutineDTO;
 import com.routine.domain.c_routine.dto.RoutineSummary;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +33,12 @@ public class RoutineServiceImpl implements RoutineService {
     private final RoutineRepository routineRepository;
     private final RoutineTaskRepository routineTaskRepository;
     private final CircleRepository circleRepository;
+    private final CircleMemberRepository circleMemberRepository;
     private final CommitLogRepository commitLogRepository;
 
     @Transactional
     @Override
-    public Long saveRoutine(RoutineDTO routineDTO, Long memberId) {
+    public Routine saveRoutine(RoutineDTO routineDTO, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
@@ -65,7 +68,7 @@ public class RoutineServiceImpl implements RoutineService {
                 commitLogRepository.save(log);
             }
         });
-        return routine.getId();
+        return routine;
     }
 
     @Transactional
@@ -174,7 +177,58 @@ public class RoutineServiceImpl implements RoutineService {
     }
 
     @Override
-    public void saveCircleRoutine(Long memberId, Long routineId, Long circleId) {
+    @Transactional
+    public void saveCircleRoutine(Long memberId, Long circleId) {
+        // 0. 해당 서클의 리더 ID 찾기
+        Long adminId = circleMemberRepository.findAdminIdByCircleId(circleId)
+                .orElseThrow(() -> new IllegalArgumentException("리더가 존재하지 않는 서클입니다."));
+
+        // 1. 리더의 서클 루틴 가져오기
+        Routine origin = routineRepository.findByMemberIdAndCircleId(adminId, circleId)
+                .orElseThrow(() -> new IllegalArgumentException("리더의 루틴이 존재하지 않습니다."));
+
+        // 2. 루틴 복사  (groupRoutine = true)
+        Routine newRoutine = Routine.builder()
+                .title(origin.getTitle())
+                .member(memberRepository.getReferenceById(memberId))
+                .category(origin.getCategory())
+                .detailCategory(origin.getDetailCategory())
+                .repeatDays(new ArrayList<>(origin.getRepeatDays()))
+                .tags(origin.getTags())
+                .circle(circleRepository.getReferenceById(circleId))
+                .isGroupRoutine(true)
+                .build();
+        routineRepository.save(newRoutine);
+
+        // 3. 태스크 복사
+        List<RoutineTask> tasks = routineTaskRepository.findAllByRoutineId(origin.getId());
+        for (RoutineTask task : tasks) {
+            // 3-1. RoutineTask 복사 및 저장
+            RoutineTask copiedTask = routineTaskRepository.save(
+                    RoutineTask.builder()
+                            .routine(newRoutine)
+                            .content(task.getContent())
+                            .orderNumber(task.getOrderNumber())
+                            .build()
+            );
+
+            // 3-2. CommitLog 생성 시 taskId 포함
+            CommitLog commitLog = CommitLog.builder()
+                    .routine(newRoutine)
+                    .member(newRoutine.getMember())
+                    .task(copiedTask)
+                    .commitDate(LocalDate.now())
+                    .status(CommitStatus.NONE)
+                    .build();
+
+            commitLogRepository.save(commitLog);
+        }
+
+    }
+
+
+    @Override
+    public void saveAsCircleRoutine(Long memberId, Long routineId, Long circleId) {
         System.out.println("--------------------routineId: " + routineId);
         Routine routine= routineRepository.findByIdAndMemberId(routineId, memberId);
         Circle circle = circleRepository.findById(circleId).orElse(null);
@@ -182,6 +236,15 @@ public class RoutineServiceImpl implements RoutineService {
         routine.setGroupRoutine(true);
         routineRepository.save(routine);
 
+    }
+
+    @Override
+    public void saveAsPersonalRoutine(Long memberId, Long circleId) {
+        Routine routine = routineRepository.findByMemberIdAndCircleId(memberId, circleId)
+                .orElseThrow(() -> new IllegalArgumentException(" 루틴이 존재하지 않습니다."));
+        routine.setCircle(null);
+        routine.setGroupRoutine(false);
+        routineRepository.save(routine);
     }
 
 

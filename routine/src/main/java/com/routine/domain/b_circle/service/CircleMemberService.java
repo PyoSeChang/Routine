@@ -14,4 +14,10 @@ public interface CircleMemberService {
     void resetAllSkipCounts();
 
     void register(Long circleId, Member member);
+
+    void assignLeader(Long circleId, Long memberId, Long id);
+
+    void kickMember(Long circleId, Long memberId, Long id);
+
+    void leaveCircle(Long circleId, Long memberId, Long id);
 }

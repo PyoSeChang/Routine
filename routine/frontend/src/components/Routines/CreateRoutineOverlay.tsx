@@ -11,7 +11,7 @@ interface Props {
 
 export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState(""); // ✅ description 추가
+    const [description, setDescription] = useState("");
     const [category, setCategory] = useState<Category>(Category.LANGUAGE);
     const [detailCategory, setDetailCategory] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
@@ -20,13 +20,14 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
 
     const handleSave = async () => {
         try {
-            const res = await axios.post("/routine/create", {
+            const res = await axios.post("/circles/create", {
                 title,
                 description,
                 category,
                 detailCategory,
                 tags: tags.join(","),
-                tasks
+                tasks,
+                repeatDays,
             });
 
             const routineId = res.data.routineId;
@@ -48,7 +49,6 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
         };
     }, [onClose]);
 
-
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative">
@@ -61,7 +61,6 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
 
                 <h2 className="text-xl font-bold mb-4">루틴 만들기</h2>
 
-                {/* 루틴 제목 입력 */}
                 <input
                     type="text"
                     placeholder="루틴 제목"
@@ -70,7 +69,6 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                     className="border p-2 rounded w-full mb-4"
                 />
 
-                {/* ✅ 루틴 설명 입력 */}
                 <textarea
                     placeholder="루틴 설명"
                     value={description}
@@ -79,7 +77,6 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                     rows={4}
                 />
 
-                {/* 카테고리/디테일카테고리 선택 */}
                 <div className="mb-4">
                     <CategorySelector
                         category={category}
@@ -89,10 +86,8 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                     />
                 </div>
 
-                {/* ✅ 태그 입력 */}
                 <TagInput tags={tags} setTags={setTags} />
 
-                {/* ✅ 태스크 입력 */}
                 <div className="mb-4">
                     <label className="block font-medium mb-1">태스크</label>
                     {tasks.map((task, index) => (
@@ -128,7 +123,6 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                     )}
                 </div>
 
-                {/* ✅ 반복 요일 선택 */}
                 <div className="mb-4">
                     <label className="block font-medium mb-1">반복 요일</label>
                     <div className="flex flex-wrap gap-2">
@@ -145,12 +139,11 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                                 }}
                                 className={`px-3 py-1 rounded-full border ${repeatDays.includes(day) ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
                             >
-                                {day.slice(0, 3)} {/* MON, TUE, WED 이렇게 표시 */}
+                                {day.slice(0, 3)}
                             </button>
                         ))}
                     </div>
                 </div>
-
 
                 <button
                     className="bg-blue-500 text-white px-6 py-2 rounded w-full"

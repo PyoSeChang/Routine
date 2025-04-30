@@ -15,4 +15,6 @@ public interface RoutineTaskRepository extends JpaRepository<RoutineTask, Long> 
     void deleteAllByRoutine(Routine original);
 
     List<RoutineTask> findAllByRoutineIdOrderByOrderNumberAsc(Long id);
+
+    List<RoutineTask> findAllByRoutineId(Long id);
 }

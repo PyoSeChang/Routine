@@ -9,4 +9,6 @@ import lombok.*;
 public class AuthorizationDTO {
     private boolean leader;
     private boolean member;
+    private Long circleMemberId;
+    private String circleMemberName;
 }

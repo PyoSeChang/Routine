@@ -89,10 +89,23 @@ public class PointServiceImpl implements PointService {
     @Override
     @Transactional
     public void rewardForCircleRoutineCommit(Long memberId, Long routineId, LocalDate commitDate) {
-        UserInfo userInfo = userInfoRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new IllegalStateException("UserInfo 없음"));
+//        UserInfo userInfo = userInfoRepository.findByMemberId(memberId)
+//                .orElseThrow(() -> new IllegalStateException("UserInfo 없음"));
 
-        userInfo.setTodayAvailablePoint(150);
+        UserInfo userInfo = userInfoRepository.findByMemberId(memberId)
+                .orElseGet(() -> {
+                    Member member = memberRepository.findById(memberId)
+                            .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
+                    UserInfo newInfo = UserInfo.builder()
+                            .member(member)
+                            .email("example") // 필요 시 email 직접 설정
+                            .todayAvailablePoint(150)
+                            .todayAvailablePointDate(LocalDate.now())
+                            .totalPoints(0)
+                            .build();
+                    return userInfoRepository.save(newInfo);
+                });
+
         userInfoRepository.save(userInfo);
         // 1. 포인트 한도 체크 (내부에서 실패 로그 남김)
         checkPointLimitOrLogFailure(memberId, routineId);

@@ -49,8 +49,8 @@ public class RoutineViewController {
                                               @AuthenticationPrincipal PrincipalDetails principal
     ) {
         Long memberId = principal.getMember().getId();
-        Long routineId = routineService.saveRoutine(dto, memberId);
-        return ResponseEntity.ok(routineId);
+        Routine routine = routineService.saveRoutine(dto, memberId);
+        return ResponseEntity.ok(routine.getId());
     }
 
     @GetMapping("/{routineId}")

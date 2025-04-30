@@ -27,8 +27,6 @@ public class Circle {
 
     private String tags;
 
-    private boolean isPublic;
-
     @Enumerated(EnumType.STRING)
     private Category category; //
 
@@ -40,6 +38,8 @@ public class Circle {
     @OneToMany(mappedBy = "circle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CircleMember> members;
 
+    private boolean isOpened;
+    private int maxMemberCount;
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

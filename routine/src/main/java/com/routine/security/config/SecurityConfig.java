@@ -22,7 +22,12 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 🔥 모든 요청 허용
+                        .requestMatchers(
+                                "/api/circles/**",
+                                "/api/routines/**",
+                                "/api/boards/**"
+                        ).authenticated() //  API 인증 필요
+                        .anyRequest().permitAll() // 나머지는 허용
                 )
                 .formLogin(form -> form
                         .loginPage("/member/login")
@@ -37,6 +42,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();

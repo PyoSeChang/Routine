@@ -67,4 +67,64 @@ public class CircleMemberServiceImpl implements CircleMemberService {
         circleMemberRepository.save(circleMember);
 
     }
+
+    @Override
+    public void assignLeader(Long circleId, Long targetMemberId, Long actorMemberId) {
+        CircleMember actor = circleMemberRepository.findByCircleIdAndMemberId(circleId, actorMemberId)
+                .orElseThrow(() -> new IllegalStateException("서클 멤버가 아닙니다."));
+
+        if (actor.getRole() != CircleMember.Role.LEADER) {
+            throw new IllegalStateException("리더만 권한을 위임할 수 있습니다.");
+        }
+
+        CircleMember target = circleMemberRepository.findByCircleIdAndMemberId(circleId, targetMemberId)
+                .orElseThrow(() -> new IllegalStateException("위임 대상이 서클 멤버가 아닙니다."));
+
+        if (target.getMember().getId().equals(actorMemberId)) {
+            throw new IllegalStateException("자기 자신에게 리더를 위임할 수 없습니다.");
+        }
+
+        actor.setRole(CircleMember.Role.MEMBER);
+        target.setRole(CircleMember.Role.LEADER);
+
+        circleMemberRepository.save(actor);
+        circleMemberRepository.save(target);
+    }
+
+
+    @Override
+    public void kickMember(Long circleId, Long targetMemberId, Long actorMemberId) {
+        CircleMember actor = circleMemberRepository.findByCircleIdAndMemberId(circleId, actorMemberId)
+                .orElseThrow(() -> new IllegalStateException("서클 멤버가 아닙니다."));
+
+        if (actor.getRole() != CircleMember.Role.LEADER) {
+            throw new IllegalStateException("리더만 멤버를 추방할 수 있습니다.");
+        }
+
+        CircleMember target = circleMemberRepository.findByCircleIdAndMemberId(circleId, targetMemberId)
+                .orElseThrow(() -> new IllegalStateException("추방 대상이 서클 멤버가 아닙니다."));
+
+        if (target.getRole() == CircleMember.Role.LEADER) {
+            throw new IllegalStateException("다른 리더는 추방할 수 없습니다.");
+        }
+        routineService.saveAsPersonalRoutine(targetMemberId, circleId);
+        circleMemberRepository.delete(target);
+    }
+
+    @Override
+    public void leaveCircle(Long circleId, Long memberId, Long actorMemberId) {
+        if (!memberId.equals(actorMemberId)) {
+            throw new IllegalStateException("본인만 탈퇴할 수 있습니다.");
+        }
+
+        CircleMember member = circleMemberRepository.findByCircleIdAndMemberId(circleId, memberId)
+                .orElseThrow(() -> new IllegalStateException("서클 멤버가 아닙니다."));
+
+        if (member.getRole() == CircleMember.Role.LEADER) {
+            throw new IllegalStateException("리더는 탈퇴할 수 없습니다. 리더 권한을 위임하세요.");
+        }
+        routineService.saveAsPersonalRoutine(actorMemberId, circleId);
+        circleMemberRepository.delete(member);
+
+    }
 }
