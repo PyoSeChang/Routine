@@ -1,10 +1,23 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors');
+
 module.exports = {
     content: [
-        "./src/**/*.{js,jsx,ts,tsx}", // ← 이거 꼭 있어야 함!
+        "./src/**/*.{js,jsx,ts,tsx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                note: '#fff9c4',
+            },
+            fontFamily: {
+                user: ['Dokrip', 'sans-serif'],
+                ui: ['MaruBuri', 'sans-serif'],
+            },
+            fontSize: {
+                base: '20px', // 기본 base 자체를 20px로 바꿔도 됨
+            },
+        },
     },
     plugins: [],
-}
+};

@@ -1,6 +1,7 @@
 // src/types/board.ts
 
 export enum Category {
+    NONE = 'NONE',
     LANGUAGE = 'LANGUAGE',
     EMPLOYMENT = 'EMPLOYMENT',
     STUDY = 'STUDY',

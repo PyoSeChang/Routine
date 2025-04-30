@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { BoardDTO, Category, BoardType } from '../types/board';
-import { CategorySelector } from '../components/ui/CategorySelector';
+import InputOnNote from '../components/ui/InputOnNote';
+import TextareaOnNote from '../components/ui/TextareaOnNote';
+import CategoryOnNote from '../components/ui/CategoryOnNote';
+import TagInputOnNote from '../components/ui/TagInputOnNote';
+import BoardTypeSelectorOnNote from '../components/ui/BoardTypeSelectorOnNote';
+import NoneLine from '../components/ui/NoneLine';
+import BlankLine from "../components/ui/BlankLine";
 
 interface Props {
     mode: 'create' | 'edit';
 }
 
-function BoardFormPage({ mode }: Props) {
+export default function BoardFormOnNotePage({ mode }: Props) {
     const { boardId } = useParams();
     const navigate = useNavigate();
 
@@ -17,34 +23,25 @@ function BoardFormPage({ mode }: Props) {
         title: '',
         content: '',
         tags: '',
-        category: Category.LANGUAGE,
+        category: Category.NONE,
         detailCategory: '',
         boardType: BoardType.NOTICE,
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
-
     useEffect(() => {
         if (mode === 'edit' && boardId) {
-            axios.get(`/boards/${boardId}`)
-                .then(res => {
-                    const data = res.data;
-                    setForm({
-                        writer: data.writerId,
-                        title: data.title,
-                        content: data.content,
-                        tags: data.tags,
-                        category: data.category,
-                        detailCategory: data.detailCategory,
-                        boardType: data.boardType,
-                    });
-                })
-                .catch(err => {
-                    console.error('게시글 불러오기 실패', err);
+            axios.get(`/boards/${boardId}`).then((res) => {
+                const data = res.data;
+                setForm({
+                    writer: data.writerId,
+                    title: data.title,
+                    content: data.content,
+                    tags: data.tags,
+                    category: data.category,
+                    detailCategory: data.detailCategory,
+                    boardType: data.boardType,
                 });
+            });
         }
     }, [mode, boardId]);
 
@@ -56,94 +53,66 @@ function BoardFormPage({ mode }: Props) {
                 await axios.put(`/boards/${boardId}`, form);
             }
             navigate('/boards');
-        } catch (error) {
-            const err = error as any;
+        } catch (err: any) {
             console.error('저장 실패', err);
             console.error('서버 전체 응답 데이터:', err.response?.data);
         }
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">
-                {mode === 'create' ? '새 글 작성' : '글 수정'}
-            </h1>
-
-            <div className="flex flex-col gap-4">
-
-                {/* 1. 제목 */}
-                <input
-                    type="text"
-                    name="title"
+        <div className=" max-w-5xl mx-auto mt-10">
+            <div className="max-w-4xl mx-auto bg-note relative">
+                <div className="absolute top-0 z-[999]" style={{ left: '1.5rem', width: '2px', height: '100%', backgroundColor: '#f28b82' }} />
+                <NoneLine/>
+                <h1 className="text-xl font-bold font-ui text-center mb-4">
+                    {mode === 'create' ? '새 글 작성' : '글 수정'}
+                </h1>
+                <NoneLine/>
+                <InputOnNote
+                    label="제목: "
                     value={form.title}
-                    onChange={handleChange}
-                    placeholder="제목"
-                    className="border p-2 rounded"
+                    placeholder="제목을 입력해주세요."
+                    onChange={(value) => setForm((prev) => ({ ...prev, title: value }))}
                 />
-
-                {/* 2. 카테고리 + 디테일카테고리 선택 (리팩토링) */}
-                <CategorySelector
+                <NoneLine/>
+                <CategoryOnNote
                     category={form.category}
                     detailCategory={form.detailCategory}
-                    onCategoryChange={(newCategory) => {
-                        setForm(prev => ({
-                            ...prev,
-                            category: newCategory,
-                            detailCategory: '', // 부모 카테고리 바뀌면 디테일 초기화
-                        }));
-                    }}
-                    onDetailCategoryChange={(newDetailCategory) => {
-                        setForm(prev => ({
-                            ...prev,
-                            detailCategory: newDetailCategory,
-                        }));
-                    }}
+                    onCategoryChange={(category) =>
+                        setForm((prev) => ({ ...prev, category, detailCategory: '' }))
+                    }
+                    onDetailCategoryChange={(detailCategory) =>
+                        setForm((prev) => ({ ...prev, detailCategory }))
+                    }
                 />
-
-                {/* 3. 게시판 종류 선택 */}
-                <select
-                    name="boardType"
+                <BlankLine/>
+                <BoardTypeSelectorOnNote
                     value={form.boardType}
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                >
-                    <option value={BoardType.NOTICE}>공지</option>
-                    <option value={BoardType.PROMOTION}>홍보</option>
-                    <option value={BoardType.REVIEW}>후기</option>
-                    <option value={BoardType.QNA}>Q&A</option>
-                    <option value={BoardType.INFORMATION}>정보공유</option>
-                </select>
-
-                {/* 4. 내용 */}
-                <textarea
-                    name="content"
+                    onChange={(value) => setForm((prev) => ({ ...prev, boardType: value }))}
+                />
+                <BlankLine/>
+                <TextareaOnNote
+                    label="내용: "
                     value={form.content}
-                    onChange={handleChange}
-                    placeholder="내용"
-                    className="border p-2 rounded h-40"
+                    onChange={(value) => setForm((prev) => ({ ...prev, content: value }))}
+                    placeholder="내용을 입력하세요"
+                    maxRows={10}
+                />
+                <TagInputOnNote
+                    tags={form.tags ? form.tags.split(',') : []}
+                    setTags={(tags) =>
+                        setForm((prev) => ({ ...prev, tags: tags.join(',') }))
+                    }
                 />
 
-                {/* 5. 태그 */}
-                <input
-                    type="text"
-                    name="tags"
-                    value={form.tags}
-                    onChange={handleChange}
-                    placeholder="태그(쉼표로 구분)"
-                    className="border p-2 rounded"
-                />
-
-                {/* 제출 버튼 */}
+                <NoneLine />
                 <button
                     onClick={handleSubmit}
-                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                    className="bg-note py-2 w-full text-center"
                 >
                     {mode === 'create' ? '등록' : '수정'}
                 </button>
-
             </div>
         </div>
     );
 }
-
-export default BoardFormPage;

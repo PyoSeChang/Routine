@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../api/axios";
-import CategorySelector from "../../components/ui/CategorySelector";
-import { Category } from "../../types/board"
-import TagInput from "../ui/TagInput";
+import { Category } from "../../types/board";
+import { Weekday } from '../../types/routine';
+
+import InputOnNote from "../ui/InputOnNote";
+import BlankLine from "../ui/BlankLine";
+import CategoryOnNote from "../ui/CategoryOnNote";
+import TagInputOnNote from "../ui/TagInputOnNote";
+import TaskInputOnNote from "../ui/TaskInputOnNote";
+import RepeatDaysOnNote from "../ui/RepeatDaysOnNote";
+import TextareaOnNote from "../ui/TextareaOnNote";
+import NoneLine from "../ui/NoneLine";
 
 interface Props {
     onClose: () => void;
@@ -12,11 +20,11 @@ interface Props {
 export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [category, setCategory] = useState<Category>(Category.LANGUAGE);
+    const [category, setCategory] = useState<Category>(Category.NONE);
     const [detailCategory, setDetailCategory] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
     const [tasks, setTasks] = useState<string[]>([""]);
-    const [repeatDays, setRepeatDays] = useState<string[]>([]);
+    const [repeatDays, setRepeatDays] = useState<Weekday[]>([]);
 
     const handleSave = async () => {
         try {
@@ -51,106 +59,51 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
 
     return (
         <div className="fixed inset-0 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative">
-                <button
-                    className="absolute top-3 right-3 text-gray-500 hover:text-black"
-                    onClick={onClose}
-                >
-                    ✕
-                </button>
+            <div className="relative w-full max-w-lg before:content-['']
+            before:absolute before:left-10 before:top-0 before:bottom-0 before:z-[10]
+            before:w-[2px] before:bg-red-500 before:opacity-60">
+                <div className="relative bg-note shadow-lg shawdow-black/30 w-full pt-3">
+                    <button
+                        className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                        onClick={onClose}
+                    >
+                        ✕
+                    </button>
 
-                <h2 className="text-xl font-bold mb-4">루틴 만들기</h2>
+                    <h2 className="text-xl font-bold mb-4 pt-2 text-center font-ui">루틴 만들기</h2>
 
-                <input
-                    type="text"
-                    placeholder="루틴 제목"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="border p-2 rounded w-full mb-4"
-                />
 
-                <textarea
-                    placeholder="루틴 설명"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="border p-2 rounded w-full mb-4"
-                    rows={4}
-                />
-
-                <div className="mb-4">
-                    <CategorySelector
-                        category={category}
-                        detailCategory={detailCategory}
-                        onCategoryChange={setCategory}
-                        onDetailCategoryChange={setDetailCategory}
+                    <InputOnNote label="<루틴 이름>" value={title} onChange={setTitle} />
+                    <BlankLine count={1} />
+                    <CategoryOnNote category={category} detailCategory={detailCategory} onCategoryChange={setCategory} onDetailCategoryChange={setDetailCategory} />
+                    <BlankLine count={1} />
+                    <TagInputOnNote tags={tags} setTags={setTags} />
+                    <BlankLine count={1} />
+                    <TaskInputOnNote tasks={tasks} setTasks={setTasks} />
+                    <BlankLine count={1} />
+                    <RepeatDaysOnNote
+                        selectedDays={repeatDays}
+                        onChange={(day) =>
+                            setRepeatDays(prev =>
+                                prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+                            )
+                        }
                     />
+                    <TextareaOnNote
+                        value={description}
+                        onChange={setDescription}
+                        placeholder="루틴 설명을 간단히 적어주세요"
+                        maxRows={4}
+                    />
+                    <NoneLine />
+
+                    <button
+                        className="bg-note px-6 py-2 w-full"
+                        onClick={handleSave}
+                    >
+                        저장
+                    </button>
                 </div>
-
-                <TagInput tags={tags} setTags={setTags} />
-
-                <div className="mb-4">
-                    <label className="block font-medium mb-1">태스크</label>
-                    {tasks.map((task, index) => (
-                        <div key={index} className="max-h-60 overflow-y-auto flex gap-2 mb-2">
-                            <input
-                                type="text"
-                                value={task}
-                                onChange={(e) => {
-                                    const updated = [...tasks];
-                                    updated[index] = e.target.value;
-                                    setTasks(updated);
-                                }}
-                                className="border p-2 rounded w-full"
-                                placeholder={`할 일 ${index + 1}`}
-                            />
-                            <button
-                                onClick={() => setTasks(tasks.filter((_, i) => i !== index))}
-                                className="text-gray-500 hover:text-red-500"
-                                disabled={tasks.length <= 1}
-                            >
-                                🗑️
-                            </button>
-                        </div>
-                    ))}
-
-                    {tasks.length < 10 && (
-                        <button
-                            onClick={() => setTasks([...tasks, ""])}
-                            className="text-sm text-blue-600 hover:underline"
-                        >
-                            + 태스크 추가
-                        </button>
-                    )}
-                </div>
-
-                <div className="mb-4">
-                    <label className="block font-medium mb-1">반복 요일</label>
-                    <div className="flex flex-wrap gap-2">
-                        {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"].map(day => (
-                            <button
-                                key={day}
-                                type="button"
-                                onClick={() => {
-                                    if (repeatDays.includes(day)) {
-                                        setRepeatDays(repeatDays.filter(d => d !== day));
-                                    } else {
-                                        setRepeatDays([...repeatDays, day]);
-                                    }
-                                }}
-                                className={`px-3 py-1 rounded-full border ${repeatDays.includes(day) ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}
-                            >
-                                {day.slice(0, 3)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <button
-                    className="bg-blue-500 text-white px-6 py-2 rounded w-full"
-                    onClick={handleSave}
-                >
-                    저장
-                </button>
             </div>
         </div>
     );
