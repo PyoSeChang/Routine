@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { RoutineViewDTO, TaskDTO } from '../../types/routine';
 import RepeatDays from '../ui/RepeatDays';
-import LinedTextArea from '../ui/LinedTextArea';
+import LinedTextArea from '../ui/note/LinedTextArea';
 import TaskCheckBox from '../ui/TaskCheckBox';
 
 type CommitStatus = 'SUCCESS' | 'FAIL' | 'SKIP' | 'NONE';

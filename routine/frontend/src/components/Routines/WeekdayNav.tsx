@@ -23,7 +23,7 @@ const WeekdayNav: React.FC<Props> = ({ viewMode, setViewMode }) => {
     }, [setViewMode]);
 
     return (
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-2">
             {weekdays.map(day => (
                 <button
                     key={day}

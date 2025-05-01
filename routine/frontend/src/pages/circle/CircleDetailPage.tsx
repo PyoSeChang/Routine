@@ -9,6 +9,7 @@ import {
     CircleMemberDTO
 } from "../../types/circle";
 import { RoutineViewDTO } from "../../types/routine";
+import AppLayout from "../../layout/AppLayout";
 
 export default function CircleDetailPage() {
     const { circleId } = useParams<{ circleId: string }>();
@@ -104,78 +105,81 @@ export default function CircleDetailPage() {
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">서클 상세</h1>
+        <AppLayout>
 
-            {!isMember && (
-                <div className="mb-4">
-                    <button
-                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                        onClick={async () => {
-                            try {
-                                await axios.post(`/circles/${circleId}/join`);
-                                alert("서클에 가입되었습니다.");
-                                window.location.reload();
-                            } catch (error) {
-                                console.error("가입 실패", error);
-                                alert("가입에 실패했습니다.");
-                            }
-                        }}
-                    >
-                        가입하기
-                    </button>
-                </div>
-            )}
+            <div className="p-6">
+                <h1 className="text-2xl font-bold mb-6">서클 상세</h1>
 
-            {routine ? (
-                <div className="mb-8">
-                    <RoutinePublicCard routine={routine} />
-                </div>
-            ) : (
-                <p className="mb-8 text-gray-500">등록된 공용 루틴이 없습니다.</p>
-            )}
-
-            <div className="flex flex-wrap gap-6">
-                {memberCommits.length === 0 ? (
-                    <p className="text-gray-500">아직 오늘의 커밋 이력이 없습니다.</p>
-                ) : (
-                    memberCommits.map(info => (
-                        <RoutineMemberCard
-                            key={info.memberId}
-                            nickname={info.nickname}
-                            tasks={info.tasks}
-                        />
-                    ))
-                )}
-            </div>
-
-            {isMember && !isLeader && (
-                <div className="mt-10">
-                    <button className="text-red-500 hover:underline"
+                {!isMember && (
+                    <div className="mb-4">
+                        <button
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                             onClick={async () => {
                                 try {
-                                    await axios.delete(`/circles/${circleId}/members/${authorization?.circleMemberId}/leave`);
-                                    alert("서클에서 탈퇴했습니다.");
-                                    window.location.href = "/circles";
-                                } catch (err) {
-                                    console.error("탈퇴 실패", err);
-                                    alert("탈퇴에 실패했습니다.");
+                                    await axios.post(`/circles/${circleId}/join`);
+                                    alert("서클에 가입되었습니다.");
+                                    window.location.reload();
+                                } catch (error) {
+                                    console.error("가입 실패", error);
+                                    alert("가입에 실패했습니다.");
                                 }
-                            }}>탈퇴하기</button>
-                </div>
-            )}
+                            }}
+                        >
+                            가입하기
+                        </button>
+                    </div>
+                )}
 
-            {isLeader && (
-                <div className="mt-10">
-                    <button
-                        onClick={handleShowMemberManage}
-                        className="text-blue-600 hover:underline"
-                    >
-                        멤버 관리하기
-                    </button>
-                    {showMemberManage && renderMemberManagement()}
+                {routine ? (
+                    <div className="mb-8">
+                        <RoutinePublicCard routine={routine} />
+                    </div>
+                ) : (
+                    <p className="mb-8 text-gray-500">등록된 공용 루틴이 없습니다.</p>
+                )}
+
+                <div className="flex flex-wrap gap-6">
+                    {memberCommits.length === 0 ? (
+                        <p className="text-gray-500">아직 오늘의 커밋 이력이 없습니다.</p>
+                    ) : (
+                        memberCommits.map(info => (
+                            <RoutineMemberCard
+                                key={info.memberId}
+                                nickname={info.nickname}
+                                tasks={info.tasks}
+                            />
+                        ))
+                    )}
                 </div>
-            )}
-        </div>
+
+                {isMember && !isLeader && (
+                    <div className="mt-10">
+                        <button className="text-red-500 hover:underline"
+                                onClick={async () => {
+                                    try {
+                                        await axios.delete(`/circles/${circleId}/members/${authorization?.circleMemberId}/leave`);
+                                        alert("서클에서 탈퇴했습니다.");
+                                        window.location.href = "/circles";
+                                    } catch (err) {
+                                        console.error("탈퇴 실패", err);
+                                        alert("탈퇴에 실패했습니다.");
+                                    }
+                                }}>탈퇴하기</button>
+                    </div>
+                )}
+
+                {isLeader && (
+                    <div className="mt-10">
+                        <button
+                            onClick={handleShowMemberManage}
+                            className="text-blue-600 hover:underline"
+                        >
+                            멤버 관리하기
+                        </button>
+                        {showMemberManage && renderMemberManagement()}
+                    </div>
+                )}
+            </div>
+        </AppLayout>
     );
 }

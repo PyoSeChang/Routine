@@ -24,6 +24,7 @@ public class BoardDTO {
     private int viewCount;
     private List<CommentDTO> comments;
 
+
     public static BoardDTO fromEntity(Board board, BoardStatus status, List<CommentDTO> comments, String nickname) {
         return BoardDTO.builder()
                 .boardId(board.getId())
@@ -38,7 +39,7 @@ public class BoardDTO {
                 .createdAt(status.getCreatedAt())
                 .viewCount(status.getViewCount())
                 .updatedAt(status.getUpdatedAt())
-                .comments(comments) // ✅ 댓글 포함
+                .comments(comments)
                 .build();
     }
 }

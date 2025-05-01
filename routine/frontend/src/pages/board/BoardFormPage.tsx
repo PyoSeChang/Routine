@@ -1,16 +1,16 @@
+// src/pages/BoardFormOnNotePage.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from '../api/axios';
-import { BoardDTO, Category, BoardType } from '../types/board';
-import InputOnNote from '../components/ui/InputOnNote';
-import TextareaOnNote from '../components/ui/TextareaOnNote';
-import CategoryOnNote from '../components/ui/CategoryOnNote';
-import TagInputOnNote from '../components/ui/TagInputOnNote';
-import BoardTypeSelectorOnNote from '../components/ui/BoardTypeSelectorOnNote';
-import NoneLine from '../components/ui/NoneLine';
-import BlankLine from "../components/ui/BlankLine";
-import NoteBlock from "../components/ui/NoteBlock";
-import PostItBoardNav from "../components/Board/PostItBoardNav";
+import axios from '../../api/axios';
+import { BoardDTO, Category, BoardType } from '../../types/board';
+import InputOnNote from '../../components/ui/note/InputOnNote';
+import TextareaOnNote from '../../components/ui/note/TextareaOnNote';
+import CategoryOnNote from '../../components/ui/note/CategoryOnNote';
+import TagInputOnNote from '../../components/ui/note/TagInputOnNote';
+import BoardTypeSelectorOnNote from '../../components/ui/note/BoardTypeSelectorOnNote';
+import BlankLine from "../../components/ui/note/BlankLine";
+import NoteBlock from "../../components/ui/note/NoteBlock";
+import AppLayout from "../../layout/AppLayout";
 
 interface Props {
     mode: 'create' | 'edit';
@@ -64,21 +64,9 @@ export default function BoardFormOnNotePage({ mode }: Props) {
     };
 
     return (
-        <div className=" max-w-5xl mx-auto mt-10">
-            <div className="max-w-4xl mx-auto bg-note relative">
-                {/*<div className="absolute top-0 z-[999]" style={{ left: '1.5rem', width: '2px', height: '100%', backgroundColor: '#f28b82' }} />*/}
-                {/*<div*/}
-                {/*    className="relative bg-note  pr-2 py-4"*/}
-                {/*    style={{*/}
-                {/*        position: 'relative',*/}
-                {/*    }}*/}
-                {/*>*/}
-                {/*    /!* 좌측 붉은 기준선 *!/*/}
-                {/*    <div*/}
-                {/*        className="absolute top-0 left-6 w-[2px] h-full"*/}
-                {/*        style={{ backgroundColor: '#f28b82' }}*/}
-                {/*    />*/}
-                {/*</div>*/}
+        <AppLayout>
+            <div className="w-full bg-note shadow-lg">
+                <div className="bg-blue-700 h-8 w-full rounded-t-md shadow-md" />
                 <NoteBlock className="flex justify-center">
                     <h1 className="text-xl font-bold font-ui text-center">
                         {mode === 'create' ? '새 글 작성' : '글 수정'}
@@ -135,8 +123,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                         취소
                     </button>
                 </NoteBlock>
-
             </div>
-        </div>
+        </AppLayout>
     );
 }

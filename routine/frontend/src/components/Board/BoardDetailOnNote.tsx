@@ -1,8 +1,8 @@
-import Line from '../ui/Line';
-import TagOnNote from '../ui/TagOnNote';
+import Line from '../ui/note/Line';
+import TagOnNote from '../ui/note/TagOnNote';
 import { format } from 'date-fns';
 import { BoardDTO } from '../../types/board';
-import NoneLine from '../ui/NoneLine';
+import NoneLine from '../ui/note/NoneLine';
 
 interface DisplayDate {
     label: string;
@@ -32,10 +32,11 @@ const BoardDetailOnNote: React.FC<Props> = ({
     }
 
     return (
-        <div className="shadow-md">
+        <div className="shadow-lg ">
 
             {/* 오른쪽으로 전체 내용 밀기 */}
             <div>
+                <div className="bg-blue-700 h-6 w-full rounded-t-md shadow-md" />
                 <NoneLine />
 
                 <Line>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CommentDTO } from '../../types/board';
+import { CommentDTO } from '../../types/comment';
 import CommentPostItItem from './CommentPostItItem';
 
 interface Props {

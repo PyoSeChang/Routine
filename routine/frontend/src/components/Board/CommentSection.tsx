@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useComments } from '../hooks/useComment';
-import { CommentDTO } from '../types/board';
-import CommentPostItList from './Board/CommentPostItList';
-import CommentPostItItem from './Board/CommentPostItItem';
+import { useComments } from '../../hooks/useComment';
+import { CommentDTO } from '../../types/comment';
+import CommentPostItList from './CommentPostItList';
+import CommentPostItItem from './CommentPostItItem';
 
 interface CommentSectionProps {
     boardId: number;
@@ -47,7 +47,7 @@ export function CommentSection({ boardId, initialComments }: CommentSectionProps
 
             {/* 에러 메시지 */}
             {error && <p className="text-red-500 my-2">{error}</p>}
-
+            <h3 className="text-lg font-semibold font-ui mt-4 mb-4">댓글 목록</h3>
             {/* 댓글 목록 */}
             {loading ? (
                 <p className="p-4">댓글 로딩중…</p>

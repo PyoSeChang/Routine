@@ -15,6 +15,7 @@ const COLOR_MAP: Record<number, string> = {
     3: '#c8e6c9', // 연두
     4: '#b3e5fc', // 하늘
     5: '#d1c4e9', // 보라
+    6: '#ccf2f4',
 };
 
 const PostItSVG: React.FC<Props> = ({

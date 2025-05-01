@@ -16,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private static final Random random = new Random();
 
     // src/main/java/com/routine/domain/e_board/service/impl/CommentServiceImpl.java
     @Override
@@ -65,6 +63,8 @@ public class CommentServiceImpl implements CommentService {
 
         return result;
     }
+
+
 
     // 재귀적으로 평탄화된 리스트 구성
     private void flatten(CommentDTO parent, Map<Long, List<CommentDTO>> childrenMap, List<CommentDTO> result) {
@@ -132,5 +132,18 @@ public class CommentServiceImpl implements CommentService {
         // Soft delete
         comment.setDeleted(true);
         commentRepository.save(comment);
+    }
+
+
+    public static int generateColorId() {
+        int rand = random.nextInt(100); // 0~99
+
+        if (rand < 40) return 0;
+        else if (rand < 50) return 1;
+        else if (rand < 60) return 2;
+        else if (rand < 70) return 3;
+        else if (rand < 80) return 4;
+        else if (rand < 90) return 5;
+        else return 6;
     }
 }

@@ -4,22 +4,34 @@ const colors = require('tailwindcss/colors');
 module.exports = {
     content: [
         "./src/**/*.{js,jsx,ts,tsx}",
+        "./public/**/*.{js,jsx,ts,tsx, png}",
     ],
     theme: {
         extend: {
             colors: {
                 note: '#fff9c4',
+                mainBlue: '#1e40af',
+                mainGreen: '#166534',
+                mainRed: '#991b1b',
+                'postit-yellow': '#fff9c4',
+                'postit-orange': '#ffe0b2',
+                'postit-pink':   '#f8bbd0',
+                'postit-green':  '#c8e6c9',
+                'postit-blue':   '#b3e5fc',
+                'postit-purple': '#d1c4e9',
+                'postit-mint':   '#ccf2f4',
+                mainYellow: '#FFFACD',
             },
             fontFamily: {
                 user: ['Dokrip', 'sans-serif'],
-                ui: ['MaruBuri', 'sans-serif'],
+                ui: ['Nanum Gothic', 'MaruBuri'],
             },
             fontSize: {
                 base: '20px', // 기본 base 자체를 20px로 바꿔도 됨
             },
             backgroundImage: {
-                'sticky-green': "url('../public/assets/bg/green-postIt.png')",
-                // 'corc': "url('../public/assets/bg/d.png')",
+                'sticky-green': "url/assets/bg/green-postIt.png')",
+                'corc': "url/assets/bg/d.png')",
             },
         },
     },

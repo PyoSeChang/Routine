@@ -1,6 +1,6 @@
 // src/components/EditCommentModal.tsx
 import React, { useState } from 'react';
-import { CommentDTO } from '../types/comment';
+import { CommentDTO } from '../../types/comment';
 
 interface EditCommentModalProps {
     comment: CommentDTO;

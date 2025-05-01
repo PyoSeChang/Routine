@@ -1,5 +1,6 @@
 // src/types/comment.ts
 export interface CommentDTO {
+    colorId?: number;
     commentId: number;
     boardId: number;
     writerId: number;

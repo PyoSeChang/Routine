@@ -1,4 +1,5 @@
 // src/types/board.ts
+import {CommentDTO} from "./comment";
 
 export enum Category {
     NONE = 'NONE',
@@ -33,16 +34,7 @@ export interface BoardDTO {
     comments?: CommentDTO[];
 }
 
-export interface CommentDTO {
-    commentId: number;
-    boardId: number;
-    writerId: number;
-    writerName: string;
-    content: string;
-    parentId: number | null;
-    createdAt: string;
-    updatedAt?: string;
-}
+
 
 
 // 목록 조회 DTO

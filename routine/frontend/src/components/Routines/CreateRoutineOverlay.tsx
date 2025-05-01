@@ -3,14 +3,14 @@ import axios from "../../api/axios";
 import { Category } from "../../types/board";
 import { Weekday } from '../../types/routine';
 
-import InputOnNote from "../ui/InputOnNote";
-import BlankLine from "../ui/BlankLine";
-import CategoryOnNote from "../ui/CategoryOnNote";
-import TagInputOnNote from "../ui/TagInputOnNote";
-import TaskInputOnNote from "../ui/TaskInputOnNote";
-import RepeatDaysOnNote from "../ui/RepeatDaysOnNote";
-import TextareaOnNote from "../ui/TextareaOnNote";
-import NoneLine from "../ui/NoneLine";
+import InputOnNote from "../ui/note/InputOnNote";
+import BlankLine from "../ui/note/BlankLine";
+import CategoryOnNote from "../ui/note/CategoryOnNote";
+import TagInputOnNote from "../ui/note/TagInputOnNote";
+import TaskInputOnNote from "../ui/note/TaskInputOnNote";
+import RepeatDaysOnNote from "../ui/note/RepeatDaysOnNote";
+import TextareaOnNote from "../ui/note/TextareaOnNote";
+import NoneLine from "../ui/note/NoneLine";
 
 interface Props {
     onClose: () => void;

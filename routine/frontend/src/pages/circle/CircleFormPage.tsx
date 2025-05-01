@@ -6,6 +6,7 @@ import { RoutineSummaryDTO } from "../../types/routine";
 import { Category } from "../../types/board";
 import TagInput from "../../components/ui/TagInput";
 import { useNavigate } from 'react-router-dom';
+import AppLayout from "../../layout/AppLayout";
 
 export default function CircleFormPage() {
     const [circleName, setCircleName] = useState("");
@@ -19,6 +20,7 @@ export default function CircleFormPage() {
     const [maxMemberCount, setMaxMemberCount] = useState(10);
     const [isCreateRoutineOpen, setIsCreateRoutineOpen] = useState(false);
     const navigate = useNavigate();
+
 
 
     useEffect(() => {
@@ -93,118 +95,121 @@ export default function CircleFormPage() {
     };
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">서클 만들기</h1>
+        <AppLayout>
+            <div className="p-6">
+                <h1 className="text-2xl font-bold mb-6">서클 만들기</h1>
 
-            <input
-                type="text"
-                placeholder="서클 이름"
-                value={circleName}
-                onChange={(e) => setCircleName(e.target.value)}
-                className="border p-2 rounded w-full mb-4"
-            />
-
-            <textarea
-                placeholder="서클 설명"
-                value={circleDescription}
-                onChange={(e) => setCircleDescription(e.target.value)}
-                className="border p-2 rounded w-full mb-6"
-            />
-
-            {/* 카테고리 선택 */}
-            <div className="mb-6">
-                <CategorySelector
-                    category={category}
-                    detailCategory={detailCategory}
-                    onCategoryChange={setCategory}
-                    onDetailCategoryChange={setDetailCategory}
-                />
-            </div>
-
-            <TagInput tags={tags} setTags={setTags} />
-
-            {/* ✅ 공개 여부 */}
-            {/* ✅ 공개 여부 */}
-            <div className="mb-6">
-                <label className="mr-4 font-semibold">공개 여부:</label>
-                <label className="mr-4">
-                    <input
-                        type="radio"
-                        name="isOpened"
-                        value="true"
-                        checked={isOpened}
-                        onChange={() => setIsOpened(true)}
-                    /> 공개
-                </label>
-                <label>
-                    <input
-                        type="radio"
-                        name="isOpened"
-                        value="false"
-                        checked={!isOpened}
-                        onChange={() => setIsOpened(false)}
-                    /> 비공개
-
-                </label>
-            </div>
-
-
-            {/* ✅ 최대 멤버 수 */}
-            <div className="mb-6">
-                <label className="block font-semibold mb-1">최대 멤버 수:</label>
                 <input
-                    type="number"
-                    min={2}
-                    value={maxMemberCount}
-                    onChange={(e) => setMaxMemberCount(parseInt(e.target.value))}
-                    className="border p-2 rounded w-full"
+                    type="text"
+                    placeholder="서클 이름"
+                    value={circleName}
+                    onChange={(e) => setCircleName(e.target.value)}
+                    className="border p-2 rounded w-full mb-4"
                 />
-            </div>
 
-            {/* 루틴 선택 */}
-            <div className="mb-6">
-                <select
-                    value={selectedRoutineId != null ? selectedRoutineId.toString() : ""}
-                    onChange={(e) => setSelectedRoutineId(Number(e.target.value))}
-                    className="border p-2 rounded w-full"
-                >
-                    <option value="">루틴 선택</option>
-                    {routineOptions.map((routine, idx) => {
-                        if (!routine?.routineId) return null;
-                        return (
-                            <option key={routine.routineId} value={routine.routineId.toString()}>
-                                {routine.title}
-                            </option>
-                        );
-                    })}
-                </select>
-            </div>
+                <textarea
+                    placeholder="서클 설명"
+                    value={circleDescription}
+                    onChange={(e) => setCircleDescription(e.target.value)}
+                    className="border p-2 rounded w-full mb-6"
+                />
 
-            {/* 루틴 새로 만들기 */}
-            <div className="flex gap-4 mb-8">
+                {/* 카테고리 선택 */}
+                <div className="mb-6">
+                    <CategorySelector
+                        category={category}
+                        detailCategory={detailCategory}
+                        onCategoryChange={setCategory}
+                        onDetailCategoryChange={setDetailCategory}
+                    />
+                </div>
+
+                <TagInput tags={tags} setTags={setTags} />
+
+                {/* ✅ 공개 여부 */}
+                {/* ✅ 공개 여부 */}
+                <div className="mb-6">
+                    <label className="mr-4 font-semibold">공개 여부:</label>
+                    <label className="mr-4">
+                        <input
+                            type="radio"
+                            name="isOpened"
+                            value="true"
+                            checked={isOpened}
+                            onChange={() => setIsOpened(true)}
+                        /> 공개
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="isOpened"
+                            value="false"
+                            checked={!isOpened}
+                            onChange={() => setIsOpened(false)}
+                        /> 비공개
+
+                    </label>
+                </div>
+
+
+                {/* ✅ 최대 멤버 수 */}
+                <div className="mb-6">
+                    <label className="block font-semibold mb-1">최대 멤버 수:</label>
+                    <input
+                        type="number"
+                        min={2}
+                        value={maxMemberCount}
+                        onChange={(e) => setMaxMemberCount(parseInt(e.target.value))}
+                        className="border p-2 rounded w-full"
+                    />
+                </div>
+
+                {/* 루틴 선택 */}
+                <div className="mb-6">
+                    <select
+                        value={selectedRoutineId != null ? selectedRoutineId.toString() : ""}
+                        onChange={(e) => setSelectedRoutineId(Number(e.target.value))}
+                        className="border p-2 rounded w-full"
+                    >
+                        <option value="">루틴 선택</option>
+                        {routineOptions.map((routine, idx) => {
+                            if (!routine?.routineId) return null;
+                            return (
+                                <option key={routine.routineId} value={routine.routineId.toString()}>
+                                    {routine.title}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
+
+                {/* 루틴 새로 만들기 */}
+                <div className="flex gap-4 mb-8">
+                    <button
+                        className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600"
+                        onClick={() => setIsCreateRoutineOpen(true)}
+                    >
+                        루틴 새로 만들기
+                    </button>
+                </div>
+
                 <button
-                    className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600"
-                    onClick={() => setIsCreateRoutineOpen(true)}
+                    className="bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600"
+                    onClick={handleSubmit}
                 >
-                    루틴 새로 만들기
+                    서클 생성 완료
                 </button>
+
+                {isCreateRoutineOpen && (
+                    <CreateRoutineOverlay
+                        onClose={() => setIsCreateRoutineOpen(false)}
+                        onSave={(routineId, title) => {
+                            handleRoutineCreate(routineId, title, category, detailCategory);
+                        }}
+                    />
+                )}
             </div>
+        </AppLayout>
 
-            <button
-                className="bg-blue-500 text-white px-8 py-2 rounded hover:bg-blue-600"
-                onClick={handleSubmit}
-            >
-                서클 생성 완료
-            </button>
-
-            {isCreateRoutineOpen && (
-                <CreateRoutineOverlay
-                    onClose={() => setIsCreateRoutineOpen(false)}
-                    onSave={(routineId, title) => {
-                        handleRoutineCreate(routineId, title, category, detailCategory);
-                    }}
-                />
-            )}
-        </div>
     );
 }

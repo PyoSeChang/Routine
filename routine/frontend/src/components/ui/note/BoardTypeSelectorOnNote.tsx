@@ -1,6 +1,6 @@
 // components/ui/BoardTypeSelectorOnNote.tsx
 import React from 'react';
-import { BoardType } from '../../types/board';
+import { BoardType } from '../../../types/board';
 import DropdownOnNote from './DropdownOnNote';
 
 interface Props {

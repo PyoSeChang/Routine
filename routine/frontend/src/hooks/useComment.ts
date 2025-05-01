@@ -18,6 +18,7 @@ export function useComments(boardId: number, initial: CommentDTO[] = []) {
     const [comments, setComments] = useState<CommentDTO[]>(initial);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    console.log('백엔드에서 받은 전체 댓글', initial);
 
     // ✅ 초기 댓글이 나중에라도 들어올 때 반영
     useEffect(() => {

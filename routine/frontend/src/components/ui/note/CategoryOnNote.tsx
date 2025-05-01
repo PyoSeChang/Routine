@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Category } from '../../types/board';
-import { detailCategories } from '../../types/detailCategories';
+import { Category } from '../../../types/board';
+import { detailCategories } from '../../../types/detailCategories';
 import Line from './Line';
 
 interface CategoryOnNoteProps {

@@ -1,6 +1,8 @@
 package com.routine.domain.e_board.dto;
 
 import com.routine.domain.e_board.model.Comment;
+import com.routine.domain.e_board.service.CommentService;
+import com.routine.domain.e_board.service.CommentServiceImpl;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,6 +17,7 @@ public class CommentDTO {
     private Long parentId;
     private String createdAt;
     private String updatedAt;
+    private int colorId;
 
     public static CommentDTO fromEntity(Comment c) {
         return CommentDTO.builder()
@@ -26,6 +29,7 @@ public class CommentDTO {
                 .parentId(c.getParentId())
                 .createdAt(c.getCreatedAt().toString())
                 .updatedAt(c.getUpdatedAt() != null ? c.getUpdatedAt().toString() : null)
+                .colorId(CommentServiceImpl.generateColorId())
                 .build();
     }
 }

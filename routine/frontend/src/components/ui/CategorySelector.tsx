@@ -26,7 +26,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             <select
                 value={category}
                 onChange={(e) => onCategoryChange(e.target.value as Category)}
-                className="border p-2 rounded"
+                className="border-black border-2 p-2 rounded bg-mainYellow shadow-md"
             >
                 <option value={Category.LANGUAGE}>외국어</option>
                 <option value={Category.EMPLOYMENT}>취업</option>
@@ -38,7 +38,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             <select
                 value={detailCategory}
                 onChange={(e) => onDetailCategoryChange(e.target.value)}
-                className="border p-2 rounded"
+                className="border-black border-2 p-2 rounded-none bg-mainYellow shadow-md"
             >
                 <option value="">세부 카테고리를 선택하세요</option>
                 {filteredDetailCategories.map((detail) => (

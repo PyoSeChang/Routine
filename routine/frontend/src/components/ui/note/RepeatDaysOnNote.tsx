@@ -1,5 +1,5 @@
 import React from 'react';
-import { Weekday } from '../../types/routine';
+import { Weekday } from '../../../types/routine';
 import Line from './Line';
 
 interface RepeatDaysOnNoteProps {

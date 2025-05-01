@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import PostItSVG from '../PostItSVG';
-import { CommentDTO } from '../../types/board';
+import PostItSVG from '../ui/post_it/PostItSVG';
+import { CommentDTO } from '../../types/comment';
 import { useCurrentUser } from '../../hooks/useAuth';
 
 interface Props {
@@ -54,7 +54,7 @@ const CommentPostItItem: React.FC<Props> = ({
 
     return (
         <div className={comment.parentId ? 'ml-8' : ''}>
-            <PostItSVG width={300} height={height}>
+            <PostItSVG width={300} height={height} variant={comment.colorId}>
                 <div ref={ref} className="text-sm leading-snug break-words w-full">
                     {mode === 'view' && (
                         <>

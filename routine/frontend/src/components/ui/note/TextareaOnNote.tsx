@@ -20,7 +20,7 @@ const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     // 최소 한 줄은 보장
-    while (lines.length < 2) lines.push('');
+    while (lines.length < 11) lines.push('');
 
     const handleChange = (i: number, newValue: string) => {
         const updated = [...lines];
