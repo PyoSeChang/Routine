@@ -12,9 +12,11 @@ const NoneLine = forwardRef<HTMLDivElement, NoneLineProps>(
             <div
                 ref={ref}
                 onClick={onClick}
-                className={`flex items-center h-[36px] w-full bg-note ${className}`}
+                className={`relative flex items-center h-[36px] w-full bg-note 
+                    before:content-[''] before:absolute before:left-[2.5rem] before:top-0 
+                    before:h-full before:w-[2px] before:bg-[#f28b82] before:z-20 ${className}`}
             >
-                {children}
+                <div className="pl-20 pr-2 w-full">{children}</div>
             </div>
         );
     }

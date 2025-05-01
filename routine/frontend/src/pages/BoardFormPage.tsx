@@ -9,6 +9,8 @@ import TagInputOnNote from '../components/ui/TagInputOnNote';
 import BoardTypeSelectorOnNote from '../components/ui/BoardTypeSelectorOnNote';
 import NoneLine from '../components/ui/NoneLine';
 import BlankLine from "../components/ui/BlankLine";
+import NoteBlock from "../components/ui/NoteBlock";
+import PostItBoardNav from "../components/Board/PostItBoardNav";
 
 interface Props {
     mode: 'create' | 'edit';
@@ -20,6 +22,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
 
     const [form, setForm] = useState<BoardDTO>({
         writer: 0,
+        writerNickname: '',
         title: '',
         content: '',
         tags: '',
@@ -34,6 +37,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                 const data = res.data;
                 setForm({
                     writer: data.writerId,
+                    writerNickname: '',
                     title: data.title,
                     content: data.content,
                     tags: data.tags,
@@ -62,19 +66,32 @@ export default function BoardFormOnNotePage({ mode }: Props) {
     return (
         <div className=" max-w-5xl mx-auto mt-10">
             <div className="max-w-4xl mx-auto bg-note relative">
-                <div className="absolute top-0 z-[999]" style={{ left: '1.5rem', width: '2px', height: '100%', backgroundColor: '#f28b82' }} />
-                <NoneLine/>
-                <h1 className="text-xl font-bold font-ui text-center mb-4">
-                    {mode === 'create' ? '새 글 작성' : '글 수정'}
-                </h1>
-                <NoneLine/>
+                {/*<div className="absolute top-0 z-[999]" style={{ left: '1.5rem', width: '2px', height: '100%', backgroundColor: '#f28b82' }} />*/}
+                {/*<div*/}
+                {/*    className="relative bg-note  pr-2 py-4"*/}
+                {/*    style={{*/}
+                {/*        position: 'relative',*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    /!* 좌측 붉은 기준선 *!/*/}
+                {/*    <div*/}
+                {/*        className="absolute top-0 left-6 w-[2px] h-full"*/}
+                {/*        style={{ backgroundColor: '#f28b82' }}*/}
+                {/*    />*/}
+                {/*</div>*/}
+                <NoteBlock className="flex justify-center">
+                    <h1 className="text-xl font-bold font-ui text-center">
+                        {mode === 'create' ? '새 글 작성' : '글 수정'}
+                    </h1>
+                </NoteBlock>
+                <BlankLine/>
                 <InputOnNote
                     label="제목: "
                     value={form.title}
                     placeholder="제목을 입력해주세요."
                     onChange={(value) => setForm((prev) => ({ ...prev, title: value }))}
                 />
-                <NoneLine/>
+                <BlankLine/>
                 <CategoryOnNote
                     category={form.category}
                     detailCategory={form.detailCategory}
@@ -104,14 +121,21 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                         setForm((prev) => ({ ...prev, tags: tags.join(',') }))
                     }
                 />
+                <NoteBlock className="justify-center gap-8">
+                    <button
+                        onClick={handleSubmit}
+                        className="text-blue-800 font-semibold hover:underline"
+                    >
+                        {mode === 'create' ? '등록' : '수정'}
+                    </button>
+                    <button
+                        onClick={() => navigate(`/boards/${boardId}`)}
+                        className="text-black font-semibold hover:underline"
+                    >
+                        취소
+                    </button>
+                </NoteBlock>
 
-                <NoneLine />
-                <button
-                    onClick={handleSubmit}
-                    className="bg-note py-2 w-full text-center"
-                >
-                    {mode === 'create' ? '등록' : '수정'}
-                </button>
             </div>
         </div>
     );

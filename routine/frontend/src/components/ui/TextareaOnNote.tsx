@@ -78,7 +78,7 @@ const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
                         placeholder={i === 0 ? placeholder : ''}
                         onChange={(e) => handleChange(i, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(e, i)}
-                        className="w-full bg-note font-user text-base py-0 px-2 focus:outline-none"
+                        className="w-full bg-note font-user text-base py-0 px-2 h-[36px] focus:outline-none"
                     />
                 </Line>
             ))}

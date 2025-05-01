@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,36 +38,43 @@ public class CommentServiceImpl implements CommentService {
         boardRepository.findById(boardId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다. id=" + boardId));
 
-        // 1) 댓글 전부를 flat 리스트로 조회
+        // 댓글 모두 조회
         List<CommentDTO> all = commentRepository
                 .findAllByBoardIdOrderByCreatedAtAsc(boardId)
                 .stream()
                 .map(CommentDTO::fromEntity)
                 .collect(Collectors.toList());
 
-        // 2) ID → DTO 매핑
-        Map<Long, CommentDTO> map = all.stream()
-                .collect(Collectors.toMap(CommentDTO::getCommentId, dto -> dto));
-
-        // 3) 계층 구조용 루트 리스트
-        List<CommentDTO> roots = new ArrayList<>();
-
-        // 4) parentId로 트리 빌드
+        // ID → 자식들 리스트 매핑
+        Map<Long, List<CommentDTO>> childrenMap = new HashMap<>();
         for (CommentDTO dto : all) {
-            if (dto.getParentId() == null) {
-                roots.add(dto);
-            } else {
-                CommentDTO parent = map.get(dto.getParentId());
-                if (parent != null) {
-                    parent.getReplies().add(dto);
-                } else {
-                    // parentId가 없거나 잘못된 경우도 루트 취급
-                    roots.add(dto);
-                }
+            if (dto.getParentId() != null) {
+                childrenMap.computeIfAbsent(dto.getParentId(), k -> new ArrayList<>()).add(dto);
             }
         }
 
-        return roots;
+        // 평탄화된 최종 결과
+        List<CommentDTO> result = new ArrayList<>();
+
+        // parentId == null인 루트부터 순서대로 삽입
+        for (CommentDTO root : all) {
+            if (root.getParentId() == null) {
+                flatten(root, childrenMap, result);
+            }
+        }
+
+        return result;
+    }
+
+    // 재귀적으로 평탄화된 리스트 구성
+    private void flatten(CommentDTO parent, Map<Long, List<CommentDTO>> childrenMap, List<CommentDTO> result) {
+        result.add(parent);
+        List<CommentDTO> children = childrenMap.get(parent.getCommentId());
+        if (children != null) {
+            for (CommentDTO child : children) {
+                flatten(child, childrenMap, result);
+            }
+        }
     }
 
 

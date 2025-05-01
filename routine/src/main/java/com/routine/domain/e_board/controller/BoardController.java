@@ -2,9 +2,11 @@ package com.routine.domain.e_board.controller;
 
 import com.routine.domain.e_board.dto.BoardDTO;
 import com.routine.domain.e_board.dto.BoardListDTO;
+import com.routine.domain.e_board.dto.CommentDTO;
 import com.routine.domain.e_board.model.Category;
 import com.routine.domain.e_board.model.DetailCategory;
 import com.routine.domain.e_board.service.BoardService;
+import com.routine.domain.e_board.service.CommentService;
 import com.routine.security.model.PrincipalDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,7 @@ import java.util.Map;
 public class BoardController {
 
     private final BoardService boardService;
-
+    private final CommentService commentService;
     // 게시글 목록 조회
     /**
      * 게시글 목록 조회 (검색 + 페이징)
@@ -87,6 +89,7 @@ public class BoardController {
     // 게시글 상세 보기
     @GetMapping("/{boardId}")
     public BoardDTO getBoard(@PathVariable Long boardId) {
+
         return boardService.getBoard(boardId);
     }
 }

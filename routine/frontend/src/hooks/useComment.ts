@@ -13,38 +13,32 @@ interface UseCommentsResult {
     remove: (commentId: number) => Promise<void>;
 }
 
-export function useComments(boardId: string): UseCommentsResult {
-    const [comments, setComments] = useState<CommentDTO[]>([]);
-    const [loading, setLoading] = useState(true);
+// useComments.ts
+export function useComments(boardId: number, initial: CommentDTO[] = []) {
+    const [comments, setComments] = useState<CommentDTO[]>(initial);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetch = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await axios.get<CommentDTO[]>(`/boards/${boardId}/comments`);
-            setComments(res.data);
-            setError(null);
-        } catch (e: any) {
-            setError(e.message || '댓글을 불러오는 중 오류 발생');
-        } finally {
-            setLoading(false);
-        }
-    }, [boardId]);
+    // ✅ 초기 댓글이 나중에라도 들어올 때 반영
+    useEffect(() => {
+        setComments(initial);
+    }, [initial]);
 
-    useEffect(() => { fetch(); }, [fetch]);
-
-    const add = async (content: string, parentId: number | null = null) => {
-        await axios.post<CommentDTO>(`/boards/${boardId}/comments`, { content, parentId });
-        await fetch();
-    };
-    const update = async (commentId: number, content: string) => {
-        await axios.put<CommentDTO>(`/boards/${boardId}/comments/${commentId}`, { content });
-        await fetch();
-    };
-    const remove = async (commentId: number) => {
-        await axios.delete(`/boards/${boardId}/comments/${commentId}`);
-        await fetch();
+    const add = async (content: string, parentId: number | null) => {
+        const res = await axios.post(`/boards/${boardId}/comments`, { boardId, content, parentId });
+        setComments(prev => [...prev, res.data]);
     };
 
-    return { comments, loading, error, reload: fetch, add, update, remove };
+    const update = async (id: number, content: string) => {
+        await axios.put(`/boards/${boardId}/comments/${id}`, { content });
+        setComments(prev => prev.map(c => (c.commentId === id ? { ...c, content } : c)));
+    };
+
+    const remove = async (id: number) => {
+        await axios.delete(`/boards/${boardId}/comments/${id}`);
+        setComments(prev => prev.filter(c => c.commentId !== id));
+    };
+
+    return { comments, loading, error, add, update, remove };
 }
+

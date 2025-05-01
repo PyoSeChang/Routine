@@ -32,13 +32,13 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment);
     }
 
-    @GetMapping
-    public ResponseEntity<List<CommentDTO>> listComments(
-            @PathVariable Long boardId
-    ) {
-        List<CommentDTO> comments = commentService.getComments(boardId);
-        return ResponseEntity.ok(comments);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<CommentDTO>> listComments(
+//            @PathVariable Long boardId
+//    ) {
+//
+//        return ResponseEntity.ok(comments);
+//    }
 
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDTO> updateComment(

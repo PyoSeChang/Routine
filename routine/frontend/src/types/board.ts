@@ -20,6 +20,7 @@ export enum BoardType {
 export interface BoardDTO {
     boardId?: number;
     writer: number;
+    writerNickname: string;
     title: string;
     content: string;
     tags?: string;
@@ -29,7 +30,20 @@ export interface BoardDTO {
     createdAt?: string;
     updatedAt?: string;
     viewCount?: number;
+    comments?: CommentDTO[];
 }
+
+export interface CommentDTO {
+    commentId: number;
+    boardId: number;
+    writerId: number;
+    writerName: string;
+    content: string;
+    parentId: number | null;
+    createdAt: string;
+    updatedAt?: string;
+}
+
 
 // 목록 조회 DTO
 export interface BoardListDTO {

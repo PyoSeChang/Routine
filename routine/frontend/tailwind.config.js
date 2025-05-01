@@ -17,6 +17,10 @@ module.exports = {
             fontSize: {
                 base: '20px', // 기본 base 자체를 20px로 바꿔도 됨
             },
+            backgroundImage: {
+                'sticky-green': "url('../public/assets/bg/green-postIt.png')",
+                // 'corc': "url('../public/assets/bg/d.png')",
+            },
         },
     },
     plugins: [],

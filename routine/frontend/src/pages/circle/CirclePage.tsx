@@ -5,6 +5,7 @@ import axios from '../../api/axios';
 import { CategorySelector } from '../../components/ui/CategorySelector';
 import { Link } from 'react-router-dom';
 import { Category } from '../../types/board';
+import PostItExam from "../../components/PostItSVG";
 
 interface CircleSummary {
     circleId: number;
@@ -58,6 +59,7 @@ export default function CircleSearchPage() {
 
     return (
         <div className="p-6">
+            <PostItExam>하이</PostItExam>
             <h1 className="text-2xl font-bold mb-6">서클</h1>
 
             {/* ✅ 내 서클 목록 */}

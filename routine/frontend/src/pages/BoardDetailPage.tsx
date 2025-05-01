@@ -6,7 +6,11 @@ import BoardNav from '../components/Board/BoardNav';
 import { BoardDTO } from '../types/board';
 import { format } from 'date-fns';
 import { useCurrentUser } from '../hooks/useAuth';
+import BoardDetailOnNote  from '../components/Board/BoardDetailOnNote';
 import { CommentSection } from '../components/CommentSection';
+import CommentPostItList from "../components/Board/CommentPostItList";
+import PostItBoardNav from "../components/Board/PostItBoardNav";
+import AppLayout from "../layout/AppLayout";
 
 export default function BoardDetailPage() {
     const { boardId } = useParams<{ boardId: string }>();
@@ -58,57 +62,29 @@ export default function BoardDetailPage() {
         : { label: '작성일', date: board.createdAt! };
 
     return (
-        <div className="flex">
-            <BoardNav />
-            <div className="flex-1 p-6 bg-white">
-                {canModify && (
-                    <div className="flex justify-end space-x-2 mb-4">
-                        <button
-                            onClick={() => navigate(`/boards/edit/${boardId}`)}
-                            className="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500"
-                        >수정</button>
-                        <button
-                            onClick={handleDelete}
-                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                        >삭제</button>
-                    </div>
-                )}
-
-                <h1 className="text-2xl font-bold mb-4">{board.title}</h1>
-                <div className="text-sm text-gray-600 mb-2">
-                    작성자: {board.writer}
-                    {'  |  '}
-                    {displayDate.label}: {format(new Date(displayDate.date), 'yyyy-MM-dd HH:mm')}
-                    {'  |  '}
-                    조회수: {board.viewCount ?? '-'}
-                </div>
-                <div className="mb-4">
-                    <span className="inline-block bg-gray-200 px-2 py-1 text-xs rounded">
-                        {board.category} / {board.detailCategory}
-                    </span>
-                    <span className="inline-block bg-blue-100 px-2 py-1 text-xs rounded ml-2">
-                        {board.boardType}
-                    </span>
-                </div>
-                <article className="prose max-w-none">
-                    {board.content}
-                </article>
-                {board.tags && (
-                    <div className="mt-6">
-                        <h4 className="font-semibold mb-1">태그</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {board.tags.split(',').map(tag => (
-                                <span key={tag} className="bg-green-100 px-2 py-1 rounded text-xs">
-                                    #{tag.trim()}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* 댓글 섹션 */}
-                <CommentSection boardId={boardId!} />
+        <AppLayout>
+            {/* 네비게이션 (왼쪽 고정) */}
+            <div className="shrink-0 mr-6">
+                <PostItBoardNav />
             </div>
-        </div>
+
+            {/* 본문 콘텐츠 (중앙 정렬, 폭 제한) */}
+            <div className="flex-1 max-w-3xl">
+                <BoardDetailOnNote
+                    board={board}
+                    displayDate={displayDate}
+                    canModify={canModify}
+                    onEdit={() => navigate(`/boards/edit/${boardId}`)}
+                    onDelete={handleDelete}
+                />
+
+                {/* 댓글 */}
+                <CommentSection boardId={board.boardId!} initialComments={board.comments ?? []} />
+            </div>
+        </AppLayout>
+
+
+
+
     );
 }

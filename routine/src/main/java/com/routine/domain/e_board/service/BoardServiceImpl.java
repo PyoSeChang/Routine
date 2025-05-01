@@ -4,9 +4,11 @@ import com.routine.domain.a_member.model.Member;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.e_board.dto.BoardDTO;
 import com.routine.domain.e_board.dto.BoardListDTO;
+import com.routine.domain.e_board.dto.CommentDTO;
 import com.routine.domain.e_board.model.*;
 import com.routine.domain.e_board.repository.BoardRepository;
 import com.routine.domain.e_board.repository.BoardStatusRepository;
+import com.routine.domain.e_board.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final BoardStatusRepository boardStatusRepository;
-
+    private final CommentService commentService;
     @Override
     @Transactional
     public void insertBoard(BoardDTO boardDTO) {
@@ -40,10 +42,11 @@ public class BoardServiceImpl implements BoardService {
         Board board = Board.builder()
                 .writer(writer)
                 .title(boardDTO.getTitle())
+                .tags(boardDTO.getTags())
                 .content(boardDTO.getContent())
-                .type(boardDTO.getBoardType())
-                .category(boardDTO.getCategory())
-                .detailCategory(boardDTO.getDetailCategory())
+                .type(BoardType.valueOf(boardDTO.getBoardType()))
+                .category(Category.valueOf(boardDTO.getCategory()))
+                .detailCategory(DetailCategory.valueOf(boardDTO.getDetailCategory()))
                 .build();
 
         boardRepository.save(board); // 1. 먼저 Board 저장
@@ -71,9 +74,9 @@ public class BoardServiceImpl implements BoardService {
 
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
-        board.setType(BoardType.valueOf(boardDTO.getBoardType().name()));
-        board.setCategory(Category.valueOf(boardDTO.getCategory().name()));
-        board.setDetailCategory(DetailCategory.valueOf(boardDTO.getDetailCategory().name()));
+        board.setType(BoardType.valueOf(boardDTO.getBoardType()));
+        board.setCategory(Category.valueOf(boardDTO.getCategory()));
+        board.setDetailCategory(DetailCategory.valueOf(boardDTO.getDetailCategory()));
 
         boardRepository.save(board);
 
@@ -135,7 +138,9 @@ public class BoardServiceImpl implements BoardService {
                         new EntityNotFoundException("게시글을 찾을 수 없습니다. id=" + boardId)
                 );
         BoardStatus status = boardStatusRepository.findById(boardId).orElseThrow();
-        return BoardDTO.fromEntity(board, status);
+        List<CommentDTO> comments = commentService.getComments(boardId);
+        String nickname = memberRepository.findNicknameById(board.getWriter().getId());
+        return BoardDTO.fromEntity(board, status, comments, nickname);
     }
 }
 

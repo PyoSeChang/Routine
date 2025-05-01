@@ -1,74 +1,67 @@
-// src/components/CommentSection.tsx
 import React, { useState } from 'react';
-import { CommentForm } from './CommentForm';
-import { CommentItem } from './CommentItem';
-import { EditCommentModal } from './EditCommentModal';
 import { useComments } from '../hooks/useComment';
-import { CommentDTO } from '../types/comment';
+import { CommentDTO } from '../types/board';
+import CommentPostItList from './Board/CommentPostItList';
+import CommentPostItItem from './Board/CommentPostItItem';
 
 interface CommentSectionProps {
-    boardId: string;
+    boardId: number;
+    initialComments: CommentDTO[];
 }
 
-export function CommentSection({ boardId }: CommentSectionProps) {
-    const { comments, loading, error, add, update, remove } = useComments(boardId);
+export function CommentSection({ boardId, initialComments }: CommentSectionProps) {
+    const { comments, loading, error, add, update, remove } = useComments(boardId, initialComments);
     const [replyTo, setReplyTo] = useState<number | null>(null);
-    const [editing, setEditing] = useState<CommentDTO | null>(null);
+    const [editingId, setEditingId] = useState<number | null>(null);
 
     const handleAdd = async (content: string, parentId?: number | null) => {
         await add(content, parentId ?? null);
         setReplyTo(null);
     };
 
-
-    if (loading) {
-        return (
-            <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">댓글</h3>
-                <CommentForm parentId={null} onSubmit={handleAdd} onCancelReply={() => setReplyTo(null)} />
-                <p className="p-4">댓글 로딩중…</p>
-            </div>
-        );
-    }
+    const handleUpdate = async (id: number, content: string) => {
+        await update(id, content);
+        setEditingId(null);
+    };
 
     return (
         <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2">댓글</h3>
+            <h3 className="text-lg font-semibold mb-4">댓글</h3>
 
-            {/* 1) 댓글 입력폼: 항상 노출 */}
-            <CommentForm
-                parentId={replyTo}
-                onSubmit={handleAdd}
-                onCancelReply={() => setReplyTo(null)}
+            {/* 입력 폼 (기본) */}
+            <CommentPostItItem
+                comment={{
+                    commentId: 0,
+                    writerId: 0,
+                    writerName: '',
+                    content: '',
+                    parentId: replyTo,
+                    boardId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: undefined,
+                }}
+                mode="input"
+                onSave={(content) => handleAdd(content, replyTo)}
+                onCancel={() => setReplyTo(null)}
             />
 
-            {/* 2) 로딩 이후 에러 처리 */}
-            {error && <p className="text-red-500 mb-4">{error}</p>}
+            {/* 에러 메시지 */}
+            {error && <p className="text-red-500 my-2">{error}</p>}
 
-            {/* 3) 댓글 리스트 */}
-            {comments.length === 0 && !error ? (
+            {/* 댓글 목록 */}
+            {loading ? (
+                <p className="p-4">댓글 로딩중…</p>
+            ) : (comments?.length ?? 0) === 0 ? (
                 <p className="p-4 text-gray-500">등록된 댓글이 없습니다.</p>
             ) : (
-                comments.map(comment => (
-                    <CommentItem
-                        key={comment.commentId}
-                        comment={comment}
-                        onReply={id => setReplyTo(id)}
-                        onEdit={c => setEditing(c)}
-                        onDelete={id => remove(id)}
-                    />
-                ))
-            )}
-
-            {/* 4) 수정 모달 */}
-            {editing && (
-                <EditCommentModal
-                    comment={editing}
-                    onSave={async (id, content) => {
-                        await update(id, content);
-                        setEditing(null);
-                    }}
-                    onCancel={() => setEditing(null)}
+                <CommentPostItList
+                    comments={comments}
+                    editingId={editingId}
+                    onReply={setReplyTo}
+                    onEdit={(comment) => setEditingId(comment.commentId)}
+                    onDelete={remove}
+                    onSaveEdit={handleUpdate}
+                    onCancelEdit={() => setEditingId(null)}
                 />
             )}
         </div>

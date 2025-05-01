@@ -19,6 +19,7 @@ export enum BoardType {
 export interface BoardDTO {
     boardId?: number;
     writer: number;
+    writerNickname: string;
     title: string;
     content: string;
     tags?: string;
