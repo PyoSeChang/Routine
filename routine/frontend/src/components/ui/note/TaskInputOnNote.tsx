@@ -26,7 +26,7 @@ const TaskInputOnNote: React.FC<TaskInputOnNoteProps> = ({ tasks, setTasks }) =>
 
     return (
         <div className="w-full">
-            <Line className="font-ui">태스크</Line>
+            <Line className="font-ui">할 일 목록</Line>
 
             {tasks.map((task, index) => (
                 <Line key={index} className="gap-2">
@@ -53,7 +53,7 @@ const TaskInputOnNote: React.FC<TaskInputOnNoteProps> = ({ tasks, setTasks }) =>
                         onClick={handleAdd}
                         className="text-sm text-blue-600 hover:underline mt-2 px-1"
                     >
-                        + 태스크 추가
+                        + 추가
                     </button>
                 </Line>
             )}

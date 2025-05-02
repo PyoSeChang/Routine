@@ -13,6 +13,7 @@ module.exports = {
                 mainBlue: '#1e40af',
                 mainGreen: '#166534',
                 mainRed: '#991b1b',
+                brown: '#9f5c1d',
                 'postit-yellow': '#fff9c4',
                 'postit-orange': '#ffe0b2',
                 'postit-pink':   '#f8bbd0',
@@ -25,6 +26,7 @@ module.exports = {
             fontFamily: {
                 user: ['Dokrip', 'sans-serif'],
                 ui: ['Nanum Gothic', 'MaruBuri'],
+                chalk: ['Cafe24Decoschool', 'MaruBuri'],
             },
             fontSize: {
                 base: '20px', // 기본 base 자체를 20px로 바꿔도 됨
@@ -32,6 +34,7 @@ module.exports = {
             backgroundImage: {
                 'sticky-green': "url/assets/bg/green-postIt.png')",
                 'corc': "url/assets/bg/d.png')",
+                'design': "url/assets/bg/1분전만큼",
             },
         },
     },

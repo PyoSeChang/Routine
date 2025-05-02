@@ -7,6 +7,7 @@ import BoardDetailPage from './pages/board/BoardDetailPage';
 import CirclePage from "./pages/circle/CirclePage";
 import CircleFormPage from "./pages/circle/CircleFormPage";
 import CircleDetailPage from "./pages/circle/CircleDetailPage";
+import IndexPage from "./pages/IndexPage";
 
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
                 <Route path="/circles/create" element={<CircleFormPage/>} />
                 {/*/!* 서클 상세 *!/*/}
                 <Route path="/circles/:circleId" element={<CircleDetailPage />} />
+
+                <Route path="/" element={<IndexPage />} />
             </Routes>
         </BrowserRouter>
     );

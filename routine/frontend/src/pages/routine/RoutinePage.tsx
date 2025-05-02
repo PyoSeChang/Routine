@@ -8,6 +8,7 @@ import CreateRoutineOverlay from "../../components/Routines/CreateRoutineOverlay
 import PostIt from "../../components/ui/post_it/PostIt";
 import AppLayout from '../../layout/AppLayout';
 import { Weekday } from '../../types/routine';
+import ChalkButton from "../../components/ui/chalk/ChalkButton";
 
 type ViewMode = { type: 'DAY'; day: Weekday };
 
@@ -56,12 +57,9 @@ const RoutinePage: React.FC = () => {
                 )}
                 {/* ✅ 루틴 만들기 버튼 */}
                 <div className="flex justify-center mt-6">
-                    <button
-                        onClick={() => setIsCreateMode(true)}
-                        className="px-6 py-3 bg-blue-500 text-white rounded-xl shadow-md hover:bg-blue-600 transition"
-                    >
-                        + 루틴 만들기
-                    </button>
+                    <ChalkButton onClick={() => setIsCreateMode(true)}>
+                        루틴 만들기
+                    </ChalkButton>
                 </div>
 
                 {/* ✅ 루틴 생성 오버레이 */}

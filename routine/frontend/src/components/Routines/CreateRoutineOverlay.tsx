@@ -62,7 +62,9 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
             <div className="relative w-full max-w-lg before:content-['']
             before:absolute before:left-10 before:top-0 before:bottom-0 before:z-[10]
             before:w-[2px] before:bg-red-500 before:opacity-60">
+                <div className="bg-blue-700 h-6 w-full rounded-t-md shadow-md" />
                 <div className="relative bg-note shadow-lg shawdow-black/30 w-full pt-3">
+
                     <button
                         className="absolute top-3 right-3 text-gray-500 hover:text-black"
                         onClick={onClose}
@@ -72,8 +74,8 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
 
                     <h2 className="text-xl font-bold mb-4 pt-2 text-center font-ui">루틴 만들기</h2>
 
-
-                    <InputOnNote label="<루틴 이름>" value={title} onChange={setTitle} />
+                    <BlankLine/>
+                    <InputOnNote label="이름: " value={title} onChange={setTitle} />
                     <BlankLine count={1} />
                     <CategoryOnNote category={category} detailCategory={detailCategory} onCategoryChange={setCategory} onDetailCategoryChange={setDetailCategory} />
                     <BlankLine count={1} />
@@ -93,7 +95,7 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                         value={description}
                         onChange={setDescription}
                         placeholder="루틴 설명을 간단히 적어주세요"
-                        maxRows={4}
+                        maxRows={3}
                     />
                     <NoneLine />
 

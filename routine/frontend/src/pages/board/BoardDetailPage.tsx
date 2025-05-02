@@ -12,6 +12,7 @@ import CommentPostItList from "../../components/Board/CommentPostItList";
 import PostItBoardNav from "../../components/Board/PostItBoardNav";
 import AppLayout from "../../layout/AppLayout";
 
+
 export default function BoardDetailPage() {
     const { boardId } = useParams<{ boardId: string }>();
     const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function BoardDetailPage() {
             </div>
 
             {/* 본문 콘텐츠 (중앙 정렬, 폭 제한) */}
-            <div className="flex-1 max-w-5xl ">
+            <div className="flex-1 w-full ">
                 <BoardDetailOnNote
                     board={board}
                     displayDate={displayDate}

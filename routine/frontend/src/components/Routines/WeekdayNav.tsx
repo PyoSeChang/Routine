@@ -28,9 +28,15 @@ const WeekdayNav: React.FC<Props> = ({ viewMode, setViewMode }) => {
                 <button
                     key={day}
                     onClick={() => setViewMode({ type: 'DAY', day })}
-                    className={`px-3 py-1 rounded border ${viewMode.day === day ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
+                    className={`
+                        font-chalk
+                        text-white
+                        text-[30px]
+                        hover:underline
+                        ${viewMode.day === day ? 'font-bold' : 'opacity-70'}
+                    `}
                 >
-                    {day}
+                    {`<${day}>`}
                 </button>
             ))}
         </div>

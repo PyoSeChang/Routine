@@ -10,8 +10,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FFFACD;
-  /*background-image: url('/public/assets/bg/d.jpg');*/
+
+  /*background-color: #aed6f8;*/
+  background-color: #175200;
+  /*background-color: #175200;*/
+  /*background-image: url('/public/assets/bg/KakaoTalk_20250502_112049736.jpg');*/
+  /*background-image: url('/public/assets/bg/KakaoTalk_20250502_112338456.jpg');*/
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+  /*background-image: url("https://www.transparenttextures.com/patterns/concrete-wall.png");*/
+  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+  background-image: url('/public/assets/bg/empty-blackboard.jpg');
 }
 
 code {
@@ -28,6 +36,13 @@ code {
 @font-face {
   font-family: 'MaruBuri';
   src: url('https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2') format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Cafe24Decoschool';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2405-3@1.1/Cafe24Decoschool.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }

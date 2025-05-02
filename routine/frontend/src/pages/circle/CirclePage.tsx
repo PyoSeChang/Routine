@@ -60,8 +60,8 @@ export default function CircleSearchPage() {
 
     return (
         <AppLayout>
-            <div className="p-6">
-                <div className="min-w-[800px] justify-center">
+            <div className="w-full max-w-[1000px] mx-auto p-6">
+                <div>
                     <h1 className="text-2xl font-bold mb-6">서클</h1>
 
                     {/* ✅ 내 서클 목록 */}
@@ -173,6 +173,7 @@ export default function CircleSearchPage() {
                         </Link>
                     </div>
                 </div>
+
 
             </div>
         </AppLayout>
