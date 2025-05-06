@@ -70,7 +70,7 @@ const CommentPostItItem: React.FC<Props> = ({
                                     </div>
                                 )}
                             </div>
-                            <p className="mt-2 whitespace-pre-wrap">{comment.content}</p>
+                            <p className="font-user text-[16pt] mt-2 whitespace-pre-wrap">{comment.content}</p>
                             {onReply && (
                                 <button
                                     onClick={() => onReply(comment.commentId)}
@@ -86,7 +86,7 @@ const CommentPostItItem: React.FC<Props> = ({
                         <div>
               <textarea
                   ref={textareaRef}
-                  className={`w-full resize-none p-1 text-sm rounded bg-[#fff9c4] placeholder-gray-400 border-none focus:outline-none focus:ring-0 focus:border-none`}
+                  className={`w-full font-user text-[17pt] resize-none p-1 text-sm rounded bg-[#fff9c4] placeholder-gray-400 border-none focus:outline-none focus:ring-0 focus:border-none`}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={3}

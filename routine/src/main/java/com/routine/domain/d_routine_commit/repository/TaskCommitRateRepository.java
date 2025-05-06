@@ -16,4 +16,6 @@ public interface TaskCommitRateRepository extends JpaRepository<TaskCommitRate, 
 
 
     List<TaskCommitRate> findAllByRoutineIdAndCommitDateBetween(Long routineId, LocalDate fiveWeeksAgoMonday, LocalDate lastSunday);
+
+    List<TaskCommitRate> findAllByRoutineIdAndCommitDateIsNull(Long routineId);
 }

@@ -21,7 +21,7 @@ const BoardLayout: React.FC<Props> = ({ children }) => {
                 <Sun />
             </div>
 
-            <main className="flex justify-center mt-[40px] flex-1">
+            <main className="flex justify-center mt-[40px] mb-20 flex-1">
                 <div className="flex w-full justify-center max-w-[1200px] px-4">
                     {children}
                 </div>

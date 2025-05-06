@@ -48,19 +48,11 @@ const RoutineMemberCard: React.FC<Props> = ({ nickname, tasks, commitMessage, co
                 </>
             )}
             {commitRate !== undefined && commitRate >= 70 && (
-                <div
-                    className="absolute top-[22%] left-1/2 text-red-600 text-[90px] font-pencil tracking-widest rotate-[-10deg] pointer-events-none select-none leading-[1.0]"
-                    style={{
-                        transform: 'translateX(-50%)',
-                        textShadow: '2px 2px 2px rgba(0,0,0,0.1)',
-                    }}
-                >
-                    {commitRate}
-                    {/* 얇고 짧은 줄 */}
-                    <div className="mx-auto mt-[-8px] w-[65%] border-t-[3px] border-red-600"></div>
-                    {/* 두꺼운 강조 줄 */}
-                    <div className="mx-auto mt-[2px] w-[85%] border-t-[3px] border-red-600"></div>
-                </div>
+                <img
+                    src="/assets/img/completed.png"
+                    alt="Success Stamp"
+                    className="absolute top-[20%] left-[50%] w-[340px] -translate-x-1/2 opacity-80 rotate-[-20deg] pointer-events-none select-none"
+                />
             )}
 
 
@@ -90,7 +82,7 @@ const RoutineMemberCard: React.FC<Props> = ({ nickname, tasks, commitMessage, co
                         </div>
                     ))}
 
-                    {commitMessage && (
+
                         <div className="mt-4 px-6 pb-4">
                             <PostItSVG variant={0} width={360} height={120}>
                                 <div className="w-full h-full flex flex-col items-start justify-start text-sm leading-snug text-gray-800 whitespace-pre-wrap">
@@ -100,7 +92,7 @@ const RoutineMemberCard: React.FC<Props> = ({ nickname, tasks, commitMessage, co
                             </PostItSVG>
 
                         </div>
-                    )}
+
                 </div>
 
             </div>

@@ -18,7 +18,7 @@ const TaskCheckBox: React.FC<TaskCheckBoxProps> = ({ label, checked, disabled, o
             {/* 기본 체크박스 숨기기 */}
             <input
                 type="checkbox"
-                className="absolute opacity-0 w-0 h-0"
+                className="absolute opacity-0 w-0 h-0 font-user"
                 checked={checked}
                 disabled={isActuallyDisabled}
                 onChange={(e) => onChange(e.target.checked)}

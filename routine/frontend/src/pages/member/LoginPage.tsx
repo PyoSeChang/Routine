@@ -33,9 +33,9 @@ const LoginPage: React.FC = () => {
 
     return (
         <AppLayout>
-            <div className="flex items-center justify-center min-h-screen">
-                <form onSubmit={handleSubmit} className="w-full max-w-[700px] p-8">
-                    <h1 className="text-[52px] mb-6 font-chalk text-center text-black">Login</h1>
+            <div className="flex items-start pt-12 w-full justify-center min-h-screen no-yellow-autofill">
+                <form onSubmit={handleSubmit} className="w-full max-w-[750px] p-8">
+                    <h1 className="text-[60px] mb-6 font-chalk text-center text-white">Login</h1>
 
                     {/* 필드 + 버튼 수평 배치 */}
                     <div className="flex items-end gap-4">
@@ -49,6 +49,7 @@ const LoginPage: React.FC = () => {
                                     placeholder="아이디 입력"
                                     value={loginId}
                                     onChange={(e) => setLoginId(e.target.value)}
+                                    style={{ backgroundColor: 'white' }}
                                 />
                             </div>
                             <div className="flex flex-col">
@@ -59,6 +60,7 @@ const LoginPage: React.FC = () => {
                                     placeholder="비밀번호 입력"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    style={{ backgroundColor: 'white' }}
                                 />
                             </div>
                         </div>

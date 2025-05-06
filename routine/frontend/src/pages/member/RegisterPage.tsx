@@ -5,6 +5,8 @@ import TagInputOnNote from "../../components/ui/note/TagInputOnNote";
 import axios from "../../api/axios";
 import NoteBlock from "../../components/ui/note/NoteBlock";
 import Line from "../../components/ui/note/Line";
+import BlankLine from "../../components/ui/note/BlankLine";
+import NoneLine from "../../components/ui/note/NoneLine";
 
 const RegisterPage: React.FC = () => {
     const [form, setForm] = useState({
@@ -69,8 +71,8 @@ const RegisterPage: React.FC = () => {
 
     return (
         <AppLayout>
-            <div className="flex flex-col items-center justify-center min-h-screen p-4">
-                <form onSubmit={handleSubmit} className="w-full max-w-md ">
+            <div className="flex flex-col w-full max-w-[900px]  justify-center min-h-screen p-4">
+                <form onSubmit={handleSubmit} className="w-full  ">
                     <div className="bg-blue-700 h-6 w-full rounded-t-md shadow-lg " />
 
                     <NoteBlock className="justify-center pt-6">
@@ -89,7 +91,7 @@ const RegisterPage: React.FC = () => {
                             {idMessage}
                         </p>
                     </Line>
-
+                    <BlankLine/>
                     <InputOnNote
                         type="password"
                         label="비밀번호: "
@@ -108,7 +110,7 @@ const RegisterPage: React.FC = () => {
                             {passwordMessage}
                         </p>
                     </Line>
-
+                    <BlankLine/>
                     <InputOnNote
                         type="text"
                         label="닉네임: "
@@ -135,7 +137,7 @@ const RegisterPage: React.FC = () => {
                         value={form.email}
                         onChange={v => handleChange("email", v)}
                     />
-
+                    <BlankLine/>
 
                     <NoteBlock className="pt-8 pb-2">
                         <button

@@ -21,6 +21,7 @@ const LinedTextArea: React.FC<LinedTextAreaProps> = ({ value, onChange, placehol
                 paddingTop: '2px',
                 paddingBottom: '6px',
                 paddingLeft: '48px',
+                fontFamily: 'NanumBarunpen',
                 fontSize: '14px',
                 lineHeight: '24px',
                 backgroundImage: `repeating-linear-gradient(

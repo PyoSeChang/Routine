@@ -48,6 +48,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ parentId, onSubmit, on
                 placeholder="댓글을 입력하세요..."
                 className="w-full border rounded p-2 mb-2"
                 rows={3}
+                style={{ fontFamily: 'NanumBarunpen' }}
             />
             <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                 {parentId != null ? '답글 등록' : '댓글 등록'}

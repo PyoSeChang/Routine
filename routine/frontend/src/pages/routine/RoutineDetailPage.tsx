@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 import axios from '../../api/axios';
 import { useRoutineDetail } from '../../hooks/useRoutineDetail';
 import RoutineCommitMessages from '../../components/Routine/RoutineCommitMessage';
@@ -14,8 +15,6 @@ import DropdownOnNote from '../../components/ui/note/DropdownOnNote';
 import BlankLine from "../../components/ui/note/BlankLine";
 import { MessageDTO } from '../../types/message';
 import NoteBlock from "../../components/ui/note/NoteBlock";
-import NoneLine from "../../components/ui/note/NoneLine";
-import TaskCheckBox from '../../components/ui/TaskCheckBox';
 import CommitSummaryCard from '../../components/Routine/CommitSummaryCard';
 
 interface TaskDTO {
@@ -58,6 +57,7 @@ export default function RoutineDetailPage() {
                 setCommitMessages(messagesRes.data);
                 setCommitRates(ratesRes.data);
                 setCommitDates(datesRes.data);
+                console.log("✅ 커밋 이행률 데이터:", ratesRes.data);
             } catch (error) {
                 console.error('루틴 상세 데이터 조회 실패', error);
             } finally {
@@ -85,18 +85,30 @@ export default function RoutineDetailPage() {
 
     return (
         <AppLayout>
-            <div className="flex max-w-[800px] w-full mx-auto gap-8">
+            <div className="flex max-w-[800px] w-full mb-20 mx-auto gap-8">
                 <div className="flex-1">
                     <div className="bg-blue-700 h-8 w-full rounded-t-lg shadow-md" />
                     <div className="bg-note shadow p-4">
                         <h2 className="text-3xl font-bold mb-2 text-center">{routine.title}</h2>
-                        <BlankLine />
-                        <Line>루틴 설명: {routine.description || '설명이 없습니다.'}</Line>
-                        <RepeatDaysOnNote selectedDays={routine.repeatDays as Weekday[]} disabled />
-                        <Line>카테고리: {routine.category} / {routine.detailCategory}</Line>
-                        <Line>시작한 날짜: {routine.createdAt}</Line>
 
                         <BlankLine />
+
+                        <Line>
+                            <span className="font-bold">루틴 설명:</span> {routine.description || '설명이 없습니다.'}
+                        </Line>
+
+                        <RepeatDaysOnNote selectedDays={routine.repeatDays as Weekday[]} disabled />
+
+                        <Line>
+                            <span className="font-bold">카테고리:</span> {routine.category} / {routine.detailCategory}
+                        </Line>
+
+                        <Line>
+                            <span className="font-bold">시작한 날짜:</span> {dayjs(routine.createdAt).format('YYYY.MM.DD')}
+                        </Line>
+
+                        <BlankLine />
+
                         <DropdownOnNote
                             value={selectedDate}
                             options={commitDates.map(date => ({ label: date, value: date }))}
@@ -120,10 +132,12 @@ export default function RoutineDetailPage() {
                         )}
 
                         <BlankLine />
+
                         <Line>
                             <button
                                 onClick={() => setOpenSection(openSection === 'commit-stats' ? null : 'commit-stats')}
-                                className="hover:underline">
+                                className="hover:underline"
+                            >
                                 [커밋 통계 확인하기]
                             </button>
                         </Line>
@@ -136,10 +150,12 @@ export default function RoutineDetailPage() {
                                 )}
                             </div>
                         )}
+
                         <Line>
                             <button
                                 onClick={() => setOpenSection(openSection === 'commit-messages' ? null : 'commit-messages')}
-                                className="hover:underline">
+                                className="hover:underline"
+                            >
                                 [커밋 메세지 모아보기]
                             </button>
                         </Line>
@@ -148,6 +164,7 @@ export default function RoutineDetailPage() {
                                 <RoutineCommitMessages data={commitMessages} loading={messagesLoading} />
                             </div>
                         )}
+
                         <NoteBlock className="flex justify-center">
                             <div className="flex gap-4 mt-2">
                                 {routine.circleRoutine ? (
@@ -167,6 +184,7 @@ export default function RoutineDetailPage() {
                             </div>
                         </NoteBlock>
                     </div>
+
                     {isEditOpen && <RoutineEditOverlay routine={routine} onClose={() => setIsEditOpen(false)} />}
                 </div>
             </div>

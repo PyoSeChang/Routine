@@ -25,45 +25,70 @@ export function CommentSection({ boardId, initialComments }: CommentSectionProps
     };
 
     return (
-        <div className="mt-6 mb-40">
-            <h3 className=" font-chalk text-white text-[42px]  mb-4">Post Comment</h3>
+        <div className="flex gap-10 mb-40">
+            {/* 댓글 입력 + 목록 */}
+            <div className="flex-1 max-w-[400px]">
+                <h3 className="font-chalk text-white text-[42px] mb-4">Post Comment</h3>
 
-            {/* 입력 폼 (기본) */}
-            <CommentPostItItem
-                comment={{
-                    commentId: 0,
-                    writerId: 0,
-                    writerName: '',
-                    content: '',
-                    parentId: replyTo,
-                    boardId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: undefined,
-                }}
-                mode="input"
-                onSave={(content) => handleAdd(content, replyTo)}
-                onCancel={() => setReplyTo(null)}
-            />
-
-            {/* 에러 메시지 */}
-            {error && <p className="text-red-500 my-2">{error}</p>}
-            <h3 className="text-[42px] font-chalk text-white mt-4 mb-4">Comments</h3>
-            {/* 댓글 목록 */}
-            {loading ? (
-                <p className="p-4">댓글 로딩중…</p>
-            ) : (comments?.length ?? 0) === 0 ? (
-                <p className="p-4 text-gray-500">등록된 댓글이 없습니다.</p>
-            ) : (
-                <CommentPostItList
-                    comments={comments}
-                    editingId={editingId}
-                    onReply={setReplyTo}
-                    onEdit={(comment) => setEditingId(comment.commentId)}
-                    onDelete={remove}
-                    onSaveEdit={handleUpdate}
-                    onCancelEdit={() => setEditingId(null)}
+                <CommentPostItItem
+                    comment={{
+                        commentId: 0,
+                        writerId: 0,
+                        writerName: '',
+                        content: '',
+                        parentId: replyTo,
+                        boardId,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: undefined,
+                    }}
+                    mode="input"
+                    onSave={(content) => handleAdd(content, replyTo)}
+                    onCancel={() => setReplyTo(null)}
                 />
-            )}
+
+                {error && <p className="text-red-500 my-2">{error}</p>}
+
+                <h3 className="text-[42px] font-chalk text-white mt-4 mb-4">Comments</h3>
+
+                {loading ? (
+                    <p className="p-4">댓글 로딩중…</p>
+                ) : (comments?.length ?? 0) === 0 ? (
+                    <p className="p-4 text-gray-500">등록된 댓글이 없습니다.</p>
+                ) : (
+                    <CommentPostItList
+                        comments={comments}
+                        editingId={editingId}
+                        onReply={setReplyTo}
+                        onEdit={(comment) => setEditingId(comment.commentId)}
+                        onDelete={remove}
+                        onSaveEdit={handleUpdate}
+                        onCancelEdit={() => setEditingId(null)}
+                    />
+                )}
+            </div>
+
+            {/* 오른쪽 이모티콘 컬럼 */}
+            <div className="w-[120px] flex flex-col items-center gap-40 pt-[68px] mt-28">
+                <Emoticon src="/assets/img/no-doodle.png" alt="낙서금지 루틴이" />
+                <Emoticon src="/assets/img/noisy-student.png" alt="떠든사람 루틴이" />
+                <Emoticon src="/assets/img/science-time.png" alt="과학시간 루틴이" />
+            </div>
         </div>
     );
 }
+
+// 이모티콘 컴포넌트
+const Emoticon: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
+    <div className="w-fit">
+        <img
+            src={src}
+            alt={alt}
+            className="mx-auto"
+            style={{
+                width: '220px',
+                transform: 'scale(2.2)',
+                transformOrigin: 'bottom left',
+            }}
+        />
+    </div>
+);

@@ -11,6 +11,7 @@ import com.routine.security.model.PrincipalDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,8 +44,9 @@ public class BoardController {
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) DetailCategory detailCategory,
             @RequestParam(required = false) String keyword,
-            Pageable pageable
+            @PageableDefault(size = 15) Pageable pageable
     ) {
+        System.out.println("Pageable"+pageable);
         return boardService.displayBoards(category, detailCategory, keyword, pageable);
     }
 

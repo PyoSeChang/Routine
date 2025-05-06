@@ -7,7 +7,6 @@ import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.c_routine.repository.RoutineTaskRepository;
-import com.routine.domain.c_routine.dto.MessageDTO;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.c_routine.model.week.WeekdayVO;
 import com.routine.domain.d_routine_commit.model.CommitRate;
@@ -42,7 +41,6 @@ public class RoutineViewServiceImpl implements RoutineViewService {
     private final CircleMemberService circleMemberService;
     private final CircleMemberRepository circleMemberRepository;
     private final CommitMessageRepository commitMessageRepository;
-
 
     @Override
     public List<AllRoutinesViewDTO> getWeeklyRoutineView(Long memberId, LocalDate today) {
@@ -106,11 +104,7 @@ public class RoutineViewServiceImpl implements RoutineViewService {
         List<RoutineTask> routineTasks = routineTaskRepository.findAllByRoutine(routine);
 
         return RoutineDTO.fromEntity(routine, routineTasks);
-
     }
-
-
-
 
     @Override
     public RoutineCommitRatesResponse getCommitRates(Long routineId) {
@@ -126,13 +120,6 @@ public class RoutineViewServiceImpl implements RoutineViewService {
                 .taskWeeklyRates(taskWeeklyRates)
                 .build();
     }
-
-
-
-
-
-
-
 
     private List<DailyRateDTO> mapThisWeekDailyRates(Long routineId) {
         LocalDate today = LocalDate.now();
@@ -167,35 +154,41 @@ public class RoutineViewServiceImpl implements RoutineViewService {
 
     private List<WeeklyRateDTO> mapRoutineWeeklyRates(Long routineId) {
         LocalDate today = LocalDate.now();
-        LocalDate lastSunday = today.with(DayOfWeek.SUNDAY).minusWeeks(1);    // 저번 주 일요일
-        LocalDate fiveWeeksAgoMonday = lastSunday.minusWeeks(4).with(DayOfWeek.MONDAY); // 5주 전 월요일
+        List<Integer> recentWeeks = new ArrayList<>();
+        List<Integer> recentYears = new ArrayList<>();
 
-        int startYear = fiveWeeksAgoMonday.getYear();
-        int startWeek = fiveWeeksAgoMonday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-        int endYear = lastSunday.getYear();
-        int endWeek = lastSunday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        for (int i = 1; i <= 4; i++) {
+            LocalDate target = today.minusWeeks(i);
+            recentYears.add(target.getYear());
+            recentWeeks.add(target.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR));
+        }
 
-        List<CommitRate> rates = commitRateRepository.findWeeklyAverageCommitRatesByRoutineIdBetween(
-                routineId, startYear, startWeek, endYear, endWeek
-        );
+        List<CommitRate> rates = commitRateRepository.findAllByRoutineIdAndCommitDateIsNull(routineId);
 
         return rates.stream()
-                .map(WeeklyRateDTO::from)
+                .filter(rate -> recentYears.contains(rate.getYear()) && recentWeeks.contains(rate.getWeek()))
+                .map(rate -> WeeklyRateDTO.builder()
+                        .week(rate.getYear() + "-W" + rate.getWeek())
+                        .commitRate(rate.getCommitRate())
+                        .build())
                 .collect(Collectors.toList());
     }
 
-
-
     private List<TaskWeeklyRateDTO> mapTaskWeeklyRates(Long routineId) {
         LocalDate today = LocalDate.now();
-        LocalDate lastSunday = today.with(DayOfWeek.SUNDAY).minusWeeks(1);    // 저번 주 일요일
-        LocalDate fiveWeeksAgoMonday = lastSunday.minusWeeks(4).with(DayOfWeek.MONDAY);
+        Set<String> allowedWeeks = new HashSet<>();
+        for (int i = 1; i <= 4; i++) {
+            LocalDate target = today.minusWeeks(i);
+            allowedWeeks.add(target.getYear() + "-W" + target.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR));
+        }
 
-        List<TaskCommitRate> taskCommitRates = taskCommitRateRepository.findAllByRoutineIdAndCommitDateBetween(
-                routineId, fiveWeeksAgoMonday, lastSunday
-        );
+        List<TaskCommitRate> weeklyRates = taskCommitRateRepository.findAllByRoutineIdAndCommitDateIsNull(routineId);
 
-        Map<Long, List<TaskCommitRate>> taskGrouped = taskCommitRates.stream()
+        List<TaskCommitRate> filteredRates = weeklyRates.stream()
+                .filter(rate -> allowedWeeks.contains(rate.getYear() + "-W" + rate.getWeek()))
+                .toList();
+
+        Map<Long, List<TaskCommitRate>> taskGrouped = filteredRates.stream()
                 .collect(Collectors.groupingBy(TaskCommitRate::getTaskId));
 
         return taskGrouped.entrySet().stream()
@@ -211,20 +204,13 @@ public class RoutineViewServiceImpl implements RoutineViewService {
                             .taskId(taskId)
                             .taskContent(taskContent)
                             .rates(taskRates.stream()
-                                    .map(taskRate -> WeeklyRateDTO.builder()
-                                            .week(taskRate.getYear() + "-W" + taskRate.getWeek())
-                                            .commitRate(taskRate.getTaskCommitRate())
+                                    .map(rate -> WeeklyRateDTO.builder()
+                                            .week(rate.getYear() + "-W" + rate.getWeek())
+                                            .commitRate(rate.getTaskCommitRate())
                                             .build())
                                     .collect(Collectors.toList()))
                             .build();
                 })
                 .collect(Collectors.toList());
     }
-
-
-
-
-
-
-
 }

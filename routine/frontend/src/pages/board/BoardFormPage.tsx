@@ -73,7 +73,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
 
     return (
         <AppLayout>
-            <div className="w-full rounded-t-lg shadow-lg">
+            <div className="w-full max-w-[1000px] rounded-t-lg shadow-lg mb-40">
                 <div className="bg-blue-700 h-8 w-full rounded-t-lg shadow-md" />
                 <NoteBlock className="flex justify-center py-6">
                     <h1 className="text-xl font-bold font-ui text-center">

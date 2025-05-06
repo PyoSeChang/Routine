@@ -94,7 +94,7 @@ const MyPage: React.FC = () => {
             <div className="w-full max-w-[700px] mx-auto">
                 <div className="bg-blue-700 h-6 w-full rounded-t-md shadow-lg " />
                 <NoteBlock className="flex justify-center" >
-                    <h1 className="mt-5 mb-5 text-center">My Page</h1>
+                    <h1 className="mt-5 mb-5 text-bold text-[30px] text-center">My Page</h1>
                 </NoteBlock>
                 <BlankLine/>
                 <Line className="flex justify-between px-4 items-center">

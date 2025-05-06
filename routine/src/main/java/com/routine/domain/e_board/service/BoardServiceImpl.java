@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,11 @@ public class BoardServiceImpl implements BoardService {
             String keyword,
             Pageable pageable
     ) {
+        Pageable fixed = PageRequest.of(
+                pageable.getPageNumber(),
+                15, // 고정
+                pageable.getSort()
+        );
         // 동적 검색 조건 빌더
         Specification<Board> spec = (root, query, cb) -> {
             List<jakarta.persistence.criteria.Predicate> preds = new ArrayList<>();
@@ -132,7 +138,7 @@ public class BoardServiceImpl implements BoardService {
 
         // 페이징 포함 조회 후 DTO 변환
         return boardRepository
-                .findAll(spec, pageable)
+                .findAll(spec, fixed)
                 .map(BoardListDTO::fromEntity);
     }
 

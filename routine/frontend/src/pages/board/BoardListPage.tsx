@@ -17,14 +17,13 @@ export default function BoardListPage() {
     const detailCategory = searchParams.get('detailCategory') || undefined;
     const keyword = searchParams.get('keyword') || undefined;
     const page = parseInt(searchParams.get('page') || '0', 10);
-    const size = parseInt(searchParams.get('size') || '10', 10);
 
     const { boards, totalPages, loading } = useBoardList(
         category,
         detailCategory,
         keyword,
         page,
-        size
+        undefined // 👈 size 전달 안함 → @PageableDefault(size = 15) 사용됨
     );
 
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +36,6 @@ export default function BoardListPage() {
             detailCategory: detailCategory || '',
             keyword: kw,
             page: '0',
-            size: size.toString(),
         });
     };
 
@@ -46,7 +44,7 @@ export default function BoardListPage() {
 
     return (
         <BoardLayout>
-            <div className="shrink-0 mr-6 mt-[216px]">
+            <div className="shrink-0 mr-6 mt-[216px] mb-30">
                 <PostItBoardNav />
             </div>
             <div className="w-full mx-auto">
@@ -83,7 +81,6 @@ export default function BoardListPage() {
                                     detailCategory: detailCategory || '',
                                     keyword: keyword || '',
                                     page: (page - 1).toString(),
-                                    size: size.toString(),
                                 })
                             }
                             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
@@ -103,7 +100,6 @@ export default function BoardListPage() {
                                     detailCategory: detailCategory || '',
                                     keyword: keyword || '',
                                     page: (page + 1).toString(),
-                                    size: size.toString(),
                                 })
                             }
                             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"

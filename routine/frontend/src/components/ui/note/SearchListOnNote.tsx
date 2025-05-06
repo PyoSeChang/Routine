@@ -45,7 +45,7 @@ const SearchListOnNote: React.FC<Props> = ({ boards }) => {
                         <span className={`${cellBase} text-gray-500`}>{board.boardType}</span>
                         <span className={cellBase}>{board.category} / {board.detailCategory}</span>
                         <span className={cellBase}>{board.writerName}</span>
-                        <span className={`${cellBase} font-semibold text-blue-600 truncate`}>{board.title}</span>
+                        <span className={`${cellBase} font-semibold font-user text-blue-600 truncate`}>{board.title}</span>
                         <div className={`${cellBase} gap-2 overflow-hidden whitespace-nowrap`}>
                             {typeof board.tags === 'string' && board.tags.trim() !== '' && (
                                 board.tags.split(',').map((tag: string) => (
