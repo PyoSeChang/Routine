@@ -113,9 +113,10 @@ export default function CircleDetailPage() {
                 <h1 className="text-[60px] font-chalk text-white mb-6 text-center">Our Circle</h1>
 
                 {!isMember && (
-                    <div className="mb-4">
-                        <button
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    <div className="flex justify-center mb-4">
+
+                        <ChalkButton
+                            className="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-600"
                             onClick={async () => {
                                 try {
                                     await axios.post(`/circles/${circleId}/join`);
@@ -125,10 +126,9 @@ export default function CircleDetailPage() {
                                     console.error("가입 실패", error);
                                     alert("가입에 실패했습니다.");
                                 }
-                            }}
-                        >
-                            가입하기
-                        </button>
+                            }}>
+                            Register
+                        </ChalkButton>
                     </div>
                 )}
 
