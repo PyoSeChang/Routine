@@ -47,8 +47,10 @@ public class CommitServiceImpl implements CommitService {
 
         if (dto.isSkipped()) {
             handleSkipCommit(memberId, dto.getRoutineId(), commitDate, logs);
+            commitMessageService.saveCommitMessage(memberId, dto.getRoutineId(), commitDate, dto.getMessage(), dto.getIsPublic());
         } else {
             handleTaskCommit(dto, logs);
+            commitMessageService.saveCommitMessage(memberId, dto.getRoutineId(), commitDate, dto.getMessage(), dto.getIsPublic());
         }
     }
 

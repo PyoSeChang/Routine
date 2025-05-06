@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+
+    <title>주문 완료 - 포스트잇 스타일</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom 스타일 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fdf6cc;
+            background-image: url('/images/abc.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            padding-top: 30px;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        p.text-muted {
+            text-align: center;
+            font-size: 1.3rem;
+            color: white !important; /* 수정: 문구 색상 white로 명시 */
+        }
+
+        .postit-board {
+            background-color: #fffab3;
+            border: 3px dashed #f1c40f;
+            border-radius: 20px;
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card-title {
+            font-size: 1.7rem;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #fffdf2;
+            border-radius: 10px;
+        }
+
+        .table th {
+            background-color: #fbe27e;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #f1c40f, #f39c12);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            padding: 0.7rem 2rem;
+        }
+
+        .btn-outline-secondary {
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: 2px solid #888;
+            padding: 0.7rem 2rem;
+            background-color: white; /* 수정: 하얀 배경 추가 */
+            color: #444;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #eee;
+        }
+
+        .text-center.mt-4 a {
+            margin: 0 10px;
+        }
+
+        .card-body p {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>🎉 주문이 완료되었습니다!</h2>
+    <p class="text-muted">고객님의 소중한 주문이 정상적으로 처리되었습니다.</p>
+
+    <!-- 주문 정보 -->
+    <div class="postit-board">
+        <div class="card-body">
+            <h4 class="card-title">🧾 주문 정보</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle">
+                    <thead>
+                    <tr>
+                        <th>상품명</th>
+                        <th>수량</th>
+                        <th>가격</th>
+                        <th>합계</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${cartItems}">
+                        <td th:text="${item.product.title}">상품명</td>
+                        <td th:text="${item.quantity}">1</td>
+                        <td th:text="${#numbers.formatInteger(item.product.price, 1, 'COMMA')} + '원'">가격</td>
+                        <td th:text="${#numbers.formatInteger(item.product.price * item.quantity, 1, 'COMMA')} + '원'">합계</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">총 상품 금액</th>
+                        <th th:text="${#numbers.formatInteger(subtotal, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="text-end">배송비</th>
+                        <th th:text="${#numbers.formatInteger(shippingCost, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    <tr class="table-warning">
+                        <th colspan="3" class="text-end">총 결제 금액</th>
+                        <th th:text="${#numbers.formatInteger(totalPrice, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 배송 정보 -->
+    <div class="postit-board">
+        <div class="card-body">
+            <h4 class="card-title">📦 배송 정보</h4>
+            <p><strong>수령인:</strong> <span th:text="${receiverName}">홍길동</span></p>
+            <p><strong>주소:</strong> <span th:text="${address}">부산광역시 해운대구 우동</span></p>
+            <p><strong>연락처:</strong> <span th:text="${phone}">010-1234-5678</span></p>
+        </div>
+    </div>
+
+    <!-- 결제 정보 -->
+    <div class="postit-board">
+        <div class="card-body">
+            <h4 class="card-title">💳 결제 정보</h4>
+            <p><strong>결제 수단:</strong> <span th:text="${paymentMethod}">신용카드</span></p>
+            <p><strong>사용한 포인트:</strong> <span th:text="${usedPoints}">0</span> P</p>
+            <p><strong>적립된 포인트:</strong> <span th:text="${earnedPoints}">0</span> P</p>
+        </div>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="text-center mt-4">
+        <a href="/member/main" class="btn btn-outline-secondary">🏠 홈으로</a>
+        <a href="/cart/purchase" class="btn btn-primary">📋 주문 내역 보기</a>
+    </div>
+</div>
+</body>
+</html>

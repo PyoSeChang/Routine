@@ -140,7 +140,7 @@ public class CircleServiceImpl implements CircleService {
     private CircleRoutineDTO findCircleRoutine(Long circleId) {
         Long adminId = circleMemberRepository.findAdminIdByCircleId(circleId)
                 .orElseThrow(() -> new IllegalArgumentException("리더가 존재하지 않는 서클입니다."));
-
+        System.out.println("🤖 내가 실제로 호출한 adminId = " + adminId);
         Routine routine = routineRepository.findByCircleIdAndMemberId(circleId, adminId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 서클에 루틴이 존재하지 않습니다."));
 
@@ -170,30 +170,42 @@ public class CircleServiceImpl implements CircleService {
 
     @Override
     public CircleRoutineCommits getCommitsByCircleId(Long circleId, LocalDate commitDate) {
+        // 1. 해당 서클에 속한 멤버 ID 조회
         List<Long> memberIds = circleMemberRepository.findMemberIdsByCircleId(circleId);
         if (memberIds.isEmpty()) {
             return new CircleRoutineCommits(List.of());
         }
 
-        // 🆕 멤버들 조회
+        // 2. 멤버 닉네임 매핑
         List<Member> members = memberRepository.findAllById(memberIds);
         Map<Long, String> memberIdToNickname = members.stream()
                 .collect(Collectors.toMap(Member::getId, Member::getNickname));
 
-        List<CommitLog> commitLogs = commitLogRepository
-                .findAllByMemberIdInAndCommitDateAndRoutine_Circle_Id(memberIds, commitDate, circleId);
-        List<CommitMessage> commitMessages = commitMessageRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
-        List<CommitRate> commitRates = commitRateRepository.findAllByMemberIdInAndCommitDate(memberIds, commitDate);
+        // 3. 해당 서클의 루틴 ID 조회
+        List<Long> routineIds = routineRepository.findIdsByCircleId(circleId);
 
+        // 4. 커밋 로그, 메시지, 이행률 조회 (해당 서클 루틴 ID에 한정)
+        List<CommitLog> commitLogs = commitLogRepository
+                .findAllByMemberIdInAndCommitDateAndRoutineIdIn(memberIds, commitDate, routineIds);
+
+        List<CommitMessage> commitMessages = commitMessageRepository
+                .findAllByMemberIdInAndCommitDateAndRoutineIdIn(memberIds, commitDate, routineIds);
+
+        List<CommitRate> commitRates = commitRateRepository
+                .findAllByMemberIdInAndCommitDateAndRoutineIdIn(memberIds, commitDate, routineIds);
+
+
+        // 5. 매핑 로직
         Map<Long, List<TaskDTO>> tasksByMemberId = mapTasksByMember(commitLogs);
         Map<Long, String> messageByMemberId = mapMessagesByMember(commitMessages);
-        Map<Long, Double> rateByMemberId = mapRatesByMember(commitRates);
+        Map<Long, Integer> rateByMemberId = mapRatesByMember(commitRates);
 
+        // 6. 최종 결과 조립
         List<CircleRoutineCommits.MemberCommitInfo> memberCommitInfos = memberIds.stream()
                 .map(memberId -> buildMemberCommitInfo(
                         memberId,
                         memberIdToNickname.getOrDefault(memberId, "Unknown"),
-                        rateByMemberId.getOrDefault(memberId, 0.0),
+                        rateByMemberId.getOrDefault(memberId, 0),
                         tasksByMemberId.getOrDefault(memberId, List.of()),
                         messageByMemberId.get(memberId)
                 ))
@@ -201,6 +213,7 @@ public class CircleServiceImpl implements CircleService {
 
         return new CircleRoutineCommits(memberCommitInfos);
     }
+
 
     @Override
     public List<CircleSummaryDTO> searchCircles(String category, String detailCategory, String keyword) {
@@ -248,22 +261,23 @@ public class CircleServiceImpl implements CircleService {
         return commitMessages.stream()
                 .collect(Collectors.toMap(
                         msg -> msg.getMember().getId(),
-                        CommitMessage::getMessage
+                        msg -> msg.getMessage() == null ? "" : msg.getMessage()
                 ));
     }
 
-    private Map<Long, Double> mapRatesByMember(List<CommitRate> commitRates) {
+    private Map<Long, Integer> mapRatesByMember(List<CommitRate> commitRates) {
         return commitRates.stream()
                 .collect(Collectors.toMap(
                         rate -> rate.getMember().getId(),
-                        CommitRate::getCommitRate
+                        rate -> (int) (rate.getCommitRate() * 100) // 0.7 → 70
                 ));
     }
+
 
     private CircleRoutineCommits.MemberCommitInfo buildMemberCommitInfo(
             Long memberId,
             String nickname,
-            Double commitRate,
+            Integer commitRate,
             List<TaskDTO> tasks,
             String commitMessage
     ) {

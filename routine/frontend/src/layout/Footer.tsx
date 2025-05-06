@@ -3,7 +3,12 @@ import React from 'react';
 
 const Footer: React.FC = () => {
     return (
-        <footer className="w-full bg-amber-900 text-center text-sm text-white py-4 mt-12">
+        <footer className="w-full text-white py-3 px-6 shadow-md"
+                style={{
+                    backgroundColor: '#724019',
+                    backgroundImage: 'url("https://www.transparenttextures.com/patterns/dark-wood.png")',
+                    backgroundRepeat: 'repeat',
+                }}>
             © {new Date().getFullYear()} Routine. All rights reserved.
         </footer>
     );

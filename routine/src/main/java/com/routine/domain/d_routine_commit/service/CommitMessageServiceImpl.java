@@ -4,6 +4,7 @@ package com.routine.domain.d_routine_commit.service;
 import com.routine.domain.a_member.model.Member;
 import com.routine.domain.a_member.repository.MemberRepository;
 import com.routine.domain.a_member.service.MemberService;
+import com.routine.domain.c_routine.dto.MessageDTO;
 import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.d_routine_commit.dto.CommitMessageDTO;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class CommitMessageServiceImpl implements CommitMessageService {
     private final CommitMessageRepository commitMessageRepository;
     private final MemberRepository memberRepository;
     private final RoutineRepository routineRepository;
+    private static final Random random = new Random();
 
     @Override
     public void saveCommitMessage(Long memberId, Long routineId, LocalDate commitDate, String message, Boolean isPublic) {
@@ -56,4 +59,23 @@ public class CommitMessageServiceImpl implements CommitMessageService {
                 .map(CommitMessageDTO::fromEntity)
                 .toList();
     }
+
+    @Override
+    public List<MessageDTO> getMyMessages(Long routineId) {
+        return commitMessageRepository.findByRoutineIdOrderByCommitDateAsc(routineId).stream()
+                .map(MessageDTO::fromEntity)
+                .toList();
+    }
+
+    public static int generateColorIdExceptFor1() {
+        int rand = random.nextInt(90); // 0~89 (총합 90 기준)
+
+        if (rand < 40) return 1;
+        else if (rand < 50) return 2;
+        else if (rand < 60) return 3;
+        else if (rand < 70) return 4;
+        else if (rand < 80) return 5;
+        else return 6;
+    }
+
 }

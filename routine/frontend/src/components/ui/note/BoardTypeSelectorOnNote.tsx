@@ -24,7 +24,7 @@ const options = Object.entries(BoardType).map(([key, value]) => ({
 export default function BoardTypeSelectorOnNote({ value, onChange }: Props) {
     return (
         <DropdownOnNote
-            label="게시판 종류"
+            label="게시글 종류: "
             value={value}
             options={options}
             onChange={(val) => onChange(val as BoardType)}

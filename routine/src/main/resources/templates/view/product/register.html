@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+<meta charset="UTF-8">
+<div layout:fragment="content">
+  <div class="card">
+    <div class="card-title">Register Page</div>
+    <form action="/product/list" method="post">
+
+
+
+<!--      <div class="input-group mb-3">-->
+<!--        <span class="input-group-text">Id</span>-->
+<!--        <input type="text" name="id" class="form-controller" placeholder="ID">-->
+<!--      </div>-->
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Title</span>
+        <input type="text" name="Title" class="form-controller" placeholder="Title">
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Description</span></br>
+        <textarea name="Content" class="form-controller col-sm-5" rows="5"></textarea>
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Url</span>
+        <input type="url" name="image" class="form-controller" placeholder="url">
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">Tags</span>
+        <input type="text" name="tags" class="form-controller" placeholder="tags">
+      </div>
+
+
+      <div class="input-group bm-3">
+        <button type="submit" class="btn btn-primary">등록</button>
+        <button type="reset" class="btn btn-secondary">취소</button>
+      </div>
+    </form>
+  </div>
+
+</div>

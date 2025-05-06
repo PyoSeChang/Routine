@@ -4,6 +4,7 @@ import { RoutineViewDTO, TaskDTO } from '../../types/routine';
 import RepeatDays from '../ui/RepeatDays';
 import LinedTextArea from '../ui/note/LinedTextArea';
 import TaskCheckBox from '../ui/TaskCheckBox';
+import axios from "../../api/axios";
 
 type CommitStatus = 'SUCCESS' | 'FAIL' | 'SKIP' | 'NONE';
 type TaskState = Record<number, CommitStatus>;
@@ -30,6 +31,7 @@ const TodayRoutineCard: React.FC<{ routine: RoutineViewDTO }> = ({ routine }) =>
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         const payload = {
             routineId: routine.routineId,
             skipped: isSkippedStr === 'true',
@@ -42,22 +44,13 @@ const TodayRoutineCard: React.FC<{ routine: RoutineViewDTO }> = ({ routine }) =>
         };
 
         try {
-            const res = await fetch(`/api/commit/today`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) {
-                const text = await res.text();
-                console.error('🚨 루틴 저장 실패:', res.status, text);
-                alert(`루틴 저장 실패: ${res.status} - ${text}`);
-            }
+            await axios.post("/commit/today", payload); // ✅ 커스텀 axios 인스턴스 사용
+            // 성공 후 행동 필요 시 여기에 작성
         } catch (err) {
-            console.error('❌ 요청 실패:', err);
-            alert('네트워크 오류 또는 서버 다운');
+            console.error("❌ 커밋 실패:", err);
+            // 에러 메시지는 axios interceptor에서 처리됨 (모달로)
         }
     };
-
     const tasksWithPadding: TaskDTO[] = [...routine.tasks];
     while (tasksWithPadding.length < 10) {
         tasksWithPadding.push({

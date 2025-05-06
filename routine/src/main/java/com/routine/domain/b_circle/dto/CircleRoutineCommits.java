@@ -19,7 +19,7 @@ public class CircleRoutineCommits {
     public static class MemberCommitInfo {
         private Long memberId;
         private String nickname;
-        private Double commitRate;
+        private int commitRate;
         private List<TaskDTO> tasks;
         private String commitMessage;
     }

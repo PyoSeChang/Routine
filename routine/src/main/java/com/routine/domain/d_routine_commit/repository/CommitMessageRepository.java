@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,9 @@ public interface CommitMessageRepository extends JpaRepository<CommitMessage, Lo
     List<CommitMessage> findByRoutineIdOrderByCommitDateDesc(Long routineId);
 
     List<CommitMessage> findAllByMemberIdInAndCommitDate(List<Long> memberIds, LocalDate commitDate);
+
+    List<CommitMessage> findByRoutineIdOrderByCommitDateAsc(Long routineId);
+
+
+    List<CommitMessage> findAllByMemberIdInAndCommitDateAndRoutineIdIn(List<Long> memberIds, LocalDate commitDate, List<Long> routineIds);
 }

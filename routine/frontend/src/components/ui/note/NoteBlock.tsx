@@ -8,7 +8,7 @@ interface NoteBlockProps {
 
 const NoteBlock: React.FC<NoteBlockProps> = ({ className = '', children }) => {
     return (
-        <div className={`relative bg-note pr-2 py-4 flex ${className}`}>
+        <div className={`relative bg-note pr-2 flex ${className}`}>
             <div
                 className="absolute top-0 left-[2.5rem] w-[2px] h-full"
                 style={{ backgroundColor: '#f28b82' }}

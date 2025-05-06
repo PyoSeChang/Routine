@@ -1,155 +1,175 @@
-    import React, { useEffect, useState } from 'react';
-    import { useParams } from 'react-router-dom';
-    import axios from 'axios';
-    import { useRoutineDetail } from '../../hooks/useRoutineDetail';
-    import RoutineCommitMessages from '../../components/Routine/RoutineCommitMessage';
-    import RoutineCommitRates from '../../components/Routine/RoutineCommitRates';
-    import RoutineEditOverlay from '../../components/Routine/RoutineEditOverlay';
-    import RoutineCommitSummary from "../../components/Routine/RoutineCommitSummary";
-    import { RoutineCommitRatesResponse } from '../../types/routineRates';
-    import AppLayout from "../../layout/AppLayout";
-    
-    export default function RoutineDetailPage() {
-        const { routineId } = useParams<{ routineId: string }>();
-        const { routine, loading } = useRoutineDetail(Number(routineId));
-    
-        const [commitMessages, setCommitMessages] = useState<string[]>([]);
-        const [commitRates, setCommitRates] = useState<RoutineCommitRatesResponse | null>(null);
-        const [commitDates, setCommitDates] = useState<string[]>([]);
-    
-        const [messagesLoading, setMessagesLoading] = useState(true);
-        const [isEditOpen, setIsEditOpen] = useState(false);
-        const [openSection, setOpenSection] = useState<string | null>(null);
-    
-        useEffect(() => {
-            if (!routineId) return;
-    
-            const fetchAll = async () => {
-                try {
-                    const [messagesRes, ratesRes, datesRes] = await Promise.all([
-                        axios.get(`/api/routine/${routineId}/messages`),
-                        axios.get(`/api/routine/${routineId}/rates`),
-                        axios.get(`/api/routine/${routineId}/commit-dates`)
-                    ]);
-                    setCommitMessages(messagesRes.data);
-                    setCommitRates(ratesRes.data);
-                    setCommitDates(datesRes.data);
-                } catch (error) {
-                    console.error('루틴 상세 데이터 조회 실패', error);
-                } finally {
-                    setMessagesLoading(false);
-                }
-            };
-    
-            fetchAll();
-        }, [routineId]);
-    
-        if (loading) return <p className="text-center mt-10">루틴 로딩 중...</p>;
-        if (!routine) return <p className="text-center mt-10">루틴을 찾을 수 없습니다.</p>;
-    
-        return (
-            <AppLayout>
-                <div className="flex max-w-8xl mx-auto p-6 gap-8">
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from '../../api/axios';
+import { useRoutineDetail } from '../../hooks/useRoutineDetail';
+import RoutineCommitMessages from '../../components/Routine/RoutineCommitMessage';
+import RoutineCommitRates from '../../components/Routine/RoutineCommitRatesOnNote';
+import RoutineEditOverlay from '../../components/Routine/RoutineEditOverlay';
+import { RoutineCommitRatesResponse } from '../../types/routineRates';
+import AppLayout from '../../layout/AppLayout';
+import Line from '../../components/ui/note/Line';
+import RepeatDaysOnNote from '../../components/ui/note/RepeatDaysOnNote';
+import { Weekday } from '../../types/routine';
+import DropdownOnNote from '../../components/ui/note/DropdownOnNote';
+import BlankLine from "../../components/ui/note/BlankLine";
+import { MessageDTO } from '../../types/message';
+import NoteBlock from "../../components/ui/note/NoteBlock";
+import NoneLine from "../../components/ui/note/NoneLine";
+import TaskCheckBox from '../../components/ui/TaskCheckBox';
+import CommitSummaryCard from '../../components/Routine/CommitSummaryCard';
 
+interface TaskDTO {
+    taskId: number;
+    content: string;
+    status: string;
+    checked: boolean;
+}
 
-                    {/* 오른쪽 본문 */}
-                    <div className="flex-1 space-y-6 scroll-smooth">
-                        {/* 루틴 기본 정보 */}
-                        <div>
-                            <h2 className="text-3xl font-bold mb-2">{routine.title}</h2>
-                            <p className="text-gray-600 mb-4">{routine.description || '설명이 없습니다.'}</p>
-                            <div className="text-sm text-gray-500 space-y-1">
-                                <p>카테고리: {routine.category} / {routine.detailCategory}</p>
-                                <p>반복 요일: {routine.repeatDays.join(', ')}</p>
-                                <p>생성일: {routine.createdAt}</p>
-                            </div>
-                        </div>
+interface CommitLogDTO {
+    routineName: string;
+    tasks: TaskDTO[];
+}
 
-                        {/* Section: 커밋 살펴보기 */}
-                        <section id="commit-summary" className="border p-4 rounded-lg shadow">
-                            <div
-                                className="cursor-pointer font-bold text-xl"
-                                onClick={() => setOpenSection(openSection === 'commit-summary' ? null : 'commit-summary')}
+export default function RoutineDetailPage() {
+    const { routineId } = useParams<{ routineId: string }>();
+    const { routine, loading } = useRoutineDetail(Number(routineId));
+
+    const [commitMessages, setCommitMessages] = useState<MessageDTO[]>([]);
+    const [commitRates, setCommitRates] = useState<RoutineCommitRatesResponse | null>(null);
+    const [commitDates, setCommitDates] = useState<string[]>([]);
+
+    const [messagesLoading, setMessagesLoading] = useState(true);
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [openSection, setOpenSection] = useState<string | null>(null);
+
+    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [commitLog, setCommitLog] = useState<CommitLogDTO | null>(null);
+
+    useEffect(() => {
+        if (!routineId) return;
+
+        const fetchAll = async () => {
+            try {
+                const [messagesRes, ratesRes, datesRes] = await Promise.all([
+                    axios.get(`/routine/${routineId}/messages`),
+                    axios.get(`/routine/${routineId}/rates`),
+                    axios.get(`/routine/${routineId}/commit-dates`)
+                ]);
+                setCommitMessages(messagesRes.data);
+                setCommitRates(ratesRes.data);
+                setCommitDates(datesRes.data);
+            } catch (error) {
+                console.error('루틴 상세 데이터 조회 실패', error);
+            } finally {
+                setMessagesLoading(false);
+            }
+        };
+
+        fetchAll();
+    }, [routineId]);
+
+    const handleFetchCommitLog = async () => {
+        if (!selectedDate) return;
+        try {
+            const res = await axios.get(`/routine/${routineId}/commit`, {
+                params: { date: selectedDate }
+            });
+            setCommitLog(res.data);
+        } catch (error) {
+            console.error('커밋 로그 조회 실패', error);
+        }
+    };
+
+    if (loading) return <p className="text-center mt-10">루틴 로딩 중...</p>;
+    if (!routine) return <p className="text-center mt-10">루틴을 찾을 수 없습니다.</p>;
+
+    return (
+        <AppLayout>
+            <div className="flex max-w-[800px] w-full mx-auto gap-8">
+                <div className="flex-1">
+                    <div className="bg-blue-700 h-8 w-full rounded-t-lg shadow-md" />
+                    <div className="bg-note shadow p-4">
+                        <h2 className="text-3xl font-bold mb-2 text-center">{routine.title}</h2>
+                        <BlankLine />
+                        <Line>루틴 설명: {routine.description || '설명이 없습니다.'}</Line>
+                        <RepeatDaysOnNote selectedDays={routine.repeatDays as Weekday[]} disabled />
+                        <Line>카테고리: {routine.category} / {routine.detailCategory}</Line>
+                        <Line>시작한 날짜: {routine.createdAt}</Line>
+
+                        <BlankLine />
+                        <DropdownOnNote
+                            value={selectedDate}
+                            options={commitDates.map(date => ({ label: date, value: date }))}
+                            onChange={setSelectedDate}
+                            placeholder="날짜를 선택하세요"
+                        />
+                        <Line>
+                            <button
+                                onClick={handleFetchCommitLog}
+                                disabled={!selectedDate}
+                                className="text-black hover:underline justify-end"
                             >
-                                커밋 살펴보기
-                            </div>
-                            {openSection === 'commit-summary' && (
-                                <div className="mt-4">
-                                    <RoutineCommitSummary routineId={Number(routineId)} commitDates={commitDates} />
-                                </div>
-                            )}
-                        </section>
+                                [커밋 조회하기]
+                            </button>
+                        </Line>
 
-                        {/* Section: 커밋 통계 보기 */}
-                        <section id="commit-stats" className="border p-4 rounded-lg shadow">
-                            <div
-                                className="cursor-pointer font-bold text-xl"
+                        {commitLog && (
+                            <div>
+                                <CommitSummaryCard title={commitLog.routineName} tasks={commitLog.tasks} />
+                            </div>
+                        )}
+
+                        <BlankLine />
+                        <Line>
+                            <button
                                 onClick={() => setOpenSection(openSection === 'commit-stats' ? null : 'commit-stats')}
-                            >
-                                커밋 통계 확인하기
+                                className="hover:underline">
+                                [커밋 통계 확인하기]
+                            </button>
+                        </Line>
+                        {openSection === 'commit-stats' && (
+                            <div>
+                                {commitRates ? (
+                                    <RoutineCommitRates data={commitRates} />
+                                ) : (
+                                    <p className="text-gray-500 text-sm">이행률 데이터를 불러오는 중입니다...</p>
+                                )}
                             </div>
-                            {openSection === 'commit-stats' && (
-                                <div className="mt-4">
-                                    {commitRates ? (
-                                        <RoutineCommitRates data={commitRates} />
-                                    ) : (
-                                        <p className="text-gray-500 text-sm">이행률 데이터를 불러오는 중입니다...</p>
-                                    )}
-                                </div>
-                            )}
-                        </section>
-
-                        {/* Section: 커밋 메세지 보기 */}
-                        <section id="commit-messages" className="border p-4 rounded-lg shadow">
-                            <div
-                                className="cursor-pointer font-bold text-xl"
+                        )}
+                        <Line>
+                            <button
                                 onClick={() => setOpenSection(openSection === 'commit-messages' ? null : 'commit-messages')}
-                            >
-                                커밋 메세지 모아보기
+                                className="hover:underline">
+                                [커밋 메세지 모아보기]
+                            </button>
+                        </Line>
+                        {openSection === 'commit-messages' && (
+                            <div>
+                                <RoutineCommitMessages data={commitMessages} loading={messagesLoading} />
                             </div>
-                            {openSection === 'commit-messages' && (
-                                <div className="mt-4">
-                                    <RoutineCommitMessages data={commitMessages} loading={messagesLoading} />
-                                </div>
-                            )}
-                        </section>
-
-                        {/* Section: 루틴 관리 버튼 */}
-                        <section className="border p-4 rounded-lg shadow">
-                            <div className="font-bold text-xl mb-2">루틴 관리</div>
-                            <div className="flex gap-2 flex-wrap">
-
+                        )}
+                        <NoteBlock className="flex justify-center">
+                            <div className="flex gap-4 mt-2">
                                 {routine.circleRoutine ? (
                                     <>
-                                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                            서클로 가기
-                                        </button>
-                                        <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                                            서클 탈퇴
-                                        </button>
+                                        <button className="text-blue-600 hover:underline">서클로 가기</button>
+                                        <button className="text-red-600 hover:underline">서클 탈퇴</button>
                                     </>
                                 ) : (
                                     <>
-                                        <button
-                                            className="bg-mainBlue text-white px-4 py-2 rounded hover:bg-yellow-600"
-                                            onClick={() => setIsEditOpen(true)}
-                                        >
+                                        <button onClick={() => setIsEditOpen(true)} className="text-mainBlue hover:underline">
                                             루틴 수정
                                         </button>
-                                        <button className="bg-mainRed text-white px-4 py-2 rounded hover:bg-red-600">
-                                            루틴 삭제
-                                        </button>
-                                        <button className="bg-mainGreen text-white px-4 py-2 rounded hover:bg-green-600">
-                                            루틴 공유
-                                        </button>
+                                        <button className="text-mainRed hover:underline">루틴 삭제</button>
+                                        <button className="text-mainGreen hover:underline">루틴 공유</button>
                                     </>
                                 )}
                             </div>
-                        </section>
-
+                        </NoteBlock>
                     </div>
+                    {isEditOpen && <RoutineEditOverlay routine={routine} onClose={() => setIsEditOpen(false)} />}
                 </div>
-            </AppLayout>
-
-        );
-    }
+            </div>
+        </AppLayout>
+    );
+}

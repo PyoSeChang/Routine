@@ -10,6 +10,7 @@ import com.routine.domain.e_board.repository.BoardRepository;
 import com.routine.domain.e_board.repository.BoardStatusRepository;
 import com.routine.domain.e_board.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import org.springframework.security.access.AccessDeniedException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +36,8 @@ public class BoardServiceImpl implements BoardService {
     private final MemberRepository memberRepository;
     private final BoardStatusRepository boardStatusRepository;
     private final CommentService commentService;
+    private final RedisTemplate<String, String> redisTemplate;
+
     @Override
     @Transactional
     public void insertBoard(BoardDTO boardDTO) {
@@ -142,5 +147,21 @@ public class BoardServiceImpl implements BoardService {
         String nickname = memberRepository.findNicknameById(board.getWriter().getId());
         return BoardDTO.fromEntity(board, status, comments, nickname);
     }
+
+//    @Override
+//    public void increaseViewCount(Long boardId, HttpServletRequest request) {
+//        String key = "viewed:" + boardId + ":" + request.getRemoteAddr() + ":" + request.getHeader("User-Agent");
+//
+//        if (!redisTemplate.hasKey(key)) {
+//            Board board = boardRepository.findById(boardId)
+//                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글"));
+//            BoardStatus status = board.getStatus();
+//            status.incrementViewCount();
+//            boardStatusRepository.save(status);
+//
+//            redisTemplate.opsForValue().set(key, "1", Duration.ofHours(1));
+//        }
+//
+//    }
 }
 

@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Category } from '../../../types/board';
 import { detailCategories } from '../../../types/detailCategories';
 import Line from './Line';
+import { ChevronDown } from 'lucide-react';
+
 
 interface CategoryOnNoteProps {
     category: Category;
@@ -59,7 +61,9 @@ const CategoryOnNote: React.FC<CategoryOnNoteProps> = ({
                     className="w-full flex justify-between items-center text-left font-ui text-base focus:outline-none"
                 >
                     <span>{categories.find((c) => c.value === category)?.label}</span>
-                    <span className="text-sm text-gray-500">▾</span>
+                    <ChevronDown
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none"
+                    />
                 </button>
 
                 {isCatOpen && (
@@ -94,7 +98,9 @@ const CategoryOnNote: React.FC<CategoryOnNoteProps> = ({
             {detailCategories.find((d) => d.code === detailCategory)?.displayName ||
                 '세부 카테고리를 선택하세요'}
           </span>
-                    <span className="text-sm text-gray-500">▾</span>
+                    <ChevronDown
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none"
+                    />
                 </button>
 
                 {isDetailOpen && (

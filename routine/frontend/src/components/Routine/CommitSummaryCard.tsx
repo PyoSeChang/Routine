@@ -1,4 +1,6 @@
 import React from 'react';
+import Line from "../ui/note/Line";
+import TaskCheckBox from "../ui/TaskCheckBox";
 
 interface TaskDTO {
     taskId: number;
@@ -14,23 +16,20 @@ interface CommitSummaryCardProps {
 
 export default function CommitSummaryCard({ title, tasks }: CommitSummaryCardProps) {
     return (
-        <div className="border border-gray-300 p-4 rounded-md shadow-sm bg-white w-[250px]">
-            <h4 className="font-bold text-lg mb-3">{title}</h4>
-            <ul className="space-y-2">
-                {tasks.map((task) => (
-                    <li key={task.taskId} className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
+        <div className="w-full">
+            <Line className="font-bold text-lg text-center">{title}</Line>
+            {tasks.map((task) => (
+                <Line key={task.taskId} className="items-center gap-2">
+                    {task.content && (
+                        <TaskCheckBox
+                            label={task.content}
                             checked={task.status === 'SUCCESS'}
                             disabled
-                            className="form-checkbox"
+                            onChange={() => {}}
                         />
-                        <span className={task.status === 'SUCCESS' ? 'line-through text-blue-400' : ''}>
-              {task.content}
-            </span>
-                    </li>
-                ))}
-            </ul>
+                    )}
+                </Line>
+            ))}
         </div>
     );
 }

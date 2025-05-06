@@ -5,9 +5,15 @@ spring:
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   jpa:
     hibernate:
       ddl-auto: update
+
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -15,3 +21,13 @@ spring:
     encoding: UTF-8
     cache: false
 
+  servlet:
+    multipart:
+      enabled: true            # 파일 업로드 사용 여부
+      max-file-size: 10MB      # 개별 파일 최대 크기
+      max-request-size: 20MB   # 전체 요청 최대 크기 (여러 파일 포함 시)
+
+
+file:
+  upload:
+    path: C:/PyoSeChang/upload

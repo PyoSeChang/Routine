@@ -96,6 +96,7 @@ export default function CreateRoutineOverlay({ onClose, onSave }: Props) {
                         onChange={setDescription}
                         placeholder="루틴 설명을 간단히 적어주세요"
                         maxRows={3}
+                        minRows={2}
                     />
                     <NoneLine />
 

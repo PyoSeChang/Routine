@@ -1,6 +1,5 @@
 package com.routine.domain.c_routine.controller;
 
-import com.routine.domain.a_member.model.Member;
 import com.routine.domain.c_routine.dto.AllRoutinesViewDTO;
 import com.routine.domain.c_routine.dto.CommitLogDTO;
 import com.routine.domain.c_routine.dto.RoutineCommitRatesResponse;
@@ -9,19 +8,22 @@ import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.c_routine.service.RoutineService;
 import com.routine.domain.c_routine.service.RoutineViewService;
+import com.routine.domain.c_routine.dto.MessageDTO;
+import com.routine.domain.d_routine_commit.service.CommitMessageService;
 import com.routine.domain.d_routine_commit.service.CommitService;
 import com.routine.security.model.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/routine")
@@ -32,6 +34,7 @@ public class RoutineViewController {
     private final RoutineService routineService;
     private final CommitService commitService;
     private final RoutineRepository routineRepository;
+    private final CommitMessageService commitMessageService;
 
     @GetMapping("/week")
     public ResponseEntity<List<AllRoutinesViewDTO>> getWeeklyRoutines(@AuthenticationPrincipal PrincipalDetails principal) {
@@ -48,6 +51,8 @@ public class RoutineViewController {
     public ResponseEntity<Long> createRoutine(@RequestBody RoutineDTO dto,
                                               @AuthenticationPrincipal PrincipalDetails principal
     ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("👀 Principal: " + auth.getPrincipal());
         Long memberId = principal.getMember().getId();
         Routine routine = routineService.saveRoutine(dto, memberId);
         return ResponseEntity.ok(routine.getId());
@@ -74,10 +79,11 @@ public class RoutineViewController {
 
 
     @GetMapping("/{routineId}/messages")
-    public ResponseEntity<List<String>> getRoutineMessages(@PathVariable Long routineId) {
-        List<String> messages = routineViewService.getCommitMessages(routineId);
+    public ResponseEntity<List<MessageDTO>> getRoutineMessages(@PathVariable Long routineId) {
+        List<MessageDTO> messages = commitMessageService.getMyMessages(routineId);
         return ResponseEntity.ok(messages);
     }
+
 
     @GetMapping("/{routineId}/rates")
     public ResponseEntity<RoutineCommitRatesResponse> getRoutineCommitRates(@PathVariable Long routineId) {

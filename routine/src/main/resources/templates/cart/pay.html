@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<header style="
+    width: 100%;
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #724019;
+    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+    background-repeat: repeat;
+">
+    <div style="
+        max-width: 96rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    ">
+        <h1 style="font-size: 32px; font-weight: bold;">
+            <a href="http://localhost:3000/" style="color: white; text-decoration: none;">Routine</a>
+        </h1>
+        <nav style="display: inline-block;">
+            <span>|</span>
+            <a href="http://localhost:8080/product/list" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; margin: 0 8px;">Shop</a>
+            <span>|</span>
+            <a href="http://localhost:3000/boards" style="color: white; text-decoration: none; margin: 0 8px;">Community</a>
+            <span>|</span>
+            <a href="http://localhost:3000/circles" style="color: white; text-decoration: none; margin: 0 8px;">Circle</a>
+            <span>|</span>
+            <a href="http://localhost:3000/routine" style="color: white; text-decoration: none; margin: 0 8px;">My Routines</a>
+            <span>|</span>
+            <a href="http://localhost:3000/login" style="color: white; text-decoration: none; margin: 0 8px;">Login</a>
+            <span>|</span>
+        </nav>
+    </div>
+</header>
+
+
+    <title>결제 정보 확인 - 포스트잇 스타일</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/style.css" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
+
+        body {
+            font-family: 'Poppins',sans-serif;
+            background-color: #f9f3c3;
+            background-image: url('/images/abc.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            padding-top: 30px;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .postit-board {
+            background-color: #fffab3;
+            border: 3px dashed #f4c542;
+            border-radius: 20px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.15);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            color: #4b4b4b;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            background-color: #fff8d6;
+            border-radius: 10px;
+        }
+
+        .table th {
+            background-color: #f8d47e;
+        }
+
+        .form-label {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            border: 2px solid #f4c542;
+            background-color: #fffdf0;
+        }
+
+        .btn-success, .btn-primary {
+            background: linear-gradient(45deg, #f4c542, #f1a900);
+            border: none;
+            font-size: 1.2rem;
+        }
+
+        .modal-content {
+            background-color: #fff6cc;
+            font-family: 'Poppins',sans-serif;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🧾 결제 정보 확인</h2>
+
+    <div class="postit-board">
+        <div class="card-body">
+            <h4 class="card-title">🛍️ 주문 내역</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle">
+                    <thead>
+                    <tr>
+                        <th>상품명</th>
+                        <th>수량</th>
+                        <th>가격</th>
+                        <th>합계</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${cartItems}">
+                        <td th:text="${item.product.title}">상품명</td>
+                        <td th:text="${item.quantity}">수량</td>
+                        <td th:text="${#numbers.formatInteger(item.product.price, 1, 'COMMA')} + '원'">가격</td>
+                        <td th:text="${#numbers.formatInteger(item.product.price * item.quantity, 1, 'COMMA')} + '원'">합계</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">총 상품 금액</th>
+                        <th th:text="${#numbers.formatInteger(subtotal, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3" class="text-end">배송비</th>
+                        <th th:text="${#numbers.formatInteger(shippingCost, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    <tr class="table-warning">
+                        <th colspan="3" class="text-end">총 결제 금액</th>
+                        <th th:text="${#numbers.formatInteger(totalPrice, 1, 'COMMA')} + '원'">0원</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="postit-board">
+        <div class="card-body">
+            <h4 class="card-title">🚚 배송 및 결제 정보</h4>
+            <form method="post" th:action="@{/cart/confirm}">
+                <div class="mb-3">
+                    <label class="form-label">수령인 이름</label>
+                    <input type="text" class="form-control" name="receiverName" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">배송 주소</label>
+                    <input type="text" class="form-control" name="address" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">연락처</label>
+                    <input type="tel" class="form-control" name="phone" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">보유 포인트</label>
+                    <input type="text" class="form-control" th:value="${points}" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">사용할 포인트</label>
+                    <input type="number" class="form-control" name="usedPoints"
+                           th:attr="max=${points}" min="0" value="0">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">결제 수단</label>
+                    <select class="form-select" name="paymentMethod" id="paymentMethod" required>
+                        <option value="" disabled selected>결제방법을 선택해주세요</option>
+                        <option value="card">신용카드</option>
+                        <option value="bank">무통장 입금</option>
+                    </select>
+                </div>
+
+                <!-- 카드 정보 섹션 -->
+                <div id="cardPaymentSection" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">카드 종류</label>
+                        <select class="form-select" name="cardType">
+                            <option value="">카드를 선택하세요</option>
+                            <option value="hyundai">현대카드</option>
+                            <option value="samsung">삼성카드</option>
+                            <option value="lotte">롯데카드</option>
+                            <option value="shinhan">신한카드</option>
+                            <option value="kb">국민카드</option>
+                            <option value="bc">비씨카드</option>
+                            <option value="nh">농협카드</option>
+                            <option value="kakao">카카오뱅크</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">카드 번호</label>
+                        <input type="text" class="form-control" name="cardNumber" id="cardNumber" maxlength="19" placeholder="숫자 16자리 입력">
+                    </div>
+
+                    <div class="mb-3 d-flex gap-2">
+                        <input type="text" class="form-control" name="expiryMonth" placeholder="MM" maxlength="2">
+                        <span class="align-self-center">/</span>
+                        <input type="text" class="form-control" name="expiryYear" placeholder="YY" maxlength="2">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">카드 비밀번호 (앞 2자리)</label>
+                        <input type="password" class="form-control" name="cardPassword" maxlength="2" placeholder="**">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 mt-3">💳 결제하기</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 모달 및 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const paymentMethodSelect = document.getElementById("paymentMethod");
+        const cardSection = document.getElementById("cardPaymentSection");
+        const cardNumberInput = document.getElementById("cardNumber");
+
+        function toggleCardInputs() {
+            if (paymentMethodSelect.value === "card") {
+                cardSection.style.display = "block";
+            } else {
+                cardSection.style.display = "none";
+            }
+
+            if (paymentMethodSelect.value === "bank") {
+                const today = new Date();
+                const deadline = new Date(today);
+                deadline.setDate(today.getDate() + 3);
+                const year = deadline.getFullYear();
+                const month = String(deadline.getMonth() + 1).padStart(2, '0');
+                const day = String(deadline.getDate()).padStart(2, '0');
+                document.getElementById("depositDeadline").innerText = `${year}-${month}-${day}`;
+                const bankInfoModal = new bootstrap.Modal(document.getElementById('bankInfoModal'));
+                bankInfoModal.show();
+            }
+        }
+
+        paymentMethodSelect.addEventListener("change", toggleCardInputs);
+        toggleCardInputs();
+
+        cardNumberInput.addEventListener("input", function () {
+            let value = this.value.replace(/\D/g, "");
+            if (value.length > 16) value = value.slice(0, 16);
+            const formatted = value.replace(/(\d{4})(?=\d)/g, "$1-");
+            this.value = formatted;
+        });
+    });
+</script>
+
+<!-- 무통장 입금 모달 -->
+<div class="modal fade" id="bankInfoModal" tabindex="-1" aria-labelledby="bankInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bankInfoModalLabel">무통장 입금 안내</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>💳 입금 계좌: <strong>부산은행 1234-5678-1234-5678</strong></p>
+                <p>🏦 예금주: <strong>주식회사 루틴</strong></p>
+                <p>⏰ 입금 기한: <strong><span id="depositDeadline"></span>까지</strong></p>
+                <p><strong> ❗ 확인 후 꼭 결제하기 버튼을 눌러주셔야 주문이 진행됩니다 ❗</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

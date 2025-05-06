@@ -31,7 +31,7 @@ const RoutinePage: React.FC = () => {
         <AppLayout>
             <div className="space-y-6 p-4 w-full">
                 <WeekdayNav viewMode={viewMode} setViewMode={setViewMode}/>
-                <PostIt content="서클 루틴"/>
+                <h3 className="font-chalk text-white text-[32px]">&lt;Circle Routine&gt;</h3>
                 {/* ✅ 서클 루틴 (groupRoutine = true) */}
                 {circleRoutines.length > 0 && (
                     <div className="flex flex-wrap gap-4 ">
@@ -43,7 +43,7 @@ const RoutinePage: React.FC = () => {
                         })}
                     </div>
                 )}
-                <PostIt content="개인 루틴"/>
+                <h3 className="font-chalk text-white text-[32px]">&lt;My Routine&gt;</h3>
                 {/* ✅ 개인 루틴 (groupRoutine = false) */}
                 {personalRoutines.length > 0 && (
                     <div className="flex flex-wrap gap-4 ">

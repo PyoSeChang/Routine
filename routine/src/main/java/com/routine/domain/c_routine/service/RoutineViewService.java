@@ -1,6 +1,7 @@
 package com.routine.domain.c_routine.service;
 
 import com.routine.domain.c_routine.dto.AllRoutinesViewDTO;
+import com.routine.domain.c_routine.dto.MessageDTO;
 import com.routine.domain.c_routine.dto.RoutineCommitRatesResponse;
 import com.routine.domain.c_routine.dto.RoutineDTO;
 
@@ -13,7 +14,7 @@ public interface RoutineViewService {
 
     RoutineDTO getRoutineById(Long routineId);
 
-    List<String> getCommitMessages(Long routineId);
+
 
     RoutineCommitRatesResponse getCommitRates(Long routineId);
 

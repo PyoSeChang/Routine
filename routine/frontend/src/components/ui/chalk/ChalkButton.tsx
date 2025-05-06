@@ -29,7 +29,6 @@ const ChalkButton: React.FC<Props> = ({ children, className = '', ...props }) =>
                         rounded
                         text-black
                         font-chalk
-                        font-bold
                         bg-transparent
                         hover:bg-white/10
                         disabled:cursor-not-allowed

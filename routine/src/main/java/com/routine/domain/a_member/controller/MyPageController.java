@@ -40,15 +40,7 @@ public class MyPageController {
         return "view/member/myPage"; // 변경된 경로
     }
 
-    @GetMapping("/{memberId}/points")
-    @ResponseBody
-    public ResponseEntity<List<PointLogDTO>> checkPoints(@PathVariable Long memberId,
-                                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        validateAccess(memberId, principalDetails);
 
-        List<PointLogDTO> pointLogs = pointService.showPointLogs(memberId);
-        return ResponseEntity.ok(pointLogs);
-    }
 
     @GetMapping("/{memberId}/edit-userinfo")
     public String goToEditUserinfo(@PathVariable Long memberId,

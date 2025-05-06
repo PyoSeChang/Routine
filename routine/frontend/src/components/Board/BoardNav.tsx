@@ -17,7 +17,7 @@ export default function BoardNav() {
     const selectedDetail   = searchParams.get('detailCategory') || '';
 
     return (
-        <nav className="w-48 border p-4">
+        <nav className="w-36 border p-4">
             {/* 대분류 */}
             <h3 className="font-semibold mb-2">카테고리</h3>
             <ul className="flex flex-col space-y-1">

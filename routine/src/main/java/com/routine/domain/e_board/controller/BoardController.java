@@ -88,8 +88,9 @@ public class BoardController {
 
     // 게시글 상세 보기
     @GetMapping("/{boardId}")
-    public BoardDTO getBoard(@PathVariable Long boardId) {
-
+    public BoardDTO getBoard(@PathVariable Long boardId,
+                             HttpServletRequest request) {
+//        boardService.increaseViewCount(boardId, request);
         return boardService.getBoard(boardId);
     }
 }

@@ -1,6 +1,7 @@
 // components/ui/DropdownOnNote.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import Line from './Line';
+import { ChevronDown} from "lucide-react";
 
 interface Option {
     label: string;
@@ -15,7 +16,13 @@ interface DropdownOnNoteProps {
     label?: string;
 }
 
-const DropdownOnNote: React.FC<DropdownOnNoteProps> = ({ value, options, onChange, placeholder = '선택하세요' }) => {
+const DropdownOnNote: React.FC<DropdownOnNoteProps> = ({
+                                                           value,
+                                                           options,
+                                                           onChange,
+                                                           placeholder = '선택하세요',
+                                                           label,
+                                                       }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -31,13 +38,17 @@ const DropdownOnNote: React.FC<DropdownOnNoteProps> = ({ value, options, onChang
 
     return (
         <Line className="relative" ref={ref}>
-            <span className="shrink-0 font-ui text-base whitespace-pre">게시글 유형: </span>
+            {label && (
+                <span className="shrink-0 font-ui text-base whitespace-pre">{label}</span>
+            )}
             <button
                 onClick={() => setOpen((prev) => !prev)}
                 className="w-full flex justify-between items-center text-left font-ui text-base focus:outline-none"
             >
                 <span>{options.find(opt => opt.value === value)?.label || placeholder}</span>
-                <span className="text-sm text-gray-500">▾</span>
+                <ChevronDown
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none"
+                />
             </button>
             {open && (
                 <ul className="absolute top-full left-0 w-full bg-note z-10 shadow border border-blue-200">

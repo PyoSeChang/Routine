@@ -24,9 +24,10 @@ module.exports = {
                 mainYellow: '#FFFACD',
             },
             fontFamily: {
-                user: ['Dokrip', 'sans-serif'],
+                user: ['NanumBarunpen', 'Dokrip'],
                 ui: ['Nanum Gothic', 'MaruBuri'],
                 chalk: ['Cafe24Decoschool', 'MaruBuri'],
+                pencil: ['"CrayonFont"', 'cursive'],
             },
             fontSize: {
                 base: '20px', // 기본 base 자체를 20px로 바꿔도 됨

@@ -1,5 +1,6 @@
 package com.routine.domain.d_routine_commit.repository;
 
+import com.routine.domain.a_member.model.Member;
 import com.routine.domain.d_routine_commit.model.PointLog;
 import com.routine.domain.d_routine_commit.model.enums.PointLogStatus;
 import com.routine.domain.d_routine_commit.model.enums.PointReason;
@@ -22,4 +23,6 @@ public interface PointLogRepository extends JpaRepository<PointLog, Long> {
     List<PointLog> findAllByReasonAndCommitDate(PointReason pointReason, LocalDate targetDate);
 
     List<PointLog> findAllByMemberIdAndStatus(Long memberId, PointLogStatus pointLogStatus);
+
+    List<PointLog> findByMember(Member member);
 }

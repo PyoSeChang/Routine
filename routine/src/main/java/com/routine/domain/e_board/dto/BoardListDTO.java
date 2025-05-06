@@ -30,8 +30,9 @@ public class BoardListDTO {
      */
     public static BoardListDTO fromEntity(Board board) {
         BoardStatus status = board.getStatus();
+        System.out.println("status: " + status);
         LocalDateTime updatedAt = status != null ? status.getUpdatedAt() : null;
-
+        System.out.println("updatedAt: " + updatedAt);
         String modifiedDate = "";
         if (updatedAt != null) {
             LocalDateTime now = LocalDateTime.now();
@@ -50,7 +51,7 @@ public class BoardListDTO {
                 .tags(board.getTags())
                 .modifiedDate(modifiedDate)
                 .viewCount(status != null ? status.getViewCount() : 0)
-                .boardType(board.getType().name())
+                .boardType(board.getType().getDisplayName())
                 .build();
     }
 }

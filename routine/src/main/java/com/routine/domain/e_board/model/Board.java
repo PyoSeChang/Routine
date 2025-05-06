@@ -36,6 +36,7 @@ public class Board {
     @JoinColumn(name = "member_id")
     private Member writer;
 
-    @OneToOne(mappedBy = "board", orphanRemoval = true)
+    @OneToOne(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private BoardStatus status;
+
 }

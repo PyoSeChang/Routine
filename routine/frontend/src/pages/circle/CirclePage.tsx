@@ -7,6 +7,9 @@ import { Link } from 'react-router-dom';
 import { Category } from '../../types/board';
 import PostItExam from "../../components/ui/post_it/PostItSVG";
 import AppLayout from "../../layout/AppLayout";
+import ChalkButton from "../../components/ui/chalk/ChalkButton";
+import ChalkInput from "../../components/ui/chalk/ChalkInput";
+import ChalkLink from "../../components/ui/chalk/ChalkLink";
 
 interface CircleSummary {
     circleId: number;
@@ -62,47 +65,40 @@ export default function CircleSearchPage() {
         <AppLayout>
             <div className="w-full max-w-[1000px] mx-auto p-6">
                 <div>
-                    <h1 className="text-2xl font-bold mb-6">서클</h1>
+
 
                     {/* ✅ 내 서클 목록 */}
-                    <div className="w-full max-w-[1200px] p-6">
-                        <h2 className="text-xl font-semibold mb-4">내 서클</h2>
-                        {myCircles.length === 0 ? (
-                            <p className="text-gray-500">아직 가입한 서클이 없습니다.</p>
-                        ) : (
-                            <div className="space-y-3 ">
-                                {myCircles.map((circle) => (
-                                    <div
-                                        key={circle.circleId}
-                                        className="p-4 border rounded flex justify-between items-center border-black border-2"
-                                    >
-                                        <Link
-                                            to={`/circles/${circle.circleId}`}
-                                            className="font-bold text-blue-600 hover:underline w-1/4 truncate"
-                                        >
-                                            {circle.name}
-                                        </Link>
-                                        <div className="text-sm text-gray-700 w-1/4">
-                                            {circle.category} / {circle.detailCategory}
-                                        </div>
-                                        <div className="text-sm text-gray-600 w-1/4">
-                                            {circle.currentMemberCount} / {circle.maxMemberCount}
-                                        </div>
-                                        <div className="text-xs text-gray-400 w-1/4 text-right">
-                                            가입일:{' '}
-                                            {circle.joinedAt &&
-                                                new Date(circle.joinedAt).toLocaleDateString('ko-KR')}
-                                        </div>
+                    <div className="space-y-3 p-6">
+                        <h1 className="text-[40px] font-chalk text-white mb-4">My Circles</h1>
+                        {myCircles.map((circle) => (
+                            <Link
+                                to={`/circles/${circle.circleId}`}
+                                key={circle.circleId}
+                                className="block bg-white border border-gray-400 rounded-md hover:bg-gray-200 transition-all"
+                            >
+                                <div className="p-4 flex items-center">
+                                    <div className="w-1/5 font-bold text-black flex items-center gap-1">
+                                        {circle.name}
+                                        {circle.isLeader && <span title="리더">👑</span>}
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                    <div className="w-1/5 text-sm text-gray-700">
+                                        {circle.category} / {circle.detailCategory}
+                                    </div>
+                                    <div className="w-1/5 text-sm text-gray-600">
+                                        {circle.currentMemberCount} / {circle.maxMemberCount}
+                                    </div>
+                                    <div className="w-2/5 text-xs text-right text-gray-400">
+                                        가입일: {circle.joinedAt && new Date(circle.joinedAt).toLocaleDateString('ko-KR')}
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
                     </div>
 
                     {/* ✅ 검색 필터 */}
-                    <h2 className="text-xl font-semibold mb-4">서클 검색</h2>
+                    <h1 className="text-[40px] font-chalk text-white p-6">Find Circle</h1>
 
-                    <div className="mb-6">
+                    <div className=" p-6">
                         <CategorySelector
                             category={category}
                             detailCategory={detailCategory}
@@ -111,31 +107,31 @@ export default function CircleSearchPage() {
                         />
                     </div>
 
-                    <div className="mb-6 flex gap-2">
-                        <input
+                    <div className="pr-6 pl-6 flex gap-2">
+
+                        <ChalkInput
                             type="text"
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                             placeholder="서클 이름 또는 태그 입력"
                             className="border p-2 rounded flex-1"
                         />
-                        <button
+                        <ChalkButton
                             onClick={handleSearch}
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        >
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                             검색
-                        </button>
+                        </ChalkButton>
                     </div>
 
                     {/* ✅ 검색 결과 */}
                     {results.length === 0 ? (
-                        <p className="text-gray-500">검색 결과가 없습니다.</p>
+                        <p className="text-gray-500 p-6">검색 결과가 없습니다.</p>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-3 p-6">
                             {results.map((circle) => (
                                 <div
                                     key={circle.circleId}
-                                    className="p-4 border rounded flex justify-between items-center"
+                                    className="p-4 border rounded flex justify-between items-center bg-white"
                                 >
                                     <Link
                                         to={`/circles/${circle.circleId}`}
@@ -165,12 +161,10 @@ export default function CircleSearchPage() {
                         </div>
 
                     )}
-                    <div className="text-right my-4">
-                        <Link to="/circles/create">
-                            <button className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
-                                서클 만들기
-                            </button>
-                        </Link>
+                    <div className="flex justify-center">
+                        <ChalkLink
+                            to="/circles/create"
+                        >서클 만들기</ChalkLink>
                     </div>
                 </div>
 

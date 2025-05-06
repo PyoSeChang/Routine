@@ -11,6 +11,12 @@ import BoardTypeSelectorOnNote from '../../components/ui/note/BoardTypeSelectorO
 import BlankLine from "../../components/ui/note/BlankLine";
 import NoteBlock from "../../components/ui/note/NoteBlock";
 import AppLayout from "../../layout/AppLayout";
+import {
+    displayNameToCategoryMap,
+    displayNameToBoardTypeMap,
+    displayNameToDetailCategoryCodeMap,} from "../../constants/displayNameMaps";
+import {DetailCategoryType} from "../../types/detailCategories";
+import NoneLine from "../../components/ui/note/NoneLine";
 
 interface Props {
     mode: 'create' | 'edit';
@@ -41,9 +47,9 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                     title: data.title,
                     content: data.content,
                     tags: data.tags,
-                    category: data.category,
-                    detailCategory: data.detailCategory,
-                    boardType: data.boardType,
+                    category: displayNameToCategoryMap[data.category],
+                    detailCategory: displayNameToDetailCategoryCodeMap[data.detailCategory],
+                    boardType: displayNameToBoardTypeMap[data.boardType],
                 });
             });
         }
@@ -63,11 +69,13 @@ export default function BoardFormOnNotePage({ mode }: Props) {
         }
     };
 
+
+
     return (
         <AppLayout>
-            <div className="w-full bg-note shadow-lg">
-                <div className="bg-blue-700 h-8 w-full rounded-t-md shadow-md" />
-                <NoteBlock className="flex justify-center">
+            <div className="w-full rounded-t-lg shadow-lg">
+                <div className="bg-blue-700 h-8 w-full rounded-t-lg shadow-md" />
+                <NoteBlock className="flex justify-center py-6">
                     <h1 className="text-xl font-bold font-ui text-center">
                         {mode === 'create' ? '새 글 작성' : '글 수정'}
                     </h1>
@@ -101,7 +109,8 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                     value={form.content}
                     onChange={(value) => setForm((prev) => ({ ...prev, content: value }))}
                     placeholder="내용을 입력하세요"
-                    maxRows={10}
+                    maxRows={15}
+                    minRows={15}
                 />
                 <TagInputOnNote
                     tags={form.tags ? form.tags.split(',') : []}
@@ -109,6 +118,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                         setForm((prev) => ({ ...prev, tags: tags.join(',') }))
                     }
                 />
+                <NoneLine/>
                 <NoteBlock className="justify-center gap-8">
                     <button
                         onClick={handleSubmit}
@@ -117,7 +127,7 @@ export default function BoardFormOnNotePage({ mode }: Props) {
                         {mode === 'create' ? '등록' : '수정'}
                     </button>
                     <button
-                        onClick={() => navigate(`/boards/${boardId}`)}
+                        onClick={() => navigate(`/boards`)}
                         className="text-black font-semibold hover:underline"
                     >
                         취소

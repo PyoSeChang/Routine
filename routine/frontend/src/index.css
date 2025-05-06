@@ -3,23 +3,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body {
+html, body, #root {
+  height: 100%;
   margin: 0;
+}
+
+body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /*background-color: #aed6f8;*/
-  background-color: #175200;
-  /*background-color: #175200;*/
-  /*background-image: url('/public/assets/bg/KakaoTalk_20250502_112049736.jpg');*/
-  /*background-image: url('/public/assets/bg/KakaoTalk_20250502_112338456.jpg');*/
-  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
-  /*background-image: url("https://www.transparenttextures.com/patterns/concrete-wall.png");*/
-  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
-  background-image: url('/public/assets/bg/empty-blackboard.jpg');
+  background-image: url('assets/empty-blackboard.jpg'); /* ✅ 슬래시 꼭 필요함 */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+
+/* 일반 CSS */
+input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px #fff9c4 inset !important; /* 배경 덮어쓰기 */
+  -webkit-text-fill-color: black !important;           /* 텍스트 색도 강제 설정 */
+}
+
+/* Tailwind에서 처리하려면 global.css나 index.css에 추가 */
+@layer base {
+  input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px #fff9c4 inset !important;
+    -webkit-text-fill-color: black !important;
+  }
 }
 
 code {
@@ -46,3 +61,17 @@ code {
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'CrayonFont';
+  src: url('../public/assets/fonts/crayon.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'NanumBarunpen';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumBarunpen.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+

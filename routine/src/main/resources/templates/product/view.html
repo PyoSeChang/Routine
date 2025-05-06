@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 상세 정보</title>
+  <header style="
+    width: 100%;
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #724019;
+    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+    background-repeat: repeat;
+">
+    <div style="
+        max-width: 96rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    ">
+      <h1 style="font-size: 32px; font-weight: bold;">
+        <a href="http://localhost:3000/" style="color: white; text-decoration: none;">Routine</a>
+      </h1>
+      <nav style="display: inline-block;">
+        <span>|</span>
+        <a href="http://localhost:8080/product/list" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; margin: 0 8px;">Shop</a>
+        <span>|</span>
+        <a href="http://localhost:3000/boards" style="color: white; text-decoration: none; margin: 0 8px;">Community</a>
+        <span>|</span>
+        <a href="http://localhost:3000/circles" style="color: white; text-decoration: none; margin: 0 8px;">Circle</a>
+        <span>|</span>
+        <a href="http://localhost:3000/routine" style="color: white; text-decoration: none; margin: 0 8px;">My Routines</a>
+        <span>|</span>
+        <a href="http://localhost:3000/login" style="color: white; text-decoration: none; margin: 0 8px;">Login</a>
+        <span>|</span>
+      </nav>
+    </div>
+  </header>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      background-image: url("/images/abc.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .container.cork-box {
+      background-image: url('/images/coco.jpg');
+      background-size: cover;
+      background-repeat: repeat;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      margin-top: 60px;
+    }
+
+    .product-image {
+      max-width: 350px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-info {
+      margin-top: 20px;
+    }
+
+    .table {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .table th {
+      width: 150px;
+      background-color: #f1f3f5;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .table td {
+      vertical-align: middle;
+    }
+
+    .button-group {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .button-group .btn {
+      min-width: 140px;
+    }
+
+    .recent-products-box {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 260px;
+      z-index: 1000;
+    }
+
+    .recent-products-box .card {
+      background-color: #fffab3;
+      border: 1px solid #e6d76c;
+      border-radius: 10px;
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.15);
+      transform: rotate(-0.5deg);
+      transition: transform 0.2s ease;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      position: relative;
+    }
+
+    .recent-products-box .card:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .recent-products-box .card::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+    .recent-products-box .card-body{
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+
+
+    .recent-products-box .recent-item {
+      background-color: #ffffff;
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-bottom: 10px;
+    }
+
+    .recent-products-box .recent-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .recent-products-box .recent-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #b03000;
+    }
+
+    .recent-products-box .recent-price {
+      font-size: 0.85rem;
+      color: #888;
+    }
+    .recent-products-box .card-header{
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    /* 공통 버튼 꾸미기 */
+    .button-group .btn {
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+    }
+
+    /* 하늘색 장바구니 버튼 */
+    .btn-sky {
+      background: linear-gradient(145deg, #63c5ea, #44b0d8);
+      color: white;
+      border: none;
+      box-shadow: 2px 4px 10px rgba(100, 180, 220, 0.4);
+    }
+
+    .btn-sky:hover {
+      background: #3caed1;
+      box-shadow: 2px 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 핑크색 목록 버튼 */
+    .btn-pink {
+      background: linear-gradient(145deg, #f8a5c2, #f78fb3);
+      color: white;
+      border: none;
+      box-shadow: 2px 4px 10px rgba(240, 150, 180, 0.4);
+    }
+
+    .btn-pink:hover {
+      background: #f368a1;
+      box-shadow: 2px 6px 14px rgba(0, 0, 0, 0.15);
+    }
+    /* 보라색: 수정하기 */
+    .btn-purple {
+      background: linear-gradient(145deg, #a18cd1, #fbc2eb);
+      color: white;
+      border: none;
+      box-shadow: 2px 4px 10px rgba(200, 150, 220, 0.4);
+    }
+    .btn-purple:hover {
+      background: #9e7cc2;
+      box-shadow: 2px 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container cork-box py-5">
+  <h2 class="text-center mb-5">🛍️ 상품 상세 정보</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-4 text-center mb-4">
+      <img class="product-image img-fluid" th:src="|/product/view/${product.imagePath}|" alt="상품 이미지">
+    </div>
+    <div class="col-md-6 product-info">
+      <table class="table table-bordered">
+        <tbody>
+        <tr><th>상품명</th><td th:text="${product.title}">상품명</td></tr>
+        <tr><th>가격</th><td th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')} + '원'">가격</td></tr>
+        <tr><th>설명</th><td th:text="${product.description}">상품 설명</td></tr>
+        <tr><th>태그</th><td th:text="${product.tags}">상품 태그</td></tr>
+        </tbody>
+      </table>
+      <form action="/cart/cinsert" method="post" class="mt-4">
+        <input type="hidden" name="productId" th:value="${product.id}">
+        <input type="hidden" name="price" th:value="${product.price}">
+        <div class="mb-3">
+          <label for="quantity" class="form-label"><strong>수량</strong></label>
+          <input type="number" id="quantity" class="form-control" name="quantity" value="1" min="1" max="10">
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn btn-sky">🛒 장바구니 담기</button>
+          <a href="/product/list" class="btn btn-pink">목록으로</a>
+          <a th:if="${#authentication.name == 'admin'}"
+             th:href="@{/product/update/{id}(id=${product.id})}"
+             class="btn btn-purple">수정하기</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="recent-products-box">
+  <div class="card">
+    <div class="card-header text-white bg-primary text-center">최근 본 상품</div>
+    <div class="card-body p-2" id="recent-products"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const MAX_RECENT = 5;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll("a[href*='/product/detail/']");
+    links.forEach(link => {
+      link.addEventListener("click", () => {
+        const productId = link.getAttribute("href").split("/").pop();
+        const title = link.closest(".card").querySelector(".card-title").textContent.trim();
+        const img = link.closest(".card").querySelector("img").getAttribute("src");
+        const price = link.closest(".card").querySelector(".fw-bold").textContent.trim();
+
+        let recent = JSON.parse(localStorage.getItem("recentProducts")) || [];
+        recent = recent.filter(p => p.id !== productId);
+        recent.unshift({id: productId, title, img, price});
+        if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
+        localStorage.setItem("recentProducts", JSON.stringify(recent));
+      });
+    });
+
+    renderRecentProducts();
+  });
+
+  function renderRecentProducts() {
+    const container = document.getElementById("recent-products");
+    container.innerHTML = "";
+    const recent = JSON.parse(localStorage.getItem("recentProducts")) || [];
+    recent.forEach(p => {
+      const item = document.createElement("div");
+      item.className = "recent-item d-flex align-items-center";
+      item.innerHTML = `
+        <a href="/product/detail/${p.id}" class="d-flex text-decoration-none text-dark w-100">
+          <img src="${p.img}" alt="${p.title}" class="me-2">
+          <div class="d-flex flex-column justify-content-center">
+            <div class="recent-title">${p.title}</div>
+            <div class="recent-price">${p.price}</div>
+          </div>
+        </a>
+      `;
+      container.appendChild(item);
+    });
+  }
+</script>
+
+</body>
+</html>

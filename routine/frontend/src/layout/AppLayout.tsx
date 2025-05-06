@@ -24,7 +24,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
             </div>
 
             <main className="flex justify-center mt-[40px]  flex-1">
-                <div className="flex w-full max-w-[1200px]  px-4">
+                <div className="flex w-full justify-center max-w-[1400px]  px-4">
                     {children}
                 </div>
             </main>

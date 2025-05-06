@@ -32,6 +32,8 @@ dependencies {
 
     // 스프링 웹 MVC 프레임워크 (REST, 컨트롤러 등)
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 
     // 타임리프에서 스프링 시큐리티 추가 기능 사용 (sec 속성)
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
@@ -64,7 +66,9 @@ dependencies {
     // JUnit5 플랫폼 런처 (테스트 실행 지원)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 }
 

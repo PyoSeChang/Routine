@@ -10,6 +10,8 @@ import {
 } from "../../types/circle";
 import { RoutineViewDTO } from "../../types/routine";
 import AppLayout from "../../layout/AppLayout";
+import TestAssignLeaderButton from "../../components/common/TestAssignLeaderButton";
+import ChalkButton from "../../components/ui/chalk/ChalkButton";
 
 export default function CircleDetailPage() {
     const { circleId } = useParams<{ circleId: string }>();
@@ -108,7 +110,7 @@ export default function CircleDetailPage() {
         <AppLayout>
 
             <div className="p-6">
-                <h1 className="text-2xl font-bold mb-6">서클 상세</h1>
+                <h1 className="text-[60px] font-chalk text-white mb-6 text-center">Our Circle</h1>
 
                 {!isMember && (
                     <div className="mb-4">
@@ -131,13 +133,13 @@ export default function CircleDetailPage() {
                 )}
 
                 {routine ? (
-                    <div className="mb-8">
-                        <RoutinePublicCard routine={routine} />
+                    <div className="mb-8 flex justify-center">
+                        <RoutinePublicCard routine={routine} isLeader={isLeader} />
                     </div>
                 ) : (
                     <p className="mb-8 text-gray-500">등록된 공용 루틴이 없습니다.</p>
                 )}
-
+                <h1 className="font-chalk text-white text-[50px]">&lt;Today Routine Report&gt;</h1>
                 <div className="flex flex-wrap gap-6">
                     {memberCommits.length === 0 ? (
                         <p className="text-gray-500">아직 오늘의 커밋 이력이 없습니다.</p>
@@ -147,6 +149,8 @@ export default function CircleDetailPage() {
                                 key={info.memberId}
                                 nickname={info.nickname}
                                 tasks={info.tasks}
+                                commitMessage={info.commitMessage}
+                                commitRate={info.commitRate}
                             />
                         ))
                     )}
@@ -154,28 +158,27 @@ export default function CircleDetailPage() {
 
                 {isMember && !isLeader && (
                     <div className="mt-10">
-                        <button className="text-red-500 hover:underline"
-                                onClick={async () => {
-                                    try {
-                                        await axios.delete(`/circles/${circleId}/members/${authorization?.circleMemberId}/leave`);
-                                        alert("서클에서 탈퇴했습니다.");
-                                        window.location.href = "/circles";
-                                    } catch (err) {
-                                        console.error("탈퇴 실패", err);
-                                        alert("탈퇴에 실패했습니다.");
-                                    }
-                                }}>탈퇴하기</button>
+                        <ChalkButton
+                            onClick={async () => {
+                                try {
+                                    await axios.delete(`/circles/${circleId}/members/${authorization?.circleMemberId}/leave`);
+                                    alert("서클에서 탈퇴했습니다.");
+                                    window.location.href = "/circles";
+                                } catch (err) {
+                                    console.error("탈퇴 실패", err);
+                                    alert("탈퇴에 실패했습니다.");
+                                }
+                            }}>Leave</ChalkButton>
                     </div>
                 )}
 
                 {isLeader && (
                     <div className="mt-10">
-                        <button
+                        <ChalkButton
                             onClick={handleShowMemberManage}
-                            className="text-blue-600 hover:underline"
                         >
                             멤버 관리하기
-                        </button>
+                        </ChalkButton>
                         {showMemberManage && renderMemberManagement()}
                     </div>
                 )}

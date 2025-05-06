@@ -1,7 +1,7 @@
 // hooks/useRoutineDetailPage.ts
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import { RoutineDTO } from '../types/routineDetail';
 
 export function useRoutineDetail(routineId: number) {
@@ -15,7 +15,7 @@ export function useRoutineDetail(routineId: number) {
     useEffect(() => {
         async function fetchRoutine() {
             try {
-                const res = await axios.get(`/api/routine/${routineId}`);
+                const res = await axios.get(`routine/${routineId}`);
                 setRoutine(res.data);
             } catch (error) {
                 console.error('루틴 상세 조회 실패:', error);

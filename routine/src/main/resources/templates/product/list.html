@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <header style="
+    width: 100%;
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #724019;
+    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+    background-repeat: repeat;
+">
+    <div style="
+        max-width: 96rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    ">
+      <h1 style="font-size: 32px; font-weight: bold;">
+        <a href="http://localhost:3000/" style="color: white; text-decoration: none;">Routine</a>
+      </h1>
+      <nav style="display: inline-block;">
+        <span>|</span>
+        <a href="http://localhost:8080/product/list" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; margin: 0 8px;">Shop</a>
+        <span>|</span>
+        <a href="http://localhost:3000/boards" style="color: white; text-decoration: none; margin: 0 8px;">Community</a>
+        <span>|</span>
+        <a href="http://localhost:3000/circles" style="color: white; text-decoration: none; margin: 0 8px;">Circle</a>
+        <span>|</span>
+        <a href="http://localhost:3000/routine" style="color: white; text-decoration: none; margin: 0 8px;">My Routines</a>
+        <span>|</span>
+        <a href="http://localhost:3000/login" style="color: white; text-decoration: none; margin: 0 8px;">Login</a>
+        <span>|</span>
+      </nav>
+    </div>
+  </header>
+
+  <title>상품 목록</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+
+    .sidebar {
+      position: fixed;
+      top: 160px;
+      left:100px;
+      width: 170px;
+      background: rgba(255, 228, 235, 0.95); /* 연핑크 배경 */
+      /*border: 2px solid #f8a5c2;*/
+      /*border-radius: 10px;*/
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 999;
+      padding: 10px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .sidebar a {
+      display: block;
+      margin: 10px 0;
+      color: #b03a5b;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      color: #ff69b4;
+      text-decoration: underline;
+    }
+    .container{
+      margin-top: 30px;
+    }
+
+
+    body {
+      background-image: url('/images/abc.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Poppins', sans-serif;
+    }
+
+
+
+    .card-container {
+      background-image: url('/images/coco.jpg');
+      background-size: cover;
+      background-repeat: repeat;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #fffab3;
+      border: 1px solid #e6d76c;
+      border-radius: 8px;
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      position: relative;
+      transform: rotate(-1deg);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .card::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: contain;
+      padding: 10px;
+    }
+
+    .fw-bold {
+      color: #b03000;
+    }
+
+    .recent-products-box {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 260px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 세로형 사이드바 -->
+<div class="sidebar">
+  <a href="/product/list">📚 전체</a>
+  <a th:href="@{/product/list(category='어학')}">어학</a>
+  <a th:href="@{/product/list(category='IT')}">IT</a>
+  <a th:href="@{/product/list(category='경제')}">경제</a>
+  <a th:href="@{/product/list(category='자기계발')}">자기계발</a>
+  <a th:href="@{/product/list(category='요리')}">요리</a>
+  <a th:href="@{/product/list(category='여행')}">여행</a>
+  <a th:href="@{/product/list(category='소설')}">소설</a>
+  <a th:href="@{/product/list(category='필기구')}">필기구</a>
+</div>
+
+
+
+
+<!-- 본문 -->
+<div class="container">
+  <h2 class="text-center mb-4 text-white">📚 상품 목록</h2>
+
+  <!-- 검색창 -->
+  <form method="get" action="/product/list" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="title" class="form-control" placeholder="상품명으로 검색" th:value="${param.title}">
+      <button type="submit" class="btn btn-secondary">검색</button>
+    </div>
+  </form>
+
+  <!-- 코르크 배경 안에 카드들 -->
+  <div class="card-container mb-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <div class="col" th:each="product : ${products}">
+        <div class="card h-100">
+          <img class="card-img-top" th:src="|/product/view/${product.imagePath}|" alt="상품 이미지">
+          <div class="card-body">
+            <h5 class="card-title" th:text="${product.title}">상품명</h5>
+            <p class="card-text" th:text="${product.description}">상품 설명</p>
+            <p class="fw-bold" th:text="${#numbers.formatInteger(product.price, 1, 'COMMA')} + '원'">가격</p>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/product/detail/{id}(id=${product.id})}">상세보기</a>
+            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+              <form th:action="@{/product/delete/{id}(id=${product.id})}" method="post"
+                    onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 최근 본 상품 카드 -->
+<div class="recent-products-box">
+  <div class="card">
+    <div class="card-header text-white bg-primary text-center">최근 본 상품</div>
+    <div class="card-body p-2" id="recent-products"></div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 최근 본 상품 스크립트 -->
+<script>
+  const MAX_RECENT = 5;
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll("a[href*='/product/detail/']");
+    links.forEach(link => {
+      link.addEventListener("click", () => {
+        const productId = link.getAttribute("href").split("/").pop();
+        const title = link.closest(".card").querySelector(".card-title").textContent.trim();
+        const img = link.closest(".card").querySelector("img").getAttribute("src");
+        const price = link.closest(".card").querySelector(".fw-bold").textContent.trim();
+
+        let recent = JSON.parse(localStorage.getItem("recentProducts")) || [];
+        recent = recent.filter(p => p.id !== productId);
+        recent.unshift({id: productId, title, img, price});
+        if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
+        localStorage.setItem("recentProducts", JSON.stringify(recent));
+      });
+    });
+    renderRecentProducts();
+  });
+
+  function renderRecentProducts() {
+    const container = document.getElementById("recent-products");
+    container.innerHTML = "";
+    const recent = JSON.parse(localStorage.getItem("recentProducts")) || [];
+    recent.forEach(p => {
+      const item = document.createElement("div");
+      item.classList.add("d-flex", "mb-3", "border", "rounded", "p-2", "bg-light");
+      item.innerHTML = `
+        <a href="/product/detail/${p.id}" class="d-flex text-decoration-none text-dark w-100">
+          <img src="${p.img}" alt="${p.title}" class="me-2 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+          <div class="d-flex flex-column justify-content-center">
+            <div class="fw-bold small">${p.title}</div>
+            <div class="text-muted small">${p.price}</div>
+          </div>
+        </a>`;
+      container.appendChild(item);
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -55,7 +55,7 @@ const BoardDetailOnNote: React.FC<Props> = ({
 
                 {paddedContent.map((line: string, idx: number) => (
                     <Line key={idx}>
-                        <p className="whitespace-pre-wrap break-words">{line || <>&nbsp;</>}</p>
+                        <p className="whitespace-pre-wrap break-words font-user">{line || <>&nbsp;</>}</p>
                     </Line>
                 ))}
 

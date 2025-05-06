@@ -1,6 +1,5 @@
 package com.routine.domain.c_routine.service;
 
-import com.routine.domain.b_circle.model.CircleMember;
 import com.routine.domain.b_circle.repository.CircleMemberRepository;
 import com.routine.domain.b_circle.service.CircleMemberService;
 import com.routine.domain.c_routine.dto.*;
@@ -8,10 +7,9 @@ import com.routine.domain.c_routine.model.Routine;
 import com.routine.domain.c_routine.model.RoutineTask;
 import com.routine.domain.c_routine.repository.RoutineRepository;
 import com.routine.domain.c_routine.repository.RoutineTaskRepository;
-import com.routine.domain.d_routine_commit.dto.CommitMessageDTO;
+import com.routine.domain.c_routine.dto.MessageDTO;
 import com.routine.domain.d_routine_commit.model.CommitLog;
 import com.routine.domain.c_routine.model.week.WeekdayVO;
-import com.routine.domain.d_routine_commit.model.CommitMessage;
 import com.routine.domain.d_routine_commit.model.CommitRate;
 import com.routine.domain.d_routine_commit.model.TaskCommitRate;
 import com.routine.domain.d_routine_commit.repository.CommitLogRepository;
@@ -21,7 +19,6 @@ import com.routine.domain.d_routine_commit.repository.TaskCommitRateRepository;
 import com.routine.domain.d_routine_commit.service.CommitMessageService;
 import com.routine.domain.d_routine_commit.service.week.WeekService;
 import com.routine.domain.c_routine.model.week.WeekdayType;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -112,13 +109,8 @@ public class RoutineViewServiceImpl implements RoutineViewService {
 
     }
 
-    @Override
-    public List<String> getCommitMessages(Long routineId) {
-        return commitMessageService.getMessagesByRoutine(routineId).stream()
-                .map(CommitMessageDTO::getMessage)
-                .filter(Objects::nonNull) // null 메시지는 제외
-                .toList();
-    }
+
+
 
     @Override
     public RoutineCommitRatesResponse getCommitRates(Long routineId) {

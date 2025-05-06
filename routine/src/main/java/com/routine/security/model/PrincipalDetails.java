@@ -23,7 +23,7 @@ public class PrincipalDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
     }
-
+    public Long getMemberId() { return member.getId(); }
     @Override
     public String getPassword() {
         return member.getPassword();
@@ -33,6 +33,7 @@ public class PrincipalDetails implements UserDetails {
     public String getUsername() {
         return member.getLoginId();
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

@@ -25,8 +25,8 @@ export function CommentSection({ boardId, initialComments }: CommentSectionProps
     };
 
     return (
-        <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4">댓글</h3>
+        <div className="mt-6 mb-40">
+            <h3 className=" font-chalk text-white text-[42px]  mb-4">Post Comment</h3>
 
             {/* 입력 폼 (기본) */}
             <CommentPostItItem
@@ -47,7 +47,7 @@ export function CommentSection({ boardId, initialComments }: CommentSectionProps
 
             {/* 에러 메시지 */}
             {error && <p className="text-red-500 my-2">{error}</p>}
-            <h3 className="text-lg font-semibold font-ui mt-4 mb-4">댓글 목록</h3>
+            <h3 className="text-[42px] font-chalk text-white mt-4 mb-4">Comments</h3>
             {/* 댓글 목록 */}
             {loading ? (
                 <p className="p-4">댓글 로딩중…</p>

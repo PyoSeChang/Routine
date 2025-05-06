@@ -21,12 +21,12 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     );
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-row gap-4 items-center">
             {/* 카테고리 선택 */}
             <select
                 value={category}
                 onChange={(e) => onCategoryChange(e.target.value as Category)}
-                className="border-black border-2 p-2 rounded bg-mainYellow shadow-md"
+                className="flex-1  p-2 rounded shadow-md"
             >
                 <option value={Category.LANGUAGE}>외국어</option>
                 <option value={Category.EMPLOYMENT}>취업</option>
@@ -38,7 +38,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             <select
                 value={detailCategory}
                 onChange={(e) => onDetailCategoryChange(e.target.value)}
-                className="border-black border-2 p-2 rounded-none bg-mainYellow shadow-md"
+                className="flex-1 b p-2 rounded shadow-md"
             >
                 <option value="">세부 카테고리를 선택하세요</option>
                 {filteredDetailCategories.map((detail) => (
@@ -49,6 +49,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             </select>
         </div>
     );
+
 };
 
 export default CategorySelector;

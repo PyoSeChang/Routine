@@ -7,6 +7,8 @@ interface TextareaOnNoteProps {
     onChange: (value: string) => void;
     placeholder?: string;
     maxRows?: number;
+    minRows?: number;
+    maxCharsPerLine?: number;
 }
 
 const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
@@ -15,37 +17,48 @@ const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
                                                            onChange,
                                                            placeholder = '',
                                                            maxRows = 4,
+                                                           minRows = 1,
+                                                           maxCharsPerLine = 100,
                                                        }) => {
     const lines = value.split('\n');
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    // 최소 한 줄은 보장
-    while (lines.length < 1) lines.push('');
+    // 최소 줄 수 보장
+    while (lines.length < minRows) lines.push('');
 
     const handleChange = (i: number, newValue: string) => {
+        const splitLines = newValue.split('\n');
+
         const updated = [...lines];
-        updated[i] = newValue;
+        updated.splice(i, 1, ...splitLines);
+
+        // 최대 줄 수 제한
+        if (updated.length > maxRows) {
+            updated.length = maxRows;
+        }
+
         onChange(updated.join('\n'));
+
+        // 커서 이동
+        requestAnimationFrame(() => {
+            inputRefs.current[i + splitLines.length - 1]?.focus();
+        });
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, i: number) => {
         const isEmpty = lines[i] === '';
 
-        // ⬅ Backspace → 위로 커서 이동
         if (e.key === 'Backspace' && isEmpty && i > 0) {
             e.preventDefault();
             inputRefs.current[i - 1]?.focus();
             return;
         }
 
-        // ↩ Enter → 아래로 커서 이동 or 줄 추가
         if (e.key === 'Enter') {
             e.preventDefault();
-
             const isAtMax = lines.length >= maxRows;
 
             if (!isAtMax) {
-                // ✅ 줄 추가 + 커서 이동
                 const updated = [...lines];
                 updated.splice(i + 1, 0, '');
                 onChange(updated.join('\n'));
@@ -54,11 +67,20 @@ const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
                     inputRefs.current[i + 1]?.focus();
                 });
             } else if (i < maxRows - 1) {
-                // ✅ 줄 추가 없이 아래줄로 커서 이동
                 requestAnimationFrame(() => {
                     inputRefs.current[i + 1]?.focus();
                 });
             }
+        }
+
+        if (e.key === 'ArrowUp' && i > 0) {
+            e.preventDefault();
+            inputRefs.current[i - 1]?.focus();
+        }
+
+        if (e.key === 'ArrowDown' && i < lines.length - 1) {
+            e.preventDefault();
+            inputRefs.current[i + 1]?.focus();
         }
     };
 
@@ -75,6 +97,7 @@ const TextareaOnNote: React.FC<TextareaOnNoteProps> = ({
                         }}
                         type="text"
                         value={line}
+                        maxLength={maxCharsPerLine + 20}
                         placeholder={i === 0 ? placeholder : ''}
                         onChange={(e) => handleChange(i, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(e, i)}

@@ -41,7 +41,7 @@ export default function PostItBoardNav() {
     };
 
     return (
-        <nav className="w-64 flex flex-col gap-4">
+        <nav className="w-56 flex flex-col gap-4">
             {categories.map((cat, idx) => {
                 const isOpen = openMap[cat.key];
                 const details = detailCategories.filter(dc => dc.parentCategory === cat.key);

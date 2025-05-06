@@ -64,23 +64,25 @@ export default function BoardDetailPage() {
 
     return (
         <AppLayout>
-            {/* 네비게이션 (왼쪽 고정) */}
-            <div className="shrink-0 mr-6">
-                <PostItBoardNav />
-            </div>
+            <div className="flex w-full gap-6">
+                {/* 네비게이션 (왼쪽 고정) */}
+                <div className="shrink-0 mr-6">
+                    <PostItBoardNav />
+                </div>
 
-            {/* 본문 콘텐츠 (중앙 정렬, 폭 제한) */}
-            <div className="flex-1 w-full ">
-                <BoardDetailOnNote
-                    board={board}
-                    displayDate={displayDate}
-                    canModify={canModify}
-                    onEdit={() => navigate(`/boards/edit/${boardId}`)}
-                    onDelete={handleDelete}
-                />
+                {/* 본문 콘텐츠 (중앙 정렬, 폭 제한) */}
+                <div className="flex-1 max-w-[900px] pl-10 mb-50">
+                    <BoardDetailOnNote
+                        board={board}
+                        displayDate={displayDate}
+                        canModify={canModify}
+                        onEdit={() => navigate(`/boards/edit/${boardId}`)}
+                        onDelete={handleDelete}
+                    />
 
-                {/* 댓글 */}
-                <CommentSection boardId={board.boardId!} initialComments={board.comments ?? []} />
+                    {/* 댓글 */}
+                    <CommentSection boardId={board.boardId!} initialComments={board.comments ?? []} />
+                </div>
             </div>
         </AppLayout>
 

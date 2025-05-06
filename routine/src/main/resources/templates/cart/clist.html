@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <header style="
+    width: 100%;
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #724019;
+    background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+    background-repeat: repeat;
+">
+    <div style="
+        max-width: 96rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    ">
+      <h1 style="font-size: 32px; font-weight: bold;">
+        <a href="http://localhost:3000/" style="color: white; text-decoration: none;">Routine</a>
+      </h1>
+      <nav style="display: inline-block;">
+        <span>|</span>
+        <a href="http://localhost:8080/product/list" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none; margin: 0 8px;">Shop</a>
+        <span>|</span>
+        <a href="http://localhost:3000/boards" style="color: white; text-decoration: none; margin: 0 8px;">Community</a>
+        <span>|</span>
+        <a href="http://localhost:3000/circles" style="color: white; text-decoration: none; margin: 0 8px;">Circle</a>
+        <span>|</span>
+        <a href="http://localhost:3000/routine" style="color: white; text-decoration: none; margin: 0 8px;">My Routines</a>
+        <span>|</span>
+        <a href="http://localhost:3000/login" style="color: white; text-decoration: none; margin: 0 8px;">Login</a>
+        <span>|</span>
+      </nav>
+    </div>
+  </header>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>장바구니</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom 스타일 -->
+  <link href="/style.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      background-image: url("/images/abc.jpg");
+    }
+
+    h2 {
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: white;
+    }
+    .table-responsive{
+      width: 100%;
+
+    }
+
+    .table {
+      background: #fffab3;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      table-layout: auto;
+    }
+
+    .table th {
+      background-color: #fffab3;
+      color: black;
+      font-weight: 600;
+      text-align: center;
+      table-layout: auto;
+    }
+
+    .table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+    /*수량*/
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+      min-width: 80px;
+      white-space: nowrap;  /* 줄바꿈 방지 */
+    }
+
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+      min-width: 80px;
+      white-space: nowrap;  /* 줄바꿈 방지 */
+    }
+
+
+
+    .btn-danger {
+      background: linear-gradient(45deg, #ff6b6b, #fa5252);
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #4dabf7, #228be6);
+      border: none;
+    }
+
+    .summary-box {
+      background: #e6d76c;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .textarea-box {
+      background: #f8a5c2;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+
+    .img-thumbnail{
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <h2 class="text-center">🛒 나의 장바구니</h2>
+
+  <div class="table-responsive mb-5">
+    <table class="table table-hover align-middle">
+      <thead>
+      <tr>
+        <th>상품 번호</th>
+        <th>이미지</th>
+        <th>상품명</th>
+        <th>가격</th>
+        <th>수량</th>
+        <th>총 금액</th>
+        <th>삭제</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${cartItems}">
+        <td th:text="${item.id}">1</td>
+        <td><img th:src="|/product/view/${item.product.image}|" alt="상품 이미지" class="img-thumbnail"></td>
+        <td class="fw-bold" th:text="${item.product.title}">상품명</td>
+        <td th:text="${#numbers.formatInteger(item.product.price, 1, 'COMMA')} + '원'">가격</td>
+        <td th:text="${item.quantity}">1</td>
+        <td class="fw-bold text-primary" th:text="${#numbers.formatInteger(item.product.price * item.quantity, 1, 'COMMA')} + '원'">총 금액</td>
+        <td>
+          <form th:action="@{/cart/delete/{id}(id=${item.id})}" method="post">
+            <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="row gy-4">
+    <div class="col-md-8">
+      <div class="textarea-box">
+        <h5 class="mb-3">📝 주문 요청사항</h5>
+        <textarea class="form-control" rows="5" placeholder="주문 시 요청사항을 입력해주세요"></textarea>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="summary-box">
+        <h5 class="mb-3">💳 결제 요약</h5>
+        <table class="table">
+          <tbody>
+          <tr>
+            <th>상품 합계</th>
+            <td th:text="${#numbers.formatInteger(subtotal, 1, 'COMMA')} + '원'">0원</td>
+          </tr>
+          <tr>
+            <th>배송비</th>
+            <td th:text="${#numbers.formatInteger(shippingCost, 1, 'COMMA')} + '원'">0원</td>
+          </tr>
+          <tr>
+            <th>총 결제 금액</th>
+            <td class="fw-bold text-danger" th:text="${#numbers.formatInteger(totalPrice, 1, 'COMMA')} + '원'">0원</td>
+          </tr>
+          </tbody>
+        </table>
+        <a href="/cart/pay" class="btn btn-primary w-100 py-2">주문하기</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

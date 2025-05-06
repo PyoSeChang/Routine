@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import AppLayout from '../../layout/AppLayout';
+import BoardLayout from "../../layout/BoardLayout";
 import PostItBoardNav from '../../components/Board/PostItBoardNav';
 import { useBoardList } from '../../hooks/useBoardList';
 import { BoardListDTO } from '../../types/board';
@@ -44,8 +45,8 @@ export default function BoardListPage() {
     if (error) return <p className="p-4 text-red-500">에러: {error}</p>;
 
     return (
-        <AppLayout>
-            <div className="shrink-0 mr-6">
+        <BoardLayout>
+            <div className="shrink-0 mr-6 mt-[216px]">
                 <PostItBoardNav />
             </div>
             <div className="w-full mx-auto">
@@ -90,7 +91,7 @@ export default function BoardListPage() {
                             Prev
                         </ChalkButton>
 
-                        <span className="px-3 py-1">
+                        <span className="px-1 py-1 font-chalk text-white mt-3 pr-2">
                             {page + 1} / {totalPages}
                         </span>
 
@@ -112,6 +113,6 @@ export default function BoardListPage() {
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </BoardLayout>
     );
 }
